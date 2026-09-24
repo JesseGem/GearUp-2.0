@@ -1,8 +1,43 @@
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
+import { User } from '../../users/entities/user.entity.js';
+import { Job } from '../../jobs/entities/job.entity.js';
+
+@Entity('reviews')
 export class Review {
-  id!: string;
-  userId!: string;
-  jobId!: string;
-  rating!: number;
-  comment?: string;
-  createdAt!: Date;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column({ type: 'int' })
+  rating: number; // 1 to 5
+
+  @Column({ type: 'text', nullable: true })
+  comment: string;
+
+  @Column()
+  userId: string; // who wrote the review
+
+  @Column()
+  jobId: string; // which job is being reviewed
+
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'userId' })
+  user: User;
+
+  @ManyToOne(() => Job)
+  @JoinColumn({ name: 'jobId' })
+  job: Job;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }
