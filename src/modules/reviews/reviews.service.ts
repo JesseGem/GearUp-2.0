@@ -1,40 +1,46 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { randomUUID } from 'node:crypto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { Review } from './entities/review.entity.js';
 import { CreateReviewDto } from './dto/create-review.dto.js';
 import { UpdateReviewDto } from './dto/update-review.dto.js';
 
 @Injectable()
 export class ReviewsService {
-  private readonly reviews: Review[] = [];
+  constructor(
+    @InjectRepository(Review)
+    private readonly reviewsRepository: Repository<Review>,
+  ) {}
 
   async create(userId: string, createReviewDto: CreateReviewDto): Promise<Review> {
-    const review: Review = {
-      id: randomUUID(),
-      createdAt: new Date(),
+    const review = this.reviewsRepository.create({
       ...createReviewDto,
       userId,
-    };
-    this.reviews.push(review);
-    return review;
+    });
+    return this.reviewsRepository.save(review);
   }
 
   async findAllByUser(userId: string): Promise<Review[]> {
-    return this.reviews
-      .filter((review) => review.userId === userId)
-      .sort((left, right) => right.createdAt.getTime() - left.createdAt.getTime());
+    return this.reviewsRepository.find({
+      where: { userId },
+      relations: { job: true },
+      order: { createdAt: 'DESC' },
+    });
   }
 
   async findByJob(jobId: string): Promise<Review[]> {
-    return this.reviews
-      .filter((review) => review.jobId === jobId)
-      .sort((left, right) => right.createdAt.getTime() - left.createdAt.getTime());
+    return this.reviewsRepository.find({
+      where: { jobId },
+      relations: { user: true },
+      order: { createdAt: 'DESC' },
+    });
   }
 
   async findOne(id: string, userId: string): Promise<Review> {
-    const review = this.reviews.find(
-      (candidate) => candidate.id === id && candidate.userId === userId,
-    );
+    const review = await this.reviewsRepository.findOne({
+      where: { id, userId },
+      relations: { job: true },
+    });
 
     if (!review) {
       throw new NotFoundException(`Review #${id} not found`);
@@ -50,16 +56,13 @@ export class ReviewsService {
   ): Promise<Review> {
     const review = await this.findOne(id, userId);
     Object.assign(review, updateReviewDto);
-    return review;
+    return this.reviewsRepository.save(review);
   }
 
   async remove(id: string, userId: string): Promise<void> {
-    const index = this.reviews.findIndex(
-      (review) => review.id === id && review.userId === userId,
-    );
-    if (index === -1) {
+    const result = await this.reviewsRepository.delete({ id, userId });
+    if (result.affected === 0) {
       throw new NotFoundException(`Review #${id} not found`);
     }
-    this.reviews.splice(index, 1);
   }
 }

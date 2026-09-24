@@ -7,8 +7,8 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { User } from '../../users/entities/user.entity.js';
-import { Vehicle } from '../../vehicles/entities/vehicle.entity.js';
+import { User } from '../../users/entities/user.entity';
+import { Vehicle } from '../../vehicles/entities/vehicle.entity';
 
 export enum JobStatus {
   PENDING = 'pending',
@@ -20,44 +20,44 @@ export enum JobStatus {
 @Entity('jobs')
 export class Job {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column()
-  title: string;
+  title!: string;
 
   @Column({ type: 'text', nullable: true })
-  description: string;
+  description!: string;
 
   @Column({
     type: 'enum',
     enum: JobStatus,
     default: JobStatus.PENDING,
   })
-  status: JobStatus;
+  status!: JobStatus;
 
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
-  estimatedCost: number;
+  estimatedCost!: number;
 
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
-  finalCost: number;
+  finalCost!: number;
 
   @Column()
-  userId: string; // the customer
+  userId!: string; // the customer
 
   @Column()
-  vehicleId: string;
+  vehicleId!: string;
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'userId' })
-  user: User;
+  user!: User;
 
   @ManyToOne(() => Vehicle)
   @JoinColumn({ name: 'vehicleId' })
-  vehicle: Vehicle;
+  vehicle!: Vehicle;
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt!: Date;
 }

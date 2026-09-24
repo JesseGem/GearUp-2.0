@@ -7,41 +7,41 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { User } from '../../users/entities/user.entity.js';
+import { User } from '../../users/entities/user.entity';
 
 @Entity('vehicles')
 export class Vehicle {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column()
-  make: string; // e.g. Toyota
+  make!: string; // e.g. Toyota
 
   @Column()
-  model: string; // e.g. Corolla
+  model!: string; // e.g. Corolla
 
   @Column()
-  year: number;
+  year!: number;
 
   @Column({ unique: true })
-  plateNumber: string;
+  plateNumber!: string;
 
   @Column({ nullable: true })
-  vin: string;
+  vin!: string;
 
   @Column({ nullable: true })
-  color: string;
+  color!: string;
 
   @Column()
-  userId: string; // owner of the vehicle
+  userId!: string; // owner of the vehicle
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'userId' })
-  user: User;
+  user!: User;
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt!: Date;
 }

@@ -9,29 +9,29 @@ import {
 @Entity('parts')
 export class Part {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column()
-  name: string;
+  name!: string;
 
   @Column({ nullable: true })
-  description: string;
+  description!: string;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
-  price: number;
+  price!: number;
 
   @Column({ default: 0 })
-  stock: number;
+  stock!: number;
 
   @Column({ nullable: true })
-  brand: string;
+  brand!: string;
 
   @Column({ nullable: true })
-  partNumber: string; // manufacturer part number
+  partNumber!: string; // manufacturer part number
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt!: Date;
 }

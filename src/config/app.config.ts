@@ -1,4 +1,6 @@
-export default () => ({
-  port: Number(process.env.PORT ?? 3000),
-  jwtSecret: process.env.JWT_SECRET ?? 'change-me-in-production',
-});
+import { registerAs } from '@nestjs/config';
+
+export default registerAs('app', () => ({
+  port: parseInt(process.env.PORT ?? '', 10) || 3000,
+  nodeEnv: process.env.NODE_ENV || 'development',
+}));

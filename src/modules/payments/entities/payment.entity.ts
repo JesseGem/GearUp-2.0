@@ -7,8 +7,8 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { User } from '../../users/entities/user.entity.js';
-import { Job } from '../../jobs/entities/job.entity.js';
+import { User } from '../../users/entities/user.entity';
+import { Job } from '../../jobs/entities/job.entity';
 
 export enum PaymentStatus {
   PENDING = 'pending',
@@ -27,47 +27,47 @@ export enum PaymentMethod {
 @Entity('payments')
 export class Payment {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
-  amount: number;
+  amount!: number;
 
   @Column({
     type: 'enum',
     enum: PaymentStatus,
     default: PaymentStatus.PENDING,
   })
-  status: PaymentStatus;
+  status!: PaymentStatus;
 
   @Column({
     type: 'enum',
     enum: PaymentMethod,
   })
-  method: PaymentMethod;
+  method!: PaymentMethod;
 
   @Column({ nullable: true })
-  reference: string; // transaction reference from payment gateway
+  reference!: string; // transaction reference from payment gateway
 
   @Column({ nullable: true })
-  notes: string;
+  notes!: string;
 
   @Column()
-  userId: string;
+  userId!: string;
 
   @Column({ nullable: true })
-  jobId: string;
+  jobId!: string;
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'userId' })
-  user: User;
+  user!: User;
 
   @ManyToOne(() => Job, { nullable: true })
   @JoinColumn({ name: 'jobId' })
-  job: Job;
+  job!: Job;
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt!: Date;
 }

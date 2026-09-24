@@ -7,37 +7,37 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { User } from '../../users/entities/user.entity.js';
-import { Job } from '../../jobs/entities/job.entity.js';
+import { User } from '../../users/entities/user.entity';
+import { Job } from '../../jobs/entities/job.entity';
 
 @Entity('reviews')
 export class Review {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column({ type: 'int' })
-  rating: number; // 1 to 5
+  rating!: number; // 1 to 5
 
   @Column({ type: 'text', nullable: true })
-  comment: string;
+  comment!: string;
 
   @Column()
-  userId: string; // who wrote the review
+  userId!: string; // who wrote the review
 
   @Column()
-  jobId: string; // which job is being reviewed
+  jobId!: string; // which job is being reviewed
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'userId' })
-  user: User;
+  user!: User;
 
   @ManyToOne(() => Job)
   @JoinColumn({ name: 'jobId' })
-  job: Job;
+  job!: Job;
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt!: Date;
 }

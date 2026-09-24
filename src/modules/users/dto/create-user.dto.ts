@@ -1,1 +1,9 @@
-export class CreateUserDto {}
+import { IsEmail, IsString, MinLength, IsOptional } from 'class-validator';
+
+export class CreateUserDto {
+  email!: string;
+  password!: string;
+  firstName!: string;
+  lastName!: string;
+  phone?: string;
+}
