@@ -1,0 +1,40 @@
+$kind: http-request
+order: 1000
+method: POST
+url: '{{base_url}}/payments'
+
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{accessToken}}'
+
+headers:
+  - key: Content-Type
+    value: application/json
+
+body:
+  type: json
+  content: |-
+    {
+      "amount": 850,
+      "method": "mobile_money",
+      "jobId": "{{jobId}}",
+      "notes": "Payment for brake inspection"
+    }
+
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      const json = pm.response.json();
+
+      if (json.id) {
+        pm.environment.set('paymentId', json.id);
+        console.log('✅ paymentId saved:', json.id);
+      } else {
+        console.error(
+          '❌ Payment creation failed – no id in response:',
+          JSON.stringify(json)
+        );
+      }

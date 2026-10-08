@@ -1,0 +1,44 @@
+name: GearUp Local
+values:
+  - key: base_url
+    value: 'http://localhost:3000'
+    enabled: true
+
+  - key: email
+    value: 'jesse.test@example.com'
+    enabled: true
+
+  - key: password
+    value: 'TestPassword123!'
+    enabled: true
+    type: secret
+
+  - key: accessToken
+    value: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJmNTlmOTU0YS0yODllLTQ2Y2YtOWQ0Mi1lYjlkNjVlZThiODEiLCJlbWFpbCI6Implc3NlLnRlc3RAZXhhbXBsZS5jb20iLCJpYXQiOjE3OTA3MDgzNzAsImV4cCI6MTc5MDc5NDc3MH0.syL9L9yNExEjcjo-gwlttftujGGvcCFdE8C2OJwew88'
+    enabled: true
+    type: secret
+
+  - key: vehicleId
+    value: '4ae48531-795e-412d-87c4-7a9fc88a6448'
+    enabled: true
+
+  - key: jobId
+    value: 'e63817d9-8a44-454c-92c7-dd0154f75767'
+    enabled: true
+
+  - key: reviewId
+    value: '
+    "id": "565b471f-f90d-4800-afdb-4878c2b84959",'
+    enabled: true
+
+  - key: partId
+    value: '9b8227ce-a5a5-435c-8f45-b9c336e13aa7'
+    enabled: true
+
+  - key: paymentId
+    value: ''
+    enabled: true
+
+
+
+

@@ -1,0 +1,37 @@
+$kind: http-request
+order: 1000
+method: POST
+url: '{{base_url}}/vehicles'
+
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{accessToken}}'
+
+headers:
+  - key: Content-Type
+    value: application/json
+
+body:
+  type: json
+  content: |-
+    {
+      "make": "Toyota",
+      "model": "Corolla",
+      "year": 2022,
+      "plateNumber": "GR-1234-26",
+      "vin": "1HGBH41JXMN109186",
+      "color": "Black"
+    }
+
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      const json = pm.response.json();
+
+      if (json.id) {
+        pm.environment.set("vehicleId", json.id);
+        console.log("Saved vehicleId:", json.id);
+      }

@@ -1,0 +1,39 @@
+$kind: http-request
+order: 1000
+method: POST
+url: '{{base_url}}/reviews'
+
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{accessToken}}'
+
+headers:
+  - key: Content-Type
+    value: application/json
+
+body:
+  type: json
+  content: |-
+    {
+      "rating": 5,
+      "comment": "Great service and quick work.",
+      "jobId": "{{jobId}}"
+    }
+
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      const json = pm.response.json();
+
+      if (json.id) {
+        pm.environment.set('reviewId', json.id);
+        console.log('✅ reviewId saved:', json.id);
+      } else {
+        console.error(
+          '❌ Review creation failed – no id in response:',
+          JSON.stringify(json)
+        );
+      }

@@ -1,0 +1,40 @@
+$kind: http-request
+order: 1000
+method: POST
+url: '{{base_url}}/jobs'
+
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{accessToken}}'
+
+headers:
+  - key: Content-Type
+    value: application/json
+
+body:
+  type: json
+  content: |-
+    {
+      "title": "Brake inspection",
+      "description": "Check front and rear brakes",
+      "vehicleId": "{{vehicleId}}",
+      "estimatedCost": 850
+    }
+
+    scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      const json = pm.response.json();
+
+      if (json.id) {
+        pm.environment.set('jobId', json.id);
+        console.log('✅ jobId saved:', json.id);
+      } else {
+        console.error(
+          '❌ Job creation failed – no id in response:',
+          JSON.stringify(json)
+        );
+      }

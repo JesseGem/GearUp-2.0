@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Build and generated output
+dist/
+build/
+coverage/
+.expo/
+.expo-shared/
+web-build/
+*.tsbuildinfo
+
+# Logs and caches
+*.log
+npm-debug.log*
+.npm/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
