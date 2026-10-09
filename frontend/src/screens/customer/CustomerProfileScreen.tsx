@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { COLORS, SPACING, FONT_SIZES, RADIUS } from '../../constants';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   StatusBar, ActivityIndicator, TextInput, Modal, Platform, Animated, Image
@@ -16,7 +17,6 @@ import { authService } from '../../services/authService';
 import { partsService } from '../../services/partsService';
 import ConfirmDialog from '../../components/ConfirmDialog';
 import { AppAlertCard } from '../../components/AppAlert';
-import { SPACING, FONT_SIZES, RADIUS } from '../../constants';
 import { useFocusEffect } from '@react-navigation/native';
 
 const VEHICLE_ICONS: Record<string, any> = {
@@ -78,25 +78,25 @@ function VehicleCard({ vehicle, index, onPress }: { vehicle: any; index: number;
     <Animated.View style={animatedStyle}>
       <TouchableOpacity style={styles.vehicleCard} activeOpacity={0.85} onPress={onPress}>
         <View style={styles.vehicleIcon}>
-          <Ionicons name={VEHICLE_ICONS[vehicle.type] || 'car'} size={24} color="#1b4332" />
+          <Ionicons name={VEHICLE_ICONS[vehicle.type] || 'car'} size={24} color={COLORS.primary} />
         </View>
         <View style={styles.vehicleInfo}>
           <Text style={styles.vehicleName}>{vehicle.make} {vehicle.model}</Text>
           <Text style={styles.vehicleDetails}>{vehicle.year} · {vehicle.licensePlate} {vehicle.color ? `· ${vehicle.color}` : ''}</Text>
           {(isExpired(vehicle.insuranceExpiry) || isExpired(vehicle.roadworthyExpiry)) && (
             <View style={styles.warnPill}>
-              <Ionicons name="alert-circle" size={10} color="#dc2626" />
+              <Ionicons name="alert-circle" size={10} color={COLORS.error} />
               <Text style={styles.warnPillText}>Document expired</Text>
             </View>
           )}
         </View>
-        <Ionicons name="chevron-forward" size={18} color="#9ca3af" />
+        <Ionicons name="chevron-forward" size={18} color={COLORS.textSecondary} />
       </TouchableOpacity>
     </Animated.View>
   );
 }
 
-export default function OwnerProfileScreen({ navigation }: any) {
+export default function CustomerProfileScreen({ navigation }: any) {
   const dispatch = useDispatch<AppDispatch>();
   const { user } = useSelector((state: RootState) => state.auth);
   const [profile, setProfile] = useState<any>(null);
@@ -326,7 +326,7 @@ export default function OwnerProfileScreen({ navigation }: any) {
     if (event.type === 'dismissed' || !selected || !activeDateField) return;
     setVehicleForm(prev => ({ ...prev, [activeDateField]: selected }));
   };
-  if (loading) return <ActivityIndicator style={{ flex: 1 }} color="#1b4332" />;
+  if (loading) return <ActivityIndicator style={{ flex: 1 }} color={COLORS.primary} />;
 
   const memberSince = profile?.createdAt
     ? new Date(profile.createdAt).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
@@ -336,7 +336,7 @@ export default function OwnerProfileScreen({ navigation }: any) {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
       <ScrollView showsVerticalScrollIndicator={false}>
-        <LinearGradient colors={['#1b4332', '#2d6a4f']} style={styles.header}>
+        <LinearGradient colors={[COLORS.primary, COLORS.secondary]} style={styles.header}>
           {profile?.profileImage ? (
             <Image source={{ uri: profile.profileImage }} style={styles.avatarImage} />
           ) : (
@@ -349,12 +349,12 @@ export default function OwnerProfileScreen({ navigation }: any) {
           {profile?.bio && <Text style={styles.bio}>{profile.bio}</Text>}
           {profile?.location && (
             <View style={styles.locationRow}>
-              <Ionicons name="location-outline" size={14} color="#86efac" />
+              <Ionicons name="location-outline" size={14} color={COLORS.accent} />
               <Text style={styles.locationText}>{profile.location}</Text>
             </View>
           )}
           <TouchableOpacity style={styles.editBtn} onPress={() => setEditModal(true)}>
-            <Ionicons name="pencil-outline" size={16} color="#1b4332" />
+            <Ionicons name="pencil-outline" size={16} color={COLORS.primary} />
             <Text style={styles.editBtnText}>Edit Profile</Text>
           </TouchableOpacity>
         </LinearGradient>
@@ -377,13 +377,13 @@ export default function OwnerProfileScreen({ navigation }: any) {
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>My Vehicles</Text>
               <TouchableOpacity onPress={openAddVehicle}>
-                <Ionicons name="add-circle-outline" size={24} color="#1b4332" />
+                <Ionicons name="add-circle-outline" size={24} color={COLORS.primary} />
               </TouchableOpacity>
             </View>
             {vehicles.length === 0 ? (
               <TouchableOpacity style={styles.addVehicleCard} onPress={openAddVehicle} activeOpacity={0.85}>
                 <View style={styles.addVehicleIconWrap}>
-                  <Ionicons name="car-outline" size={28} color="#9ca3af" />
+                  <Ionicons name="car-outline" size={28} color={COLORS.textSecondary} />
                 </View>
                 <Text style={styles.addVehicleText}>Add your first vehicle</Text>
               </TouchableOpacity>
@@ -402,18 +402,18 @@ export default function OwnerProfileScreen({ navigation }: any) {
 
         <TouchableOpacity style={styles.walletBtn} onPress={() => navigation.navigate('Wallet')}>
           <View style={styles.walletBtnLeft}>
-            <Ionicons name="wallet-outline" size={20} color="#1b4332" />
+            <Ionicons name="wallet-outline" size={20} color={COLORS.primary} />
             <Text style={styles.walletBtnText}>Wallet</Text>
           </View>
-          <Ionicons name="chevron-forward" size={18} color="#9ca3af" />
+          <Ionicons name="chevron-forward" size={18} color={COLORS.textSecondary} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.logoutBtn} onPress={() => setLogoutConfirm(true)}>
-          <Ionicons name="log-out-outline" size={20} color="#dc2626" />
+          <Ionicons name="log-out-outline" size={20} color={COLORS.error} />
           <Text style={styles.logoutText}>Log Out</Text>
         </TouchableOpacity>
         {pendingDeletion ? (
           <TouchableOpacity style={styles.deleteAccountBtn} onPress={() => setCancelDeletionConfirm(true)}>
-            <Ionicons name="time-outline" size={18} color="#000814" />
+            <Ionicons name="time-outline" size={18} color={COLORS.primary} />
             <Text style={styles.deleteAccountPendingText}>Deletion Request Pending — Cancel</Text>
           </TouchableOpacity>
         ) : (
@@ -422,10 +422,10 @@ export default function OwnerProfileScreen({ navigation }: any) {
             onPress={() => setDeleteAccountConfirm(true)}
             disabled={sendingDeletionCode}>
             {sendingDeletionCode ? (
-              <ActivityIndicator size="small" color="#dc2626" />
+              <ActivityIndicator size="small" color={COLORS.error} />
             ) : (
               <>
-                <Ionicons name="trash-outline" size={18} color="#dc2626" />
+                <Ionicons name="trash-outline" size={18} color={COLORS.error} />
                 <Text style={styles.deleteAccountText}>Delete Account</Text>
               </>
             )}
@@ -445,7 +445,7 @@ export default function OwnerProfileScreen({ navigation }: any) {
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Edit Profile</Text>
             <TouchableOpacity onPress={() => setEditModal(false)}>
-              <Ionicons name="close" size={24} color="#1b1b1b" />
+              <Ionicons name="close" size={24} color={COLORS.text} />
             </TouchableOpacity>
           </View>
           <ScrollView style={styles.modalBody}>
@@ -454,16 +454,16 @@ export default function OwnerProfileScreen({ navigation }: any) {
                 <Image source={{ uri: editForm.profileImage }} style={styles.avatarPickerImage} />
               ) : (
                 <View style={styles.avatarPickerPlaceholder}>
-                  <Ionicons name="camera-outline" size={26} color="#1b4332" />
+                  <Ionicons name="camera-outline" size={26} color={COLORS.primary} />
                 </View>
               )}
               {uploadingAvatar ? (
                 <View style={styles.avatarUploadingOverlay}>
-                  <ActivityIndicator color="#fff" />
+                  <ActivityIndicator color={COLORS.white} />
                 </View>
               ) : (
                 <View style={styles.avatarEditBadge}>
-                  <Ionicons name="pencil" size={12} color="#fff" />
+                  <Ionicons name="pencil" size={12} color={COLORS.white} />
                 </View>
               )}
             </TouchableOpacity>
@@ -480,14 +480,14 @@ export default function OwnerProfileScreen({ navigation }: any) {
               <TouchableOpacity style={styles.avatarMenuOverlay} activeOpacity={1} onPress={() => setAvatarMenuVisible(false)}>
                 <View style={styles.avatarMenu}>
                   <TouchableOpacity style={styles.avatarMenuOption} onPress={() => triggerAvatarAction(takeAvatarPhoto)}>
-                    <View style={[styles.avatarMenuIconWrap, { backgroundColor: '#f0fdf4' }]}>
-                      <Ionicons name="camera" size={20} color="#10b981" />
+                    <View style={[styles.avatarMenuIconWrap, { backgroundColor: COLORS.successTint }]}>
+                      <Ionicons name="camera" size={20} color={COLORS.success} />
                     </View>
                     <Text style={styles.avatarMenuText}>Take Photo</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.avatarMenuOption} onPress={() => triggerAvatarAction(pickAvatarFromLibrary)}>
-                    <View style={[styles.avatarMenuIconWrap, { backgroundColor: '#eff6ff' }]}>
-                      <Ionicons name="image" size={20} color="#2563eb" />
+                    <View style={[styles.avatarMenuIconWrap, { backgroundColor: COLORS.infoTint }]}>
+                      <Ionicons name="image" size={20} color={COLORS.info} />
                     </View>
                     <Text style={styles.avatarMenuText}>Choose Photo</Text>
                   </TouchableOpacity>
@@ -503,7 +503,7 @@ export default function OwnerProfileScreen({ navigation }: any) {
             <Text style={styles.label}>Location</Text>
             <TextInput style={styles.input} value={editForm.location} onChangeText={t => setEditForm({ ...editForm, location: t })} placeholder="e.g. Kumasi, Ghana" />
             <TouchableOpacity style={styles.submitBtn} onPress={handleUpdateProfile}>
-              <LinearGradient colors={['#1b4332', '#2d6a4f']} style={styles.submitGradient}>
+              <LinearGradient colors={[COLORS.accent, COLORS.accent]} style={styles.submitGradient}>
                 <Text style={styles.submitText}>Save Changes</Text>
               </LinearGradient>
             </TouchableOpacity>
@@ -518,7 +518,7 @@ export default function OwnerProfileScreen({ navigation }: any) {
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>{editingVehicleId ? 'Edit Vehicle' : 'Add Vehicle'}</Text>
             <TouchableOpacity onPress={() => { setVehicleModal(false); setEditingVehicleId(null); }}>
-              <Ionicons name="close" size={24} color="#1b1b1b" />
+              <Ionicons name="close" size={24} color={COLORS.text} />
             </TouchableOpacity>
           </View>
           <ScrollView style={styles.modalBody}>
@@ -547,17 +547,17 @@ export default function OwnerProfileScreen({ navigation }: any) {
             <TextInput style={styles.input} placeholder="e.g. 45000" value={vehicleForm.mileage} onChangeText={t => setVehicleForm({ ...vehicleForm, mileage: t })} keyboardType="numeric" />
             <Text style={styles.label}>Last Serviced</Text>
             <TouchableOpacity style={styles.dateBtn} onPress={() => setActiveDateField('lastServicedDate')}>
-              <Ionicons name="build-outline" size={16} color="#1b4332" />
+              <Ionicons name="build-outline" size={16} color={COLORS.primary} />
               <Text style={styles.dateBtnText}>{formatDate(vehicleForm.lastServicedDate)}</Text>
             </TouchableOpacity>
             <Text style={styles.label}>Insurance Expiry</Text>
             <TouchableOpacity style={styles.dateBtn} onPress={() => setActiveDateField('insuranceExpiry')}>
-              <Ionicons name="shield-checkmark-outline" size={16} color="#1b4332" />
+              <Ionicons name="shield-checkmark-outline" size={16} color={COLORS.primary} />
               <Text style={styles.dateBtnText}>{formatDate(vehicleForm.insuranceExpiry)}</Text>
             </TouchableOpacity>
             <Text style={styles.label}>Roadworthy / Inspection Expiry</Text>
             <TouchableOpacity style={styles.dateBtn} onPress={() => setActiveDateField('roadworthyExpiry')}>
-              <Ionicons name="checkmark-done-outline" size={16} color="#1b4332" />
+              <Ionicons name="checkmark-done-outline" size={16} color={COLORS.primary} />
               <Text style={styles.dateBtnText}>{formatDate(vehicleForm.roadworthyExpiry)}</Text>
             </TouchableOpacity>
             {activeDateField && (
@@ -568,7 +568,7 @@ export default function OwnerProfileScreen({ navigation }: any) {
                   display={Platform.OS === 'ios' ? 'spinner' : 'default'}
                   onChange={onDateChange}
                   themeVariant="light"
-                  textColor="#1b1b1b"
+                  textColor={COLORS.text}
                   style={styles.picker}
                 />
                 {Platform.OS === 'ios' && (
@@ -588,7 +588,7 @@ export default function OwnerProfileScreen({ navigation }: any) {
               numberOfLines={3}
             />
             <TouchableOpacity style={styles.submitBtn} onPress={handleSubmitVehicle}>
-              <LinearGradient colors={['#1b4332', '#2d6a4f']} style={styles.submitGradient}>
+              <LinearGradient colors={[COLORS.accent, COLORS.accent]} style={styles.submitGradient}>
                 <Text style={styles.submitText}>{editingVehicleId ? 'Save Changes' : 'Add Vehicle'}</Text>
               </LinearGradient>
             </TouchableOpacity>
@@ -603,13 +603,13 @@ export default function OwnerProfileScreen({ navigation }: any) {
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Vehicle Details</Text>
             <TouchableOpacity onPress={() => setDetailModal(false)}>
-              <Ionicons name="close" size={24} color="#1b1b1b" />
+              <Ionicons name="close" size={24} color={COLORS.text} />
             </TouchableOpacity>
           </View>
           {selectedVehicle && (
             <ScrollView style={styles.modalBody}>
               <View style={styles.detailHeroIcon}>
-                <Ionicons name={VEHICLE_ICONS[selectedVehicle.type] || 'car'} size={48} color="#1b4332" />
+                <Ionicons name={VEHICLE_ICONS[selectedVehicle.type] || 'car'} size={48} color={COLORS.primary} />
               </View>
               <Text style={styles.detailTitle}>{selectedVehicle.make} {selectedVehicle.model}</Text>
               <Text style={styles.detailSubtitle}>{selectedVehicle.year} · {selectedVehicle.licensePlate}</Text>
@@ -663,11 +663,11 @@ export default function OwnerProfileScreen({ navigation }: any) {
                 </View>
               ) : null}
               <TouchableOpacity style={styles.editVehicleBtn} onPress={() => openEditVehicle(selectedVehicle)}>
-                <Ionicons name="pencil-outline" size={16} color="#1b4332" />
+                <Ionicons name="pencil-outline" size={16} color={COLORS.primary} />
                 <Text style={styles.editVehicleBtnText}>Edit Vehicle</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.deleteVehicleBtn} onPress={() => setDeleteVehicleConfirm(selectedVehicle.id)}>
-                <Ionicons name="trash-outline" size={16} color="#dc2626" />
+                <Ionicons name="trash-outline" size={16} color={COLORS.error} />
                 <Text style={styles.deleteVehicleBtnText}>Delete Vehicle</Text>
               </TouchableOpacity>
               <View style={{ height: 40 }} />
@@ -731,91 +731,91 @@ export default function OwnerProfileScreen({ navigation }: any) {
   );
 }
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f9fafb' },
+  container: { flex: 1, backgroundColor: COLORS.background },
   header: { paddingTop: 60, paddingBottom: SPACING.xl, alignItems: 'center', gap: SPACING.sm, borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
-  avatar: { width: 80, height: 80, borderRadius: 40, backgroundColor: '#fbbf24', justifyContent: 'center', alignItems: 'center' },
+  avatar: { width: 80, height: 80, borderRadius: 40, backgroundColor: COLORS.secondary, justifyContent: 'center', alignItems: 'center' },
   avatarImage: { width: 80, height: 80, borderRadius: 40 },
-  avatarText: { fontSize: 32, fontWeight: '700', color: '#1b4332' },
-  name: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: '#fff' },
-  email: { fontSize: FONT_SIZES.sm, color: '#86efac' },
-  bio: { fontSize: FONT_SIZES.sm, color: '#d1fae5', textAlign: 'center', paddingHorizontal: SPACING.xl },
+  avatarText: { fontSize: 32, fontWeight: '700', color: COLORS.white },
+  name: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.white },
+  email: { fontSize: FONT_SIZES.sm, color: COLORS.accent },
+  bio: { fontSize: FONT_SIZES.sm, color: COLORS.successTint, textAlign: 'center', paddingHorizontal: SPACING.xl },
   locationRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  locationText: { fontSize: FONT_SIZES.sm, color: '#86efac' },
-  editBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#fef3c7', paddingHorizontal: 16, paddingVertical: 8, borderRadius: RADIUS.full },
-  editBtnText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: '#1b4332' },
+  locationText: { fontSize: FONT_SIZES.sm, color: COLORS.accent },
+  editBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: COLORS.warningTint, paddingHorizontal: 16, paddingVertical: 8, borderRadius: RADIUS.full },
+  editBtnText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.primary },
   statsRow: { flexDirection: 'row', padding: SPACING.lg, gap: SPACING.md },
-  statCard: { flex: 1, backgroundColor: '#fff', borderRadius: RADIUS.md, padding: SPACING.md, alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 },
-  statValue: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: '#1b4332' },
-  statLabel: { fontSize: FONT_SIZES.xs, color: '#6b7280', marginTop: 2 },
+  statCard: { flex: 1, backgroundColor: COLORS.white, borderRadius: RADIUS.md, padding: SPACING.md, alignItems: 'center', shadowColor: COLORS.black, shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 },
+  statValue: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.primary },
+  statLabel: { fontSize: FONT_SIZES.xs, color: COLORS.textSecondary, marginTop: 2 },
   section: { paddingHorizontal: SPACING.lg },
   sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACING.md },
-  sectionTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: '#1b1b1b' },
-  addVehicleCard: { alignItems: 'center', padding: SPACING.xl, backgroundColor: '#fff', borderRadius: RADIUS.md, borderWidth: 1, borderColor: '#e5e7eb', borderStyle: 'dashed', gap: 8 },
-  addVehicleIconWrap: { width: 56, height: 56, borderRadius: 28, backgroundColor: '#f3f4f6', justifyContent: 'center', alignItems: 'center' },
-  addVehicleText: { fontSize: FONT_SIZES.sm, color: '#9ca3af' },
-  vehicleCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: RADIUS.md, padding: SPACING.md, marginBottom: SPACING.md, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 },
-  vehicleIcon: { width: 44, height: 44, borderRadius: 10, backgroundColor: '#f0fdf4', justifyContent: 'center', alignItems: 'center', marginRight: SPACING.md },
+  sectionTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.text },
+  addVehicleCard: { alignItems: 'center', padding: SPACING.xl, backgroundColor: COLORS.white, borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.border, borderStyle: 'dashed', gap: 8 },
+  addVehicleIconWrap: { width: 56, height: 56, borderRadius: 28, backgroundColor: COLORS.background, justifyContent: 'center', alignItems: 'center' },
+  addVehicleText: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary },
+  vehicleCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.white, borderRadius: RADIUS.md, padding: SPACING.md, marginBottom: SPACING.md, shadowColor: COLORS.black, shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 },
+  vehicleIcon: { width: 44, height: 44, borderRadius: 10, backgroundColor: COLORS.successTint, justifyContent: 'center', alignItems: 'center', marginRight: SPACING.md },
   vehicleInfo: { flex: 1 },
-  vehicleName: { fontSize: FONT_SIZES.md, fontWeight: '600', color: '#1b1b1b' },
-  vehicleDetails: { fontSize: FONT_SIZES.sm, color: '#6b7280', marginTop: 2 },
-  warnPill: { flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 4, alignSelf: 'flex-start', backgroundColor: '#fef2f2', paddingHorizontal: 6, paddingVertical: 2, borderRadius: RADIUS.full },
-  warnPillText: { fontSize: 10, fontWeight: '600', color: '#dc2626' },
-  walletBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginHorizontal: SPACING.lg, marginTop: SPACING.md, padding: SPACING.md, backgroundColor: '#fff', borderRadius: RADIUS.md, borderWidth: 1, borderColor: '#f3f4f6' },
+  vehicleName: { fontSize: FONT_SIZES.md, fontWeight: '600', color: COLORS.text },
+  vehicleDetails: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, marginTop: 2 },
+  warnPill: { flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 4, alignSelf: 'flex-start', backgroundColor: COLORS.errorTint, paddingHorizontal: 6, paddingVertical: 2, borderRadius: RADIUS.full },
+  warnPillText: { fontSize: 10, fontWeight: '600', color: COLORS.error },
+  walletBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginHorizontal: SPACING.lg, marginTop: SPACING.md, padding: SPACING.md, backgroundColor: COLORS.white, borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.background },
   walletBtnLeft: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  walletBtnText: { fontSize: FONT_SIZES.md, fontWeight: '600', color: '#1b1b1b' },
-  logoutBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: SPACING.sm, marginHorizontal: SPACING.lg, marginTop: SPACING.lg, padding: SPACING.md, backgroundColor: '#fef2f2', borderRadius: RADIUS.md, borderWidth: 1, borderColor: '#fecaca' },
-  logoutText: { fontSize: FONT_SIZES.md, fontWeight: '600', color: '#dc2626' },
-  deleteAccountBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: SPACING.sm, margin: SPACING.lg, marginTop: SPACING.sm, padding: SPACING.md, borderRadius: RADIUS.md, borderWidth: 1, borderColor: '#f3f4f6' },
-  deleteAccountText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: '#dc2626' },
-  deleteAccountPendingText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: '#000814' },
-  modal: { flex: 1, backgroundColor: '#f9fafb' },
-  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: SPACING.lg, paddingTop: 60, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#f3f4f6' },
-  modalTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: '#1b1b1b' },
+  walletBtnText: { fontSize: FONT_SIZES.md, fontWeight: '600', color: COLORS.text },
+  logoutBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: SPACING.sm, marginHorizontal: SPACING.lg, marginTop: SPACING.lg, padding: SPACING.md, backgroundColor: COLORS.errorTint, borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.errorTint },
+  logoutText: { fontSize: FONT_SIZES.md, fontWeight: '600', color: COLORS.error },
+  deleteAccountBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: SPACING.sm, margin: SPACING.lg, marginTop: SPACING.sm, padding: SPACING.md, borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.background },
+  deleteAccountText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.error },
+  deleteAccountPendingText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.primary },
+  modal: { flex: 1, backgroundColor: COLORS.background },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: SPACING.lg, paddingTop: 60, backgroundColor: COLORS.white, borderBottomWidth: 1, borderBottomColor: COLORS.background },
+  modalTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.text },
   modalBody: { padding: SPACING.lg },
-  label: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: '#374151', marginBottom: 6, marginTop: 14 },
-  input: { backgroundColor: '#fff', borderRadius: RADIUS.md, borderWidth: 1, borderColor: '#e5e7eb', padding: 12, fontSize: FONT_SIZES.md, color: '#1b1b1b' },
+  label: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.text, marginBottom: 6, marginTop: 14 },
+  input: { backgroundColor: COLORS.white, borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.border, padding: 12, fontSize: FONT_SIZES.md, color: COLORS.text },
   textArea: { height: 80, textAlignVertical: 'top' },
   submitBtn: { marginTop: 24, borderRadius: RADIUS.md, overflow: 'hidden' },
   submitGradient: { padding: 16, alignItems: 'center' },
-  submitText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: '#fff' },
+  submitText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.accentInk },
   devBtn: { alignItems: 'center', padding: SPACING.md },
-  devBtnText: { fontSize: FONT_SIZES.xs, color: '#9ca3af' },
-  typeOption: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: RADIUS.full, borderWidth: 1, borderColor: '#e5e7eb', marginRight: 8, backgroundColor: '#fff' },
-  typeOptionActive: { backgroundColor: '#1b4332', borderColor: '#1b4332' },
-  typeText: { fontSize: FONT_SIZES.sm, color: '#6b7280', fontWeight: '600' },
-  typeTextActive: { color: '#fff' },
-  dateBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#fff', borderRadius: RADIUS.md, borderWidth: 1, borderColor: '#e5e7eb', padding: 12 },
-  dateBtnText: { fontSize: FONT_SIZES.md, color: '#1b1b1b', fontWeight: '600' },
-  pickerContainer: { backgroundColor: '#fff', borderRadius: RADIUS.md, borderWidth: 1, borderColor: '#e5e7eb', marginTop: 8, overflow: 'hidden' },
-  picker: { height: 200, backgroundColor: '#fff' },
-  pickerDoneBtn: { padding: 12, alignItems: 'center', borderTopWidth: 1, borderTopColor: '#f3f4f6' },
-  pickerDoneBtnText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: '#1b4332' },
-  detailHeroIcon: { alignSelf: 'center', width: 90, height: 90, borderRadius: 45, backgroundColor: '#f0fdf4', justifyContent: 'center', alignItems: 'center', marginTop: 10, marginBottom: SPACING.md },
-  detailTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: '#1b1b1b', textAlign: 'center' },
-  detailSubtitle: { fontSize: FONT_SIZES.sm, color: '#6b7280', textAlign: 'center', marginBottom: SPACING.lg },
-  detailCard: { backgroundColor: '#fff', borderRadius: RADIUS.md, padding: SPACING.md, borderWidth: 1, borderColor: '#f3f4f6' },
+  devBtnText: { fontSize: FONT_SIZES.xs, color: COLORS.textSecondary },
+  typeOption: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: RADIUS.full, borderWidth: 1, borderColor: COLORS.border, marginRight: 8, backgroundColor: COLORS.white },
+  typeOptionActive: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
+  typeText: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, fontWeight: '600' },
+  typeTextActive: { color: COLORS.white },
+  dateBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: COLORS.white, borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.border, padding: 12 },
+  dateBtnText: { fontSize: FONT_SIZES.md, color: COLORS.text, fontWeight: '600' },
+  pickerContainer: { backgroundColor: COLORS.white, borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.border, marginTop: 8, overflow: 'hidden' },
+  picker: { height: 200, backgroundColor: COLORS.white },
+  pickerDoneBtn: { padding: 12, alignItems: 'center', borderTopWidth: 1, borderTopColor: COLORS.background },
+  pickerDoneBtnText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.primary },
+  detailHeroIcon: { alignSelf: 'center', width: 90, height: 90, borderRadius: 45, backgroundColor: COLORS.successTint, justifyContent: 'center', alignItems: 'center', marginTop: 10, marginBottom: SPACING.md },
+  detailTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.text, textAlign: 'center' },
+  detailSubtitle: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, textAlign: 'center', marginBottom: SPACING.lg },
+  detailCard: { backgroundColor: COLORS.white, borderRadius: RADIUS.md, padding: SPACING.md, borderWidth: 1, borderColor: COLORS.background },
   detailRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 10 },
-  detailLabel: { fontSize: FONT_SIZES.sm, color: '#6b7280' },
-  detailValue: { fontSize: FONT_SIZES.sm, fontWeight: '700', color: '#1b1b1b' },
-  detailValueWarn: { color: '#000814' },
-  detailValueDanger: { color: '#dc2626' },
-  detailDivider: { height: 1, backgroundColor: '#f3f4f6' },
-  notesCard: { backgroundColor: '#fffbeb', borderRadius: RADIUS.md, padding: SPACING.md, marginTop: SPACING.md, borderWidth: 1, borderColor: '#fde68a' },
-  notesLabel: { fontSize: FONT_SIZES.xs, fontWeight: '700', color: '#000814', marginBottom: 4 },
-  notesText: { fontSize: FONT_SIZES.sm, color: '#1b1b1b' },
-  editVehicleBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: SPACING.lg, padding: 14, backgroundColor: '#f0fdf4', borderRadius: RADIUS.md, borderWidth: 1, borderColor: '#86efac' },
-  editVehicleBtnText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: '#1b4332' },
-  deleteVehicleBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: SPACING.md, padding: 14, backgroundColor: '#fef2f2', borderRadius: RADIUS.md, borderWidth: 1, borderColor: '#fecaca' },
-  deleteVehicleBtnText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: '#dc2626' },
+  detailLabel: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary },
+  detailValue: { fontSize: FONT_SIZES.sm, fontWeight: '700', color: COLORS.text },
+  detailValueWarn: { color: COLORS.primary },
+  detailValueDanger: { color: COLORS.error },
+  detailDivider: { height: 1, backgroundColor: COLORS.background },
+  notesCard: { backgroundColor: COLORS.warningTint, borderRadius: RADIUS.md, padding: SPACING.md, marginTop: SPACING.md, borderWidth: 1, borderColor: COLORS.accent },
+  notesLabel: { fontSize: FONT_SIZES.xs, fontWeight: '700', color: COLORS.primary, marginBottom: 4 },
+  notesText: { fontSize: FONT_SIZES.sm, color: COLORS.text },
+  editVehicleBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: SPACING.lg, padding: 14, backgroundColor: COLORS.successTint, borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.accent },
+  editVehicleBtnText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.primary },
+  deleteVehicleBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: SPACING.md, padding: 14, backgroundColor: COLORS.errorTint, borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.errorTint },
+  deleteVehicleBtnText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.error },
   alertOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.55)', justifyContent: 'center', alignItems: 'center', padding: SPACING.lg },
   avatarPickerBtn: { alignSelf: 'center', width: 84, height: 84, marginBottom: SPACING.md },
   avatarPickerImage: { width: 84, height: 84, borderRadius: 42 },
-  avatarPickerPlaceholder: { width: 84, height: 84, borderRadius: 42, backgroundColor: '#f0fdf4', borderWidth: 1.5, borderColor: '#86efac', borderStyle: 'dashed', justifyContent: 'center', alignItems: 'center' },
+  avatarPickerPlaceholder: { width: 84, height: 84, borderRadius: 42, backgroundColor: COLORS.successTint, borderWidth: 1.5, borderColor: COLORS.accent, borderStyle: 'dashed', justifyContent: 'center', alignItems: 'center' },
   avatarUploadingOverlay: { ...StyleSheet.absoluteFillObject, borderRadius: 42, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'center', alignItems: 'center' },
-  avatarEditBadge: { position: 'absolute', bottom: 0, right: 0, width: 26, height: 26, borderRadius: 13, backgroundColor: '#1b4332', justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: '#fff' },
+  avatarEditBadge: { position: 'absolute', bottom: 0, right: 0, width: 26, height: 26, borderRadius: 13, backgroundColor: COLORS.primary, justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: COLORS.white },
   avatarMenuOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.3)', justifyContent: 'flex-end' },
-  avatarMenu: { backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingVertical: SPACING.md, paddingBottom: 40 },
+  avatarMenu: { backgroundColor: COLORS.white, borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingVertical: SPACING.md, paddingBottom: 40 },
   avatarMenuOption: { flexDirection: 'row', alignItems: 'center', gap: SPACING.md, paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md },
   avatarMenuIconWrap: { width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center' },
-  avatarMenuText: { fontSize: FONT_SIZES.md, fontWeight: '600', color: '#1b1b1b' },
+  avatarMenuText: { fontSize: FONT_SIZES.md, fontWeight: '600', color: COLORS.text },
 });

@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { COLORS, FONT_FAMILY, SPACING, FONT_SIZES, RADIUS } from '../../constants';
 import {
   View,
   Text,
@@ -17,8 +18,12 @@ import { AppDispatch, RootState } from '../../store';
 import { verifyRegistrationThunk } from '../../store/slices/authSlice';
 import { authService } from '../../services/authService';
 import { AppAlertCard } from '../../components/AppAlert';
-import { SPACING, FONT_SIZES, RADIUS } from '../../constants';
 
+const getRoleTab = (role?: string) => {
+  if (role === 'customer') return 'CustomerTabs';
+  if (role === 'mechanic') return 'MechanicTabs';
+  return null;
+};
 
 export default function OtpScreen({ route, navigation }: any) {
   const dispatch = useDispatch<AppDispatch>();
@@ -49,10 +54,11 @@ const { loading, error, user } = useSelector((state: RootState) => state.auth);
     return () => clearInterval(interval);
   }, [timer]);
   useEffect(() => {
-    if (isRegisterMode && user) {
+    const roleTab = getRoleTab(user?.role);
+    if (isRegisterMode && roleTab) {
       navigation.reset({
         index: 0,
-        routes: [{ name: user.role === 'OWNER' ? 'OwnerTabs' : 'MechanicTabs' }],
+        routes: [{ name: roleTab }],
       });
     }
   }, [user]);
@@ -164,27 +170,30 @@ const { loading, error, user } = useSelector((state: RootState) => state.auth);
             return;
           }
           if (user) {
-            navigation.reset({
-              index: 0,
-              routes: [{ name: user.role === 'OWNER' ? 'OwnerTabs' : 'MechanicTabs' }],
-            });
+            const roleTab = getRoleTab(user.role);
+            if (roleTab) {
+              navigation.reset({
+                index: 0,
+                routes: [{ name: roleTab }],
+              });
+            }
           } else {
             navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
           }
         }}
       >
-        <Ionicons name="arrow-back" size={22} color="#1b4332" />
+        <Ionicons name="arrow-back" size={22} color={COLORS.primary} />
       </TouchableOpacity>
 
       <View style={styles.inner}>
         {/* Icon */}
         <LinearGradient
-          colors={['#52b788', '#1b4332']}
+          colors={[COLORS.accent, COLORS.primary]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.iconCircle}
         >
-          <Ionicons name="mail-outline" size={36} color="#ffffff" />
+          <Ionicons name="mail-outline" size={36} color={COLORS.white} />
         </LinearGradient>
         {/* Title */}
         <Text style={styles.title}>{isRegisterMode ? 'Verify your email' : isDeleteMode ? 'Confirm account deletion' : 'Enter reset code'}</Text>
@@ -219,7 +228,7 @@ const { loading, error, user } = useSelector((state: RootState) => state.auth);
         {/* Error */}
         {displayError && (
           <View style={styles.errorBox}>
-            <Ionicons name="alert-circle" size={16} color="#dc2626" />
+            <Ionicons name="alert-circle" size={16} color={COLORS.error} />
             <Text style={styles.errorText}>{displayError}</Text>
           </View>
         )}
@@ -234,13 +243,13 @@ const { loading, error, user } = useSelector((state: RootState) => state.auth);
           ]}
         >
           <LinearGradient
-            colors={['#52b788', '#2d6a4f', '#1b4332']}
+            colors={[COLORS.accent, COLORS.accent, COLORS.accent]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.btn}
           >
             {displayLoading ? (
-              <ActivityIndicator color="#ffffff" />
+              <ActivityIndicator color={COLORS.accentInk} />
             ) : (
               <Text style={styles.btnText}>Verify & Continue</Text>
             )}
@@ -251,7 +260,7 @@ const { loading, error, user } = useSelector((state: RootState) => state.auth);
           <Text style={styles.resendLabel}>Didn't receive the code? </Text>
           {canResend ? (
             resending ? (
-              <ActivityIndicator size="small" color="#2d6a4f" />
+              <ActivityIndicator size="small" color={COLORS.primary} />
             ) : (
               <TouchableOpacity onPress={handleResend}>
                 <Text style={styles.resendLink}>Resend</Text>
@@ -284,7 +293,7 @@ const { loading, error, user } = useSelector((state: RootState) => state.auth);
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9fafb',
+    backgroundColor: COLORS.background,
   },
   backBtn: {
     position: 'absolute',
@@ -293,10 +302,10 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#ffffff',
+    backgroundColor: COLORS.white,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
+    shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.08,
     shadowRadius: 4,
@@ -318,7 +327,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: SPACING.lg,
-    shadowColor: '#1b4332',
+    shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.4,
     shadowRadius: 8,
@@ -329,19 +338,22 @@ const styles = StyleSheet.create({
   title: {
     fontSize: FONT_SIZES.xxl,
     fontWeight: '700',
-    color: '#1b4332',
+    color: COLORS.primary,
     marginBottom: SPACING.sm,
+    fontFamily: FONT_FAMILY.headingBold,
   },
   subtitle: {
     fontSize: FONT_SIZES.md,
-    color: '#6b7280',
+    color: COLORS.textSecondary,
     textAlign: 'center',
     lineHeight: 24,
     marginBottom: SPACING.xl,
+    fontFamily: FONT_FAMILY.body,
   },
   phone: {
     fontWeight: '700',
-    color: '#1b1b1b',
+    color: COLORS.text,
+    fontFamily: FONT_FAMILY.bodyBold,
   },
 
   // OTP inputs
@@ -355,23 +367,24 @@ const styles = StyleSheet.create({
     height: 56,
     borderRadius: RADIUS.md,
     borderWidth: 1.5,
-    borderColor: '#e5e7eb',
-    backgroundColor: '#ffffff',
+    borderColor: COLORS.border,
+    backgroundColor: COLORS.white,
     textAlign: 'center',
     fontSize: FONT_SIZES.xl,
     fontWeight: '700',
-    color: '#1b1b1b',
+    color: COLORS.text,
+    fontFamily: FONT_FAMILY.bodyBold,
   },
   otpInputFilled: {
-    borderColor: '#2d6a4f',
-    backgroundColor: '#f0fdf4',
+    borderColor: COLORS.primary,
+    backgroundColor: COLORS.successTint,
   },
 
   // Error
   errorBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fef2f2',
+    backgroundColor: COLORS.errorTint,
     borderRadius: RADIUS.sm,
     padding: SPACING.sm,
     marginBottom: SPACING.md,
@@ -380,8 +393,9 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: FONT_SIZES.sm,
-    color: '#dc2626',
+    color: COLORS.error,
     flex: 1,
+    fontFamily: FONT_FAMILY.body,
   },
 
   // Button
@@ -389,7 +403,7 @@ const styles = StyleSheet.create({
     width: '100%',
     borderRadius: RADIUS.md,
     overflow: 'hidden',
-    shadowColor: '#1b4332',
+    shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.35,
     shadowRadius: 8,
@@ -402,10 +416,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   btnText: {
-    color: '#ffffff',
+    color: COLORS.accentInk,
     fontSize: FONT_SIZES.md,
     fontWeight: '700',
     letterSpacing: 0.3,
+    fontFamily: FONT_FAMILY.bodyBold,
   },
 
   // Resend
@@ -415,17 +430,20 @@ const styles = StyleSheet.create({
   },
   resendLabel: {
     fontSize: FONT_SIZES.sm,
-    color: '#6b7280',
+    color: COLORS.textSecondary,
+    fontFamily: FONT_FAMILY.body,
   },
   resendLink: {
     fontSize: FONT_SIZES.sm,
-    color: '#2d6a4f',
+    color: COLORS.primary,
     fontWeight: '700',
+    fontFamily: FONT_FAMILY.bodyBold,
   },
   resendTimer: {
     fontSize: FONT_SIZES.sm,
-    color: '#6b7280',
+    color: COLORS.textSecondary,
     fontWeight: '600',
+    fontFamily: FONT_FAMILY.bodySemiBold,
   },
   alertOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.55)', justifyContent: 'center', alignItems: 'center', padding: SPACING.lg },
 });

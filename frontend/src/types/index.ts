@@ -1,4 +1,4 @@
-export type UserRole = 'CAR_OWNER' | 'MECHANIC' | 'PARTS_DEALER';
+export type UserRole = 'customer' | 'mechanic' | 'admin';
 
 export interface User {
   id: string;
@@ -55,11 +55,9 @@ export interface MechanicProfile {
 }
 
 export type JobType = 'STANDARD' | 'SOS';
-export type JobStatus =
-  | 'PENDING' | 'ACCEPTED'
-  | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+export type JobStatus = 'pending' | 'in_progress' | 'completed' | 'cancelled';
 
-export interface JobRequest {
+export interface Job {
   id: string;
   ownerId: string;
   mechanicId?: string;
@@ -89,8 +87,8 @@ export interface ServiceRecord {
   mileage?: number;
 }
 
-export type PaymentMethod = 'PAYSTACK' | 'MTN_MOMO';
-export type TransactionStatus = 'PENDING' | 'HELD' | 'RELEASED' | 'REFUNDED';
+export type PaymentStatus = 'pending' | 'success' | 'failed' | 'refunded';
+export type PaymentMethod = 'cash' | 'card' | 'mobile_money' | 'bank_transfer';
 
 export interface Transaction {
   id: string;
@@ -100,7 +98,7 @@ export interface Transaction {
   commissionAmount: number;
   netAmount: number;
   paymentMethod: PaymentMethod;
-  status: TransactionStatus;
+  status: PaymentStatus;
   paidAt?: string;
   releasedAt?: string;
 }

@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
+import { COLORS, SPACING, FONT_SIZES, RADIUS } from '../../constants';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   StatusBar, RefreshControl, ActivityIndicator, Alert, Animated
@@ -13,10 +14,9 @@ import { messageService } from '../../services/messageService';
 import { jobService } from '../../services/jobService';
 import { userService } from '../../services/userService';
 import ConfirmDialog from '../../components/ConfirmDialog';
-import { SPACING, FONT_SIZES, RADIUS } from '../../constants';
 
-const ACCENT = '#000814';
-const ACCENT_DEEP = '#001D3D';
+const ACCENT = COLORS.primary;
+const ACCENT_DEEP = COLORS.secondary;
 
 // ─── ConversationCard: its own component so entrance-animation hooks are safe/stable ───
 function ConversationCard({
@@ -50,7 +50,7 @@ function ConversationCard({
     return (
       <TouchableOpacity style={styles.deleteAction} onPress={() => onDelete(convo)} activeOpacity={0.85}>
         <Animated.View style={{ transform: [{ scale }], alignItems: 'center', gap: 4 }}>
-          <Ionicons name="trash" size={20} color="#fff" />
+          <Ionicons name="trash" size={20} color={COLORS.white} />
           <Text style={styles.deleteActionText}>Delete</Text>
         </Animated.View>
       </TouchableOpacity>
@@ -115,14 +115,14 @@ export default function MechanicMessagesScreen({ navigation }: any) {
       const enriched = await Promise.all(
         msgs.map(async (msg: any) => {
           const isPartOrder = msg.job_id < 0;
-          // Conversations are reused across an owner's jobs — if the job that
+          // Conversations are reused across an customer's jobs — if the job that
           // originally started this thread was since deleted, fall back to a
           // generic label instead of hiding the conversation entirely.
           const job = isPartOrder
             ? { id: msg.job_id, title: 'Part Sale', isPartOrder: true }
             : jobs.find((j: any) => j.id === msg.job_id) || { id: msg.job_id, title: 'Previous Job' };
           const otherUserId = msg.sender_id === myId ? msg.receiver_id : msg.sender_id;
-          let otherUserName = 'Car Owner';
+          let otherUserName = 'Customer';
           try {
             const profile = await userService.getUserById(otherUserId);
             otherUserName = profile.name;
@@ -214,11 +214,11 @@ export default function MechanicMessagesScreen({ navigation }: any) {
           {conversations.length === 0 ? (
             <View style={styles.emptyState}>
               <View style={styles.emptyIconWrap}>
-                <Ionicons name="chatbubbles-outline" size={40} color="#9ca3af" />
+                <Ionicons name="chatbubbles-outline" size={40} color={COLORS.textSecondary} />
               </View>
               <Text style={styles.emptyText}>No messages yet</Text>
               <Text style={styles.emptySubText}>
-                Messages with car owners will appear here
+                Messages with customers will appear here
               </Text>
             </View>
           ) : (
@@ -255,31 +255,31 @@ export default function MechanicMessagesScreen({ navigation }: any) {
   );
 }
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f9fafb' },
+  container: { flex: 1, backgroundColor: COLORS.background },
   header: { paddingTop: 60, paddingBottom: SPACING.xl, paddingHorizontal: SPACING.lg, borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
-  headerTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: '#ffffff' },
-  headerSubtitle: { fontSize: FONT_SIZES.sm, color: '#fde68a', marginTop: 2 },
-  convoCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', padding: SPACING.md, marginHorizontal: SPACING.lg, marginTop: SPACING.md, borderRadius: RADIUS.md, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 },
+  headerTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.white },
+  headerSubtitle: { fontSize: FONT_SIZES.sm, color: COLORS.accent, marginTop: 2 },
+  convoCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.white, padding: SPACING.md, marginHorizontal: SPACING.lg, marginTop: SPACING.md, borderRadius: RADIUS.md, shadowColor: COLORS.black, shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 },
   avatarContainer: { position: 'relative', marginRight: SPACING.md },
   avatar: { width: 48, height: 48, borderRadius: 24, justifyContent: 'center', alignItems: 'center' },
-  avatarText: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: '#fff' },
-  unreadDot: { position: 'absolute', top: 0, right: 0, width: 12, height: 12, borderRadius: 6, backgroundColor: '#ef4444', borderWidth: 2, borderColor: '#fff' },
+  avatarText: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.white },
+  unreadDot: { position: 'absolute', top: 0, right: 0, width: 12, height: 12, borderRadius: 6, backgroundColor: COLORS.error, borderWidth: 2, borderColor: COLORS.white },
   convoInfo: { flex: 1 },
   convoHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2, gap: 8 },
-  convoName: { fontSize: FONT_SIZES.md, fontWeight: '600', color: '#1b1b1b', flexShrink: 1 },
+  convoName: { fontSize: FONT_SIZES.md, fontWeight: '600', color: COLORS.text, flexShrink: 1 },
   convoNameUnread: { fontWeight: '800' },
-  convoTime: { fontSize: FONT_SIZES.xs, color: '#9ca3af' },
+  convoTime: { fontSize: FONT_SIZES.xs, color: COLORS.textSecondary },
   convoTimeUnread: { color: ACCENT, fontWeight: '700' },
   convoMessageRow: { flexDirection: 'row', alignItems: 'center', gap: 4, flex: 1 },
   convoReceipt: { fontSize: FONT_SIZES.sm, color: ACCENT, fontWeight: '600' },
-  convoMessage: { fontSize: FONT_SIZES.sm, color: '#6b7280', flexShrink: 1 },
-  convoMessageUnread: { color: '#1b1b1b', fontWeight: '600' },
+  convoMessage: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, flexShrink: 1 },
+  convoMessageUnread: { color: COLORS.text, fontWeight: '600' },
   unreadBadge: { backgroundColor: ACCENT, width: 22, height: 22, borderRadius: 11, justifyContent: 'center', alignItems: 'center', marginLeft: SPACING.sm },
-  unreadCount: { fontSize: 11, fontWeight: '700', color: '#fff' },
+  unreadCount: { fontSize: 11, fontWeight: '700', color: COLORS.white },
   emptyState: { alignItems: 'center', paddingVertical: 80, paddingHorizontal: SPACING.xl, gap: 4 },
-  emptyIconWrap: { width: 72, height: 72, borderRadius: 36, backgroundColor: '#f3f4f6', justifyContent: 'center', alignItems: 'center', marginBottom: 12 },
-  emptyText: { fontSize: FONT_SIZES.lg, fontWeight: '600', color: '#374151' },
-  emptySubText: { fontSize: FONT_SIZES.sm, color: '#9ca3af', textAlign: 'center', lineHeight: 20 },
-  deleteAction: { backgroundColor: '#dc2626', justifyContent: 'center', alignItems: 'center', width: 76, marginTop: SPACING.md, marginRight: SPACING.lg, borderRadius: RADIUS.md },
-  deleteActionText: { fontSize: 11, fontWeight: '700', color: '#fff' },
+  emptyIconWrap: { width: 72, height: 72, borderRadius: 36, backgroundColor: COLORS.background, justifyContent: 'center', alignItems: 'center', marginBottom: 12 },
+  emptyText: { fontSize: FONT_SIZES.lg, fontWeight: '600', color: COLORS.text },
+  emptySubText: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, textAlign: 'center', lineHeight: 20 },
+  deleteAction: { backgroundColor: COLORS.error, justifyContent: 'center', alignItems: 'center', width: 76, marginTop: SPACING.md, marginRight: SPACING.lg, borderRadius: RADIUS.md },
+  deleteActionText: { fontSize: 11, fontWeight: '700', color: COLORS.white },
 });

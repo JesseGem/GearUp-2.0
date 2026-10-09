@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
+import { COLORS, SPACING, FONT_SIZES, RADIUS } from '../../constants';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   StatusBar, RefreshControl, ActivityIndicator, Alert, Animated
@@ -13,7 +14,6 @@ import { messageService } from '../../services/messageService';
 import { jobService } from '../../services/jobService';
 import { userService } from '../../services/userService';
 import ConfirmDialog from '../../components/ConfirmDialog';
-import { SPACING, FONT_SIZES, RADIUS } from '../../constants';
 
 // ─── ConversationCard: its own component so entrance-animation hooks are safe/stable ───
 function ConversationCard({
@@ -47,7 +47,7 @@ function ConversationCard({
     return (
       <TouchableOpacity style={styles.deleteAction} onPress={() => onDelete(convo)} activeOpacity={0.85}>
         <Animated.View style={{ transform: [{ scale }], alignItems: 'center', gap: 4 }}>
-          <Ionicons name="trash" size={20} color="#fff" />
+          <Ionicons name="trash" size={20} color={COLORS.white} />
           <Text style={styles.deleteActionText}>Delete</Text>
         </Animated.View>
       </TouchableOpacity>
@@ -61,7 +61,7 @@ function ConversationCard({
         overshootRight={false}>
         <TouchableOpacity style={styles.convoCard} activeOpacity={0.85} onPress={() => onOpen(convo)}>
           <View style={styles.avatarContainer}>
-            <LinearGradient colors={['#1b4332', '#2d6a4f']} style={styles.avatar}>
+            <LinearGradient colors={[COLORS.primary, COLORS.secondary]} style={styles.avatar}>
               <Text style={styles.avatarText}>{convo.otherUserName?.[0]?.toUpperCase()}</Text>
             </LinearGradient>
             {isUnread && <View style={styles.unreadDot} />}
@@ -93,7 +93,7 @@ function ConversationCard({
   );
 }
 
-export default function OwnerMessagesScreen({ navigation }: any) {
+export default function CustomerMessagesScreen({ navigation }: any) {
   const { user } = useSelector((state: RootState) => state.auth);
   const [conversations, setConversations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -107,7 +107,7 @@ export default function OwnerMessagesScreen({ navigation }: any) {
       const myId = user?.userId;
       const [msgs, jobs] = await Promise.all([
         messageService.getConversations(myId),
-        jobService.getMyJobsAsOwner(),
+        jobService.getMyJobsAsCustomer(),
       ]);
       const enriched = await Promise.all(
         msgs.map(async (msg: any) => {
@@ -194,23 +194,23 @@ export default function OwnerMessagesScreen({ navigation }: any) {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
-      <LinearGradient colors={['#1b4332', '#2d6a4f']} style={styles.header}>
+      <LinearGradient colors={[COLORS.primary, COLORS.secondary]} style={styles.header}>
         <Text style={styles.headerTitle}>Messages</Text>
         <Text style={styles.headerSubtitle}>
           {unreadCount > 0 ? `${unreadCount} unread ${unreadCount === 1 ? 'message' : 'messages'}` : 'All caught up'}
         </Text>
       </LinearGradient>
       {loading ? (
-        <ActivityIndicator style={{ flex: 1 }} color="#1b4332" />
+        <ActivityIndicator style={{ flex: 1 }} color={COLORS.primary} />
       ) : (
         <ScrollView
           showsVerticalScrollIndicator={false}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#1b4332" />}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.primary} />}
           contentContainerStyle={{ paddingBottom: SPACING.xl }}>
           {conversations.length === 0 ? (
             <View style={styles.emptyState}>
               <View style={styles.emptyIconWrap}>
-                <Ionicons name="chatbubbles-outline" size={40} color="#9ca3af" />
+                <Ionicons name="chatbubbles-outline" size={40} color={COLORS.textSecondary} />
               </View>
               <Text style={styles.emptyText}>No messages yet</Text>
               <Text style={styles.emptySubText}>
@@ -236,7 +236,7 @@ export default function OwnerMessagesScreen({ navigation }: any) {
           )}
           {/* Start new conversation hint */}
           <View style={styles.hint}>
-            <Ionicons name="information-circle-outline" size={16} color="#9ca3af" />
+            <Ionicons name="information-circle-outline" size={16} color={COLORS.textSecondary} />
             <Text style={styles.hintText}>
               Open a job and tap "Message Mechanic" to start a conversation
             </Text>
@@ -257,33 +257,33 @@ export default function OwnerMessagesScreen({ navigation }: any) {
   );
 }
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f9fafb' },
+  container: { flex: 1, backgroundColor: COLORS.background },
   header: { paddingTop: 60, paddingBottom: SPACING.xl, paddingHorizontal: SPACING.lg, borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
-  headerTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: '#ffffff' },
-  headerSubtitle: { fontSize: FONT_SIZES.sm, color: '#86efac', marginTop: 2 },
-  convoCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', padding: SPACING.md, marginHorizontal: SPACING.lg, marginTop: SPACING.md, borderRadius: RADIUS.md, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 },
+  headerTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.white },
+  headerSubtitle: { fontSize: FONT_SIZES.sm, color: COLORS.accent, marginTop: 2 },
+  convoCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.white, padding: SPACING.md, marginHorizontal: SPACING.lg, marginTop: SPACING.md, borderRadius: RADIUS.md, shadowColor: COLORS.black, shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 },
   avatarContainer: { position: 'relative', marginRight: SPACING.md },
   avatar: { width: 48, height: 48, borderRadius: 24, justifyContent: 'center', alignItems: 'center' },
-  avatarText: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: '#fff' },
-  unreadDot: { position: 'absolute', top: 0, right: 0, width: 12, height: 12, borderRadius: 6, backgroundColor: '#ef4444', borderWidth: 2, borderColor: '#fff' },
+  avatarText: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.white },
+  unreadDot: { position: 'absolute', top: 0, right: 0, width: 12, height: 12, borderRadius: 6, backgroundColor: COLORS.error, borderWidth: 2, borderColor: COLORS.white },
   convoInfo: { flex: 1 },
   convoHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2, gap: 8 },
-  convoName: { fontSize: FONT_SIZES.md, fontWeight: '600', color: '#1b1b1b', flexShrink: 1 },
+  convoName: { fontSize: FONT_SIZES.md, fontWeight: '600', color: COLORS.text, flexShrink: 1 },
   convoNameUnread: { fontWeight: '800' },
-  convoTime: { fontSize: FONT_SIZES.xs, color: '#9ca3af' },
-  convoTimeUnread: { color: '#1b4332', fontWeight: '700' },
+  convoTime: { fontSize: FONT_SIZES.xs, color: COLORS.textSecondary },
+  convoTimeUnread: { color: COLORS.primary, fontWeight: '700' },
   convoMessageRow: { flexDirection: 'row', alignItems: 'center', gap: 4, flex: 1 },
-  convoReceipt: { fontSize: FONT_SIZES.sm, color: '#1b4332', fontWeight: '600' },
-  convoMessage: { fontSize: FONT_SIZES.sm, color: '#6b7280', flexShrink: 1 },
-  convoMessageUnread: { color: '#1b1b1b', fontWeight: '600' },
-  unreadBadge: { backgroundColor: '#1b4332', width: 22, height: 22, borderRadius: 11, justifyContent: 'center', alignItems: 'center', marginLeft: SPACING.sm },
-  unreadCount: { fontSize: 11, fontWeight: '700', color: '#fff' },
+  convoReceipt: { fontSize: FONT_SIZES.sm, color: COLORS.primary, fontWeight: '600' },
+  convoMessage: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, flexShrink: 1 },
+  convoMessageUnread: { color: COLORS.text, fontWeight: '600' },
+  unreadBadge: { backgroundColor: COLORS.primary, width: 22, height: 22, borderRadius: 11, justifyContent: 'center', alignItems: 'center', marginLeft: SPACING.sm },
+  unreadCount: { fontSize: 11, fontWeight: '700', color: COLORS.white },
   emptyState: { alignItems: 'center', paddingVertical: 80, paddingHorizontal: SPACING.xl, gap: 4 },
-  emptyIconWrap: { width: 72, height: 72, borderRadius: 36, backgroundColor: '#f3f4f6', justifyContent: 'center', alignItems: 'center', marginBottom: 12 },
-  emptyText: { fontSize: FONT_SIZES.lg, fontWeight: '600', color: '#374151' },
-  emptySubText: { fontSize: FONT_SIZES.sm, color: '#9ca3af', textAlign: 'center', lineHeight: 20 },
+  emptyIconWrap: { width: 72, height: 72, borderRadius: 36, backgroundColor: COLORS.background, justifyContent: 'center', alignItems: 'center', marginBottom: 12 },
+  emptyText: { fontSize: FONT_SIZES.lg, fontWeight: '600', color: COLORS.text },
+  emptySubText: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, textAlign: 'center', lineHeight: 20 },
   hint: { flexDirection: 'row', alignItems: 'center', gap: 6, padding: SPACING.lg, paddingTop: SPACING.md },
-  hintText: { fontSize: FONT_SIZES.xs, color: '#9ca3af', flex: 1, lineHeight: 18 },
-  deleteAction: { backgroundColor: '#dc2626', justifyContent: 'center', alignItems: 'center', width: 76, marginTop: SPACING.md, marginRight: SPACING.lg, borderRadius: RADIUS.md },
-  deleteActionText: { fontSize: 11, fontWeight: '700', color: '#fff' },
+  hintText: { fontSize: FONT_SIZES.xs, color: COLORS.textSecondary, flex: 1, lineHeight: 18 },
+  deleteAction: { backgroundColor: COLORS.error, justifyContent: 'center', alignItems: 'center', width: 76, marginTop: SPACING.md, marginRight: SPACING.lg, borderRadius: RADIUS.md },
+  deleteActionText: { fontSize: 11, fontWeight: '700', color: COLORS.white },
 });

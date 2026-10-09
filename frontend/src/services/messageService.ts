@@ -50,7 +50,7 @@ export interface JobCardMetadata {
 const buildJobCardSummary = (meta: JobCardMetadata): string => {
   switch (meta.status) {
     case 'PENDING':
-      return meta.proposedByMechanicId ? `🔧 Proposed changes: ${meta.title}` : `📋 New Job Request: ${meta.title}`;
+      return meta.proposedByMechanicId ? `🔧 Proposed changes: ${meta.title}` : `📋 New Job: ${meta.title}`;
     case 'ACCEPTED':
       return `✅ Job accepted: ${meta.title}`;
     case 'IN_PROGRESS':

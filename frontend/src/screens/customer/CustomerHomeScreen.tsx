@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { COLORS, FONT_FAMILY, JOB_STATUS_COLORS, SPACING, FONT_SIZES, RADIUS } from '../../constants';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   StatusBar, RefreshControl, ActivityIndicator, Alert, Animated, Dimensions, FlatList, Image
@@ -11,7 +12,6 @@ import { jobService } from '../../services/jobService';
 import { vehicleService } from '../../services/vehicleService';
 import { paymentService } from '../../services/paymentService';
 import { userService } from '../../services/userService';
-import { SPACING, FONT_SIZES, RADIUS } from '../../constants';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_WIDTH = SCREEN_WIDTH - SPACING.lg * 2;
@@ -45,7 +45,7 @@ type UpdateCardData = {
   onPress: () => void;
 };
 
-export default function OwnerHomeScreen({ navigation }: any) {
+export default function CustomerHomeScreen({ navigation }: any) {
   const { user } = useSelector((state: RootState) => state.auth);
   const [jobs, setJobs] = useState<any[]>([]);
   const [vehicles, setVehicles] = useState<any[]>([]);
@@ -67,8 +67,8 @@ const [updates, setUpdates] = useState<UpdateCardData[]>([]);
       results.push({
         key: `active-${activeJob.id}`,
         icon: isInProgress ? 'construct' : 'checkmark-circle',
-        color: '#7c3aed',
-        bg: '#f5f3ff',
+        color: COLORS.info,
+        bg: COLORS.infoTint,
         title: isInProgress ? 'Job in progress' : 'Mechanic accepted your job',
         subtitle: `${activeJob.title} · ${isInProgress ? 'Work has started' : 'On the way to you'}`,
         onPress: () => navigation.navigate('Jobs'),
@@ -79,12 +79,12 @@ const [updates, setUpdates] = useState<UpdateCardData[]>([]);
     if (recentCompleted) {
       try {
         const payment = await paymentService.getPaymentByJob(recentCompleted.id);
-        if (!payment || payment.status !== 'COMPLETED') {
+        if (!payment || payment.status !== 'success') {
           results.push({
             key: `payment-${recentCompleted.id}`,
             icon: 'cash-outline',
-            color: '#000814',
-            bg: '#fffbeb',
+            color: COLORS.primary,
+            bg: COLORS.warningTint,
             title: 'Job completed — payment due',
             subtitle: `${recentCompleted.title} · GHS ${recentCompleted.finalCost || 0}`,
             onPress: () => navigation.navigate('Jobs'),
@@ -94,8 +94,8 @@ const [updates, setUpdates] = useState<UpdateCardData[]>([]);
         results.push({
           key: `payment-${recentCompleted.id}`,
           icon: 'cash-outline',
-          color: '#000814',
-          bg: '#fffbeb',
+          color: COLORS.primary,
+          bg: COLORS.warningTint,
           title: 'Job completed — payment due',
           subtitle: `${recentCompleted.title} · GHS ${recentCompleted.finalCost || 0}`,
           onPress: () => navigation.navigate('Jobs'),
@@ -111,8 +111,8 @@ const [updates, setUpdates] = useState<UpdateCardData[]>([]);
       results.push({
         key: `scheduled-${upcoming.id}`,
         icon: 'calendar-outline',
-        color: '#2563eb',
-        bg: '#eff6ff',
+        color: COLORS.info,
+        bg: COLORS.infoTint,
         title: 'Upcoming scheduled job',
         subtitle: `${upcoming.title} · ${formatScheduled(upcoming.scheduledDate)}`,
         onPress: () => navigation.navigate('Jobs'),
@@ -128,8 +128,8 @@ const [updates, setUpdates] = useState<UpdateCardData[]>([]);
           results.push({
             key: `vehicle-${v.id}-${field}`,
             icon: 'alert-circle-outline',
-            color: daysLeft < 0 ? '#dc2626' : '#000814',
-            bg: daysLeft < 0 ? '#fef2f2' : '#fffbeb',
+            color: daysLeft < 0 ? COLORS.error : COLORS.primary,
+            bg: daysLeft < 0 ? COLORS.errorTint : COLORS.warningTint,
             title: daysLeft < 0 ? `${label} expired` : `${label} expiring soon`,
             subtitle: `${v.make} ${v.model} · ${formatDate(dateStr)}`,
             onPress: () => navigation.navigate('Profile', { openVehicleId: v.id }),
@@ -145,7 +145,7 @@ const [updates, setUpdates] = useState<UpdateCardData[]>([]);
   const fetchData = async () => {
     try {
       const [jobsData, vehiclesData, profileData] = await Promise.all([
-        jobService.getMyJobsAsOwner(),
+        jobService.getMyJobsAsCustomer(),
         vehicleService.getMyVehicles(),
         userService.getMyProfile().catch(() => null),
       ]);
@@ -207,23 +207,14 @@ const [updates, setUpdates] = useState<UpdateCardData[]>([]);
     fetchData();
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'PENDING': return '#f59e0b';
-      case 'ACCEPTED': return '#3b82f6';
-      case 'IN_PROGRESS': return '#8b5cf6';
-      case 'COMPLETED': return '#10b981';
-      case 'CANCELLED': return '#ef4444';
-      default: return '#6b7280';
-    }
-  };
+  const getStatusColor = (status: string) => JOB_STATUS_COLORS[status] || COLORS.textSecondary;
 
   const featuredJob = jobs.find(j => j.status === 'ACCEPTED' || j.status === 'IN_PROGRESS') || jobs[0] || null;
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
-      <LinearGradient colors={['#1b4332', '#2d6a4f']} style={styles.header}>
+      <LinearGradient colors={[COLORS.primary, COLORS.secondary]} style={styles.header}>
         <View style={styles.headerContent}>
           <View>
             <Text style={styles.greeting}>Hello, {user?.name?.split(' ')[0]}</Text>
@@ -242,9 +233,9 @@ const [updates, setUpdates] = useState<UpdateCardData[]>([]);
         <TouchableOpacity
           style={styles.sosButton}
           activeOpacity={0.85}
-          onPress={() => navigation.navigate('SOS')}>
+          onPress={() => navigation.navigate('CustomerSOS')}>
           <View style={styles.sosIconWrap}>
-            <Ionicons name="warning" size={20} color="#dc2626" />
+            <Ionicons name="warning" size={20} color={COLORS.error} />
           </View>
           <View style={{ flex: 1 }}>
             <Text style={styles.sosText}>SOS Emergency</Text>
@@ -256,7 +247,7 @@ const [updates, setUpdates] = useState<UpdateCardData[]>([]);
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#1b4332" />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.primary} />}
         style={styles.scrollBody}>
 
         <Animated.View style={{ opacity: enterAnim, transform: [{ translateY: enterAnim.interpolate({ inputRange: [0, 1], outputRange: [16, 0] }) }] }}>
@@ -280,7 +271,7 @@ const [updates, setUpdates] = useState<UpdateCardData[]>([]);
                     style={[styles.updateCard, { backgroundColor: item.bg, width: CARD_WIDTH }]}
                     activeOpacity={0.85}
                     onPress={item.onPress}>
-                    <View style={[styles.updateIconWrap, { backgroundColor: '#fff' }]}>
+                    <View style={[styles.updateIconWrap, { backgroundColor: COLORS.white }]}>
                       <Ionicons name={item.icon} size={22} color={item.color} />
                     </View>
                     <View style={{ flex: 1 }}>
@@ -305,15 +296,15 @@ const [updates, setUpdates] = useState<UpdateCardData[]>([]);
           <View style={styles.section}>
             <View style={styles.quickActions}>
               <TouchableOpacity style={styles.actionCard} onPress={() => navigation.navigate('Jobs')} activeOpacity={0.85}>
-                <View style={[styles.actionIconWrap, { backgroundColor: '#f0fdf4' }]}>
-                  <Ionicons name="add-circle" size={26} color="#1b4332" />
+                <View style={[styles.actionIconWrap, { backgroundColor: COLORS.successTint }]}>
+                  <Ionicons name="add-circle" size={26} color={COLORS.primary} />
                 </View>
                 <Text style={styles.actionText}>New Job</Text>
-                <Text style={styles.actionSubtext}>Request a mechanic</Text>
+                <Text style={styles.actionSubtext}>Find a mechanic for this job</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.actionCard} onPress={() => navigation.navigate('Search')} activeOpacity={0.85}>
-                <View style={[styles.actionIconWrap, { backgroundColor: '#eff6ff' }]}>
-                  <Ionicons name="search" size={24} color="#2563eb" />
+                <View style={[styles.actionIconWrap, { backgroundColor: COLORS.infoTint }]}>
+                  <Ionicons name="search" size={24} color={COLORS.info} />
                 </View>
                 <Text style={styles.actionText}>Find Mechanic</Text>
                 <Text style={styles.actionSubtext}>Browse & compare</Text>
@@ -330,10 +321,10 @@ const [updates, setUpdates] = useState<UpdateCardData[]>([]);
               </TouchableOpacity>
             </View>
             {loading ? (
-              <ActivityIndicator color="#1b4332" style={{ marginTop: 10 }} />
+              <ActivityIndicator color={COLORS.primary} style={{ marginTop: 10 }} />
             ) : vehicles.length === 0 ? (
               <TouchableOpacity style={styles.addVehicleCard} onPress={() => navigation.navigate('Profile')} activeOpacity={0.85}>
-                <Ionicons name="car-outline" size={28} color="#d1d5db" />
+                <Ionicons name="car-outline" size={28} color={COLORS.border} />
                 <Text style={styles.addVehicleText}>Add your first vehicle</Text>
               </TouchableOpacity>
             ) : (
@@ -344,8 +335,8 @@ const [updates, setUpdates] = useState<UpdateCardData[]>([]);
                     style={styles.vehicleCard}
                     activeOpacity={0.85}
                     onPress={() => navigation.navigate('Profile', { openVehicleId: v.id })}>
-                    <LinearGradient colors={['#f0fdf4', '#dcfce7']} style={styles.vehicleImagePlaceholder}>
-                      <Ionicons name={VEHICLE_ICONS[v.type] || 'car-sport'} size={38} color="#1b4332" />
+                    <LinearGradient colors={[COLORS.successTint, COLORS.successTint]} style={styles.vehicleImagePlaceholder}>
+                      <Ionicons name={VEHICLE_ICONS[v.type] || 'car-sport'} size={38} color={COLORS.primary} />
                     </LinearGradient>
                     <Text style={styles.vehicleName} numberOfLines={1}>{v.make} {v.model}</Text>
                     <Text style={styles.vehicleSub}>{v.year} · {v.licensePlate}</Text>
@@ -353,14 +344,14 @@ const [updates, setUpdates] = useState<UpdateCardData[]>([]);
                       <Text style={styles.typeBadgeText}>{v.type}</Text>
                     </View>
                     <View style={styles.servicedRow}>
-                      <Ionicons name="build-outline" size={11} color="#6b7280" />
+                      <Ionicons name="build-outline" size={11} color={COLORS.textSecondary} />
                       <Text style={styles.servicedText}>Serviced: {formatDate(v.lastServicedDate)}</Text>
                     </View>
                   </TouchableOpacity>
                 ))}
                 <TouchableOpacity style={styles.addVehicleMini} onPress={() => navigation.navigate('Profile')} activeOpacity={0.85}>
                   <View style={styles.addVehicleMiniCircle}>
-                    <Ionicons name="add" size={26} color="#1b4332" />
+                    <Ionicons name="add" size={26} color={COLORS.primary} />
                   </View>
                   <Text style={styles.addVehicleMiniText}>Add Vehicle</Text>
                 </TouchableOpacity>
@@ -379,16 +370,16 @@ const [updates, setUpdates] = useState<UpdateCardData[]>([]);
               )}
             </View>
             {loading ? (
-              <ActivityIndicator color="#1b4332" style={{ marginTop: 20 }} />
+              <ActivityIndicator color={COLORS.primary} style={{ marginTop: 20 }} />
             ) : !featuredJob ? (
               <View style={styles.emptyState}>
                 <View style={styles.emptyIconWrap}>
-                  <Ionicons name="construct-outline" size={40} color="#9ca3af" />
+                  <Ionicons name="construct-outline" size={40} color={COLORS.textSecondary} />
                 </View>
                 <Text style={styles.emptyText}>No jobs yet</Text>
-                <Text style={styles.emptySubText}>Create your first job request</Text>
+                <Text style={styles.emptySubText}>Create your first job</Text>
                 <TouchableOpacity style={styles.emptyCta} onPress={() => navigation.navigate('Jobs')}>
-                  <Text style={styles.emptyCtaText}>Create Job Request</Text>
+                  <Text style={styles.emptyCtaText}>Create Job</Text>
                 </TouchableOpacity>
               </View>
             ) : (
@@ -402,11 +393,11 @@ const [updates, setUpdates] = useState<UpdateCardData[]>([]);
                 </View>
                 <Text style={styles.jobDesc} numberOfLines={2}>{featuredJob.description}</Text>
                 <View style={styles.jobFooter}>
-                  <Ionicons name="construct-outline" size={13} color="#9ca3af" />
+                  <Ionicons name="construct-outline" size={13} color={COLORS.textSecondary} />
                   <Text style={styles.jobMeta}>{featuredJob.type}</Text>
                   {featuredJob.location && (
                     <>
-                      <Ionicons name="location-outline" size={13} color="#9ca3af" style={{ marginLeft: 8 }} />
+                      <Ionicons name="location-outline" size={13} color={COLORS.textSecondary} style={{ marginLeft: 8 }} />
                       <Text style={styles.jobMeta} numberOfLines={1}>{featuredJob.location}</Text>
                     </>
                   )}
@@ -422,61 +413,61 @@ const [updates, setUpdates] = useState<UpdateCardData[]>([]);
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f9fafb' },
+  container: { flex: 1, backgroundColor: COLORS.background },
   header: { paddingTop: 60, paddingBottom: SPACING.xl, paddingHorizontal: SPACING.lg, borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
   headerContent: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACING.lg },
-  greeting: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: '#ffffff' },
-  subGreeting: { fontSize: FONT_SIZES.sm, color: '#86efac', marginTop: 2 },
-  avatar: { width: 46, height: 46, borderRadius: 23, backgroundColor: '#fbbf24', justifyContent: 'center', alignItems: 'center' },
+  greeting: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.white, fontFamily: FONT_FAMILY.headingBold },
+  subGreeting: { fontSize: FONT_SIZES.sm, color: COLORS.darkTextSecondary, marginTop: 2, fontFamily: FONT_FAMILY.body },
+  avatar: { width: 46, height: 46, borderRadius: 23, backgroundColor: COLORS.secondary, justifyContent: 'center', alignItems: 'center' },
   avatarImage: { width: 46, height: 46, borderRadius: 23 },
-  avatarText: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: '#1b4332' },
-  sosButton: { flexDirection: 'row', alignItems: 'center', gap: SPACING.md, backgroundColor: 'rgba(220,38,38,0.18)', borderRadius: RADIUS.md, padding: SPACING.md, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)' },
-  sosIconWrap: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center' },
-  sosText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: '#ffffff' },
+  avatarText: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.primary },
+  sosButton: { flexDirection: 'row', alignItems: 'center', gap: SPACING.md, backgroundColor: 'rgba(180,35,53,0.18)', borderRadius: RADIUS.md, padding: SPACING.md, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)' },
+  sosIconWrap: { width: 40, height: 40, borderRadius: 20, backgroundColor: COLORS.white, justifyContent: 'center', alignItems: 'center' },
+  sosText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.white },
   sosSubtext: { fontSize: 11, color: 'rgba(255,255,255,0.75)', marginTop: 1 },
   scrollBody: { flex: 1 },
   section: { padding: SPACING.lg, paddingTop: SPACING.lg },
   sectionHeaderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACING.md },
-  sectionTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: '#1b1b1b' },
-  seeAllText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: '#1b4332' },
+  sectionTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.text, fontFamily: FONT_FAMILY.headingBold },
+  seeAllText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.primary },
   updateCard: { flexDirection: 'row', alignItems: 'center', gap: SPACING.md, borderRadius: RADIUS.md, padding: SPACING.md },
   updateIconWrap: { width: 42, height: 42, borderRadius: 21, justifyContent: 'center', alignItems: 'center' },
   updateTitle: { fontSize: FONT_SIZES.sm, fontWeight: '700' },
-  updateSubtitle: { fontSize: FONT_SIZES.xs, color: '#6b7280', marginTop: 2 },
+  updateSubtitle: { fontSize: FONT_SIZES.xs, color: COLORS.textSecondary, marginTop: 2 },
   updateDotsRow: { flexDirection: 'row', justifyContent: 'center', gap: 6, marginTop: 10 },
-  updateDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#d1d5db' },
-  updateDotActive: { backgroundColor: '#1b4332', width: 18 },
+  updateDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: COLORS.border },
+  updateDotActive: { backgroundColor: COLORS.primary, width: 18 },
   quickActions: { flexDirection: 'row', gap: SPACING.md },
-  actionCard: { flex: 1, backgroundColor: '#fff', borderRadius: RADIUS.md, padding: SPACING.md, gap: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 },
+  actionCard: { flex: 1, backgroundColor: COLORS.white, borderRadius: RADIUS.md, padding: SPACING.md, gap: 4, shadowColor: COLORS.black, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 },
   actionIconWrap: { width: 44, height: 44, borderRadius: 14, justifyContent: 'center', alignItems: 'center', marginBottom: 6 },
-  actionText: { fontSize: FONT_SIZES.sm, fontWeight: '700', color: '#1b1b1b' },
-  actionSubtext: { fontSize: 11, color: '#9ca3af' },
-  addVehicleCard: { alignItems: 'center', padding: SPACING.xl, backgroundColor: '#fff', borderRadius: RADIUS.md, borderWidth: 1.5, borderColor: '#e5e7eb', borderStyle: 'dashed', gap: 8 },
-  addVehicleText: { fontSize: FONT_SIZES.sm, color: '#9ca3af' },
-  vehicleCard: { width: 172, backgroundColor: '#fff', borderRadius: RADIUS.md, padding: SPACING.md, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 },
+  actionText: { fontSize: FONT_SIZES.sm, fontWeight: '700', color: COLORS.text },
+  actionSubtext: { fontSize: 11, color: COLORS.textSecondary },
+  addVehicleCard: { alignItems: 'center', padding: SPACING.xl, backgroundColor: COLORS.white, borderRadius: RADIUS.md, borderWidth: 1.5, borderColor: COLORS.border, borderStyle: 'dashed', gap: 8 },
+  addVehicleText: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary },
+  vehicleCard: { width: 172, backgroundColor: COLORS.white, borderRadius: RADIUS.md, padding: SPACING.md, shadowColor: COLORS.black, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 },
   vehicleImagePlaceholder: { width: '100%', height: 76, borderRadius: RADIUS.md, justifyContent: 'center', alignItems: 'center', marginBottom: 10 },
-  vehicleName: { fontSize: FONT_SIZES.sm, fontWeight: '700', color: '#1b1b1b' },
-  vehicleSub: { fontSize: FONT_SIZES.xs, color: '#6b7280', marginTop: 2 },
+  vehicleName: { fontSize: FONT_SIZES.sm, fontWeight: '700', color: COLORS.text },
+  vehicleSub: { fontSize: FONT_SIZES.xs, color: COLORS.textSecondary, marginTop: 2 },
   vehicleMetaRow: { marginTop: 8 },
-  typeBadgeText: { fontSize: 10, fontWeight: '700', color: '#1b4332', backgroundColor: '#f0fdf4', paddingHorizontal: 8, paddingVertical: 2, borderRadius: RADIUS.full, alignSelf: 'flex-start' },
+  typeBadgeText: { fontSize: 10, fontWeight: '700', color: COLORS.primary, backgroundColor: COLORS.successTint, paddingHorizontal: 8, paddingVertical: 2, borderRadius: RADIUS.full, alignSelf: 'flex-start' },
   servicedRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 6 },
-  servicedText: { fontSize: 10, color: '#9ca3af' },
-  addVehicleMini: { width: 120, backgroundColor: '#fff', borderRadius: RADIUS.md, justifyContent: 'center', alignItems: 'center', borderWidth: 1.5, borderColor: '#e5e7eb', borderStyle: 'dashed', gap: 8, padding: SPACING.md },
-  addVehicleMiniCircle: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#f0fdf4', justifyContent: 'center', alignItems: 'center' },
-  addVehicleMiniText: { fontSize: FONT_SIZES.xs, fontWeight: '600', color: '#1b4332' },
-  jobCard: { backgroundColor: '#ffffff', borderRadius: RADIUS.md, padding: SPACING.md, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 },
+  servicedText: { fontSize: 10, color: COLORS.textSecondary },
+  addVehicleMini: { width: 120, backgroundColor: COLORS.white, borderRadius: RADIUS.md, justifyContent: 'center', alignItems: 'center', borderWidth: 1.5, borderColor: COLORS.border, borderStyle: 'dashed', gap: 8, padding: SPACING.md },
+  addVehicleMiniCircle: { width: 44, height: 44, borderRadius: 22, backgroundColor: COLORS.successTint, justifyContent: 'center', alignItems: 'center' },
+  addVehicleMiniText: { fontSize: FONT_SIZES.xs, fontWeight: '600', color: COLORS.primary },
+  jobCard: { backgroundColor: COLORS.white, borderRadius: RADIUS.md, padding: SPACING.md, shadowColor: COLORS.black, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 },
   jobHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6, gap: 8 },
-  jobTitle: { fontSize: FONT_SIZES.md, fontWeight: '700', color: '#1b1b1b', flex: 1 },
+  jobTitle: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.text, flex: 1, fontFamily: FONT_FAMILY.headingBold },
   statusBadge: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 9, paddingVertical: 4, borderRadius: RADIUS.full },
   statusDot: { width: 6, height: 6, borderRadius: 3 },
   statusText: { fontSize: 11, fontWeight: '700' },
-  jobDesc: { fontSize: FONT_SIZES.sm, color: '#6b7280', marginBottom: 10, lineHeight: 19 },
+  jobDesc: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, marginBottom: 10, lineHeight: 19 },
   jobFooter: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  jobMeta: { fontSize: FONT_SIZES.xs, color: '#9ca3af', flexShrink: 1 },
-  emptyState: { alignItems: 'center', paddingVertical: 32, backgroundColor: '#fff', borderRadius: RADIUS.md, gap: 4 },
-  emptyIconWrap: { width: 72, height: 72, borderRadius: 36, backgroundColor: '#f3f4f6', justifyContent: 'center', alignItems: 'center', marginBottom: 8 },
-  emptyText: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: '#374151' },
-  emptySubText: { fontSize: FONT_SIZES.sm, color: '#9ca3af', marginBottom: 16 },
-  emptyCta: { backgroundColor: '#1b4332', paddingHorizontal: 20, paddingVertical: 10, borderRadius: RADIUS.full },
-  emptyCtaText: { fontSize: FONT_SIZES.sm, fontWeight: '700', color: '#fff' },
+  jobMeta: { fontSize: FONT_SIZES.xs, color: COLORS.textSecondary, flexShrink: 1 },
+  emptyState: { alignItems: 'center', paddingVertical: 32, backgroundColor: COLORS.white, borderRadius: RADIUS.md, gap: 4 },
+  emptyIconWrap: { width: 72, height: 72, borderRadius: 36, backgroundColor: COLORS.background, justifyContent: 'center', alignItems: 'center', marginBottom: 8 },
+  emptyText: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.text },
+  emptySubText: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, marginBottom: 16 },
+  emptyCta: { backgroundColor: COLORS.primary, paddingHorizontal: 20, paddingVertical: 10, borderRadius: RADIUS.full },
+  emptyCtaText: { fontSize: FONT_SIZES.sm, fontWeight: '700', color: COLORS.white },
 });

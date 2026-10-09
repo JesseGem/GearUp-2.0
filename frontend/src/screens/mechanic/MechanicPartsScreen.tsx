@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { COLORS, SPACING, FONT_SIZES, RADIUS } from '../../constants';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   StatusBar, RefreshControl, ActivityIndicator, Modal, TextInput,
@@ -14,10 +15,9 @@ import { userService } from '../../services/userService';
 import { messageService } from '../../services/messageService';
 import ConfirmDialog from '../../components/ConfirmDialog';
 import { AppAlertCard } from '../../components/AppAlert';
-import { SPACING, FONT_SIZES, RADIUS } from '../../constants';
 
-const ACCENT = '#000814';
-const ACCENT_DEEP = '#001D3D';
+const ACCENT = COLORS.primary;
+const ACCENT_DEEP = COLORS.secondary;
 const CONDITIONS = ['New', 'Used - Like New', 'Used - Good', 'Used - Fair'];
 const CATEGORIES = ['Engine', 'Battery', 'Tires', 'Brakes', 'Suspension', 'Electrical', 'Body', 'Other'];
 const emptyForm = {
@@ -28,20 +28,20 @@ const emptyForm = {
 
 const getStatusColor = (status: string) => {
   switch (status) {
-    case 'AVAILABLE': return '#10b981';
-    case 'SOLD': return '#6b7280';
-    case 'RESERVED': return '#f59e0b';
-    default: return '#6b7280';
+    case 'AVAILABLE': return COLORS.success;
+    case 'SOLD': return COLORS.textSecondary;
+    case 'RESERVED': return COLORS.warning;
+    default: return COLORS.textSecondary;
   }
 };
 const getOrderStatusColor = (status: string) => {
   switch (status) {
-    case 'PENDING': return '#f59e0b';
-    case 'ACCEPTED': return '#3b82f6';
-    case 'DECLINED': return '#ef4444';
-    case 'CANCELLED': return '#ef4444';
-    case 'COMPLETED': return '#10b981';
-    default: return '#6b7280';
+    case 'PENDING': return COLORS.warning;
+    case 'ACCEPTED': return COLORS.info;
+    case 'DECLINED': return COLORS.error;
+    case 'CANCELLED': return COLORS.error;
+    case 'COMPLETED': return COLORS.success;
+    default: return COLORS.textSecondary;
   }
 };
 
@@ -75,7 +75,7 @@ function PartCard({ part, index, onOpenEdit, onOpenBuyers, onMarkSold, onDelete 
             <Image source={{ uri: part.imageUrl }} style={styles.partThumb} />
           ) : (
             <View style={styles.partThumbPlaceholder}>
-              <Ionicons name="image-outline" size={24} color="#d1d5db" />
+              <Ionicons name="image-outline" size={24} color={COLORS.border} />
             </View>
           )}
           <View style={{ flex: 1 }}>
@@ -88,7 +88,7 @@ function PartCard({ part, index, onOpenEdit, onOpenBuyers, onMarkSold, onDelete 
             <Text style={styles.partDesc} numberOfLines={2}>{part.description}</Text>
             <Text style={styles.partPrice}>GHS {part.price}</Text>
           </View>
-          <Ionicons name="chevron-forward" size={18} color="#9ca3af" />
+          <Ionicons name="chevron-forward" size={18} color={COLORS.textSecondary} />
         </View>
         <View style={styles.partMeta}>
           {part.brand && <Text style={styles.metaChip}>{part.brand}</Text>}
@@ -98,7 +98,7 @@ function PartCard({ part, index, onOpenEdit, onOpenBuyers, onMarkSold, onDelete 
         <View style={styles.actions}>
           {part.status !== 'SOLD' && (
             <TouchableOpacity style={styles.buyersBtn} onPress={(e) => { e.stopPropagation(); onOpenBuyers(); }}>
-              <Ionicons name="people-outline" size={14} color="#2563eb" />
+              <Ionicons name="people-outline" size={14} color={COLORS.info} />
               <Text style={styles.buyersBtnText}>Buyers</Text>
             </TouchableOpacity>
           )}
@@ -115,7 +115,7 @@ function PartCard({ part, index, onOpenEdit, onOpenBuyers, onMarkSold, onDelete 
           )}
           {part.status === 'AVAILABLE' && (
             <TouchableOpacity style={styles.deleteBtn} onPress={(e) => { e.stopPropagation(); onDelete(); }}>
-              <Ionicons name="trash-outline" size={16} color="#dc2626" />
+              <Ionicons name="trash-outline" size={16} color={COLORS.error} />
             </TouchableOpacity>
           )}
         </View>
@@ -298,7 +298,7 @@ export default function MechanicPartsScreen({ navigation }: any) {
   const handleMessageBuyer = async (order: any) => {
     setMessagingBuyerId(order.buyerId);
     try {
-      const buyerName = buyerProfiles[order.buyerId]?.name || 'Car Owner';
+      const buyerName = buyerProfiles[order.buyerId]?.name || 'Customer';
       const existing = await messageService.getConversationWithUser(user?.userId, order.buyerId).catch(() => null);
       const chatJobId = existing ? existing.job_id : -order.id;
       setBuyersModalPart(null);
@@ -328,7 +328,7 @@ export default function MechanicPartsScreen({ navigation }: any) {
         ) : parts.length === 0 ? (
           <View style={styles.emptyState}>
             <View style={styles.emptyIconWrap}>
-              <Ionicons name="construct-outline" size={40} color="#9ca3af" />
+              <Ionicons name="construct-outline" size={40} color={COLORS.textSecondary} />
             </View>
             <Text style={styles.emptyText}>No listings yet</Text>
             <Text style={styles.emptySubText}>Tap + to list a spare part</Text>
@@ -353,8 +353,8 @@ export default function MechanicPartsScreen({ navigation }: any) {
         )}
       </ScrollView>
       <TouchableOpacity style={styles.fab} onPress={openAddModal}>
-        <LinearGradient colors={[ACCENT, ACCENT_DEEP]} style={styles.fabGradient}>
-          <Ionicons name="add" size={28} color="#fff" />
+        <LinearGradient colors={[COLORS.accent, COLORS.accent]} style={styles.fabGradient}>
+          <Ionicons name="add" size={28} color={COLORS.accentInk} />
         </LinearGradient>
       </TouchableOpacity>
 
@@ -365,7 +365,7 @@ export default function MechanicPartsScreen({ navigation }: any) {
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>{editingPartId ? 'Edit Listing' : 'List a Part'}</Text>
               <TouchableOpacity onPress={() => { setModalVisible(false); setEditingPartId(null); }}>
-                <Ionicons name="close" size={24} color="#1b1b1b" />
+                <Ionicons name="close" size={24} color={COLORS.text} />
               </TouchableOpacity>
             </View>
             <ScrollView style={styles.modalBody} keyboardShouldPersistTaps="handled">
@@ -381,12 +381,12 @@ export default function MechanicPartsScreen({ navigation }: any) {
                 )}
                 {uploadingImage && (
                   <View style={styles.imageUploadingOverlay}>
-                    <ActivityIndicator color="#fff" />
+                    <ActivityIndicator color={COLORS.white} />
                   </View>
                 )}
                 {localImageUri && !uploadingImage && (
                   <View style={styles.imageCheckBadge}>
-                    <Ionicons name="checkmark-circle" size={20} color="#10b981" />
+                    <Ionicons name="checkmark-circle" size={20} color={COLORS.success} />
                   </View>
                 )}
               </TouchableOpacity>
@@ -412,9 +412,9 @@ export default function MechanicPartsScreen({ navigation }: any) {
               />
               <Text style={styles.label}>Brand</Text>
               <TextInput style={styles.input} placeholder="e.g. Denso" value={form.brand} onChangeText={t => setForm({ ...form, brand: t })} />
-              <Text style={styles.label}>Car Make</Text>
+              <Text style={styles.label}>Vehicle Make</Text>
               <TextInput style={styles.input} placeholder="e.g. Toyota" value={form.carMake} onChangeText={t => setForm({ ...form, carMake: t })} />
-              <Text style={styles.label}>Car Model</Text>
+              <Text style={styles.label}>Vehicle Model</Text>
               <TextInput style={styles.input} placeholder="e.g. Corolla" value={form.carModel} onChangeText={t => setForm({ ...form, carModel: t })} />
               <Text style={styles.label}>Category</Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipScroll}>
@@ -439,7 +439,7 @@ export default function MechanicPartsScreen({ navigation }: any) {
                 ))}
               </View>
               <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit} disabled={uploadingImage}>
-                <LinearGradient colors={[ACCENT, ACCENT_DEEP]} style={styles.submitGradient}>
+                <LinearGradient colors={[COLORS.accent, COLORS.accent]} style={styles.submitGradient}>
                   <Text style={styles.submitText}>
                     {uploadingImage ? 'Uploading image...' : editingPartId ? 'Save Changes' : 'List Part'}
                   </Text>
@@ -460,7 +460,7 @@ export default function MechanicPartsScreen({ navigation }: any) {
               {buyersModalPart && <Text style={styles.modalSubtitle} numberOfLines={1}>{buyersModalPart.name}</Text>}
             </View>
             <TouchableOpacity onPress={() => setBuyersModalPart(null)}>
-              <Ionicons name="close" size={24} color="#1b1b1b" />
+              <Ionicons name="close" size={24} color={COLORS.text} />
             </TouchableOpacity>
           </View>
           {loadingBuyers ? (
@@ -470,7 +470,7 @@ export default function MechanicPartsScreen({ navigation }: any) {
               {buyerOrders.length === 0 ? (
                 <View style={styles.emptyState}>
                   <View style={styles.emptyIconWrap}>
-                    <Ionicons name="people-outline" size={40} color="#9ca3af" />
+                    <Ionicons name="people-outline" size={40} color={COLORS.textSecondary} />
                   </View>
                   <Text style={styles.emptyText}>No orders yet</Text>
                   <Text style={styles.emptySubText}>Interested buyers will appear here</Text>
@@ -485,7 +485,7 @@ export default function MechanicPartsScreen({ navigation }: any) {
                           <Text style={styles.buyerAvatarText}>{buyer?.name?.[0]?.toUpperCase() || '?'}</Text>
                         </View>
                         <View style={{ flex: 1 }}>
-                          <Text style={styles.buyerName}>{buyer?.name || 'Car Owner'}</Text>
+                          <Text style={styles.buyerName}>{buyer?.name || 'Customer'}</Text>
                           <Text style={styles.buyerPrice}>
                             {order.proposedPrice != null ? `Offered: GHS ${order.proposedPrice}` : `GHS ${order.price}`}
                           </Text>
@@ -556,71 +556,71 @@ export default function MechanicPartsScreen({ navigation }: any) {
   );
 }
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f9fafb' },
+  container: { flex: 1, backgroundColor: COLORS.background },
   header: { paddingTop: 60, paddingBottom: SPACING.lg, paddingHorizontal: SPACING.lg, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
-  headerTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: '#ffffff' },
-  fab: { position: 'absolute', right: SPACING.lg, bottom: 110, borderRadius: 28, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 8 },
+  headerTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.white },
+  fab: { position: 'absolute', right: SPACING.lg, bottom: 110, borderRadius: 28, shadowColor: COLORS.black, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 8 },
   fabGradient: { width: 56, height: 56, borderRadius: 28, justifyContent: 'center', alignItems: 'center' },
   list: { flex: 1, padding: SPACING.lg },
-  partCard: { backgroundColor: '#fff', borderRadius: RADIUS.md, padding: SPACING.md, marginBottom: SPACING.md, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 },
+  partCard: { backgroundColor: COLORS.white, borderRadius: RADIUS.md, padding: SPACING.md, marginBottom: SPACING.md, shadowColor: COLORS.black, shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 },
   partCardRow: { flexDirection: 'row', gap: SPACING.md, marginBottom: 8, alignItems: 'center' },
   partThumb: { width: 64, height: 64, borderRadius: RADIUS.md },
-  partThumbPlaceholder: { width: 64, height: 64, borderRadius: RADIUS.md, backgroundColor: '#f3f4f6', justifyContent: 'center', alignItems: 'center' },
+  partThumbPlaceholder: { width: 64, height: 64, borderRadius: RADIUS.md, backgroundColor: COLORS.background, justifyContent: 'center', alignItems: 'center' },
   partHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4, gap: 8 },
-  partName: { fontSize: FONT_SIZES.md, fontWeight: '600', color: '#1b1b1b', flex: 1 },
+  partName: { fontSize: FONT_SIZES.md, fontWeight: '600', color: COLORS.text, flex: 1 },
   statusBadge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: RADIUS.full },
   statusText: { fontSize: FONT_SIZES.xs, fontWeight: '600' },
-  partDesc: { fontSize: FONT_SIZES.sm, color: '#6b7280', marginBottom: 4 },
+  partDesc: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, marginBottom: 4 },
   partPrice: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: ACCENT },
   partMeta: { flexDirection: 'row', gap: 6, flexWrap: 'wrap', marginBottom: 8 },
-  metaChip: { fontSize: FONT_SIZES.xs, color: '#6b7280', backgroundColor: '#f3f4f6', paddingHorizontal: 8, paddingVertical: 3, borderRadius: RADIUS.full },
+  metaChip: { fontSize: FONT_SIZES.xs, color: COLORS.textSecondary, backgroundColor: COLORS.background, paddingHorizontal: 8, paddingVertical: 3, borderRadius: RADIUS.full },
   actions: { flexDirection: 'row', gap: 8, alignItems: 'center', flexWrap: 'wrap' },
-  buyersBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, paddingHorizontal: 12, paddingVertical: 8, backgroundColor: '#eff6ff', borderRadius: RADIUS.md, borderWidth: 1, borderColor: '#bfdbfe' },
-  buyersBtnText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: '#2563eb' },
-  editBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, paddingHorizontal: 12, paddingVertical: 8, backgroundColor: '#fffbeb', borderRadius: RADIUS.md, borderWidth: 1, borderColor: '#fde68a' },
+  buyersBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, paddingHorizontal: 12, paddingVertical: 8, backgroundColor: COLORS.infoTint, borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.infoTint },
+  buyersBtnText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.info },
+  editBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, paddingHorizontal: 12, paddingVertical: 8, backgroundColor: COLORS.warningTint, borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.accent },
   editBtnText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: ACCENT },
-  soldBtn: { flex: 1, padding: 8, backgroundColor: '#f0fdf4', borderRadius: RADIUS.md, alignItems: 'center', minWidth: 90 },
-  soldBtnText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: '#10b981' },
-  deleteBtn: { width: 36, height: 36, backgroundColor: '#fef2f2', borderRadius: RADIUS.md, justifyContent: 'center', alignItems: 'center' },
-  emptyState: { alignItems: 'center', paddingVertical: 60, gap: 4, backgroundColor: '#fff', borderRadius: RADIUS.md },
-  emptyIconWrap: { width: 72, height: 72, borderRadius: 36, backgroundColor: '#f3f4f6', justifyContent: 'center', alignItems: 'center', marginBottom: 8 },
-  emptyText: { fontSize: FONT_SIZES.lg, fontWeight: '600', color: '#9ca3af' },
-  emptySubText: { fontSize: FONT_SIZES.sm, color: '#d1d5db' },
-  addFirstBtn: { marginTop: 8, paddingHorizontal: 24, paddingVertical: 12, backgroundColor: ACCENT, borderRadius: RADIUS.md },
-  addFirstBtnText: { fontSize: FONT_SIZES.md, fontWeight: '600', color: '#fff' },
-  modal: { flex: 1, backgroundColor: '#f9fafb' },
-  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: SPACING.lg, paddingTop: 60, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#f3f4f6' },
-  modalTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: '#1b1b1b' },
-  modalSubtitle: { fontSize: FONT_SIZES.sm, color: '#6b7280', marginTop: 2 },
+  soldBtn: { flex: 1, padding: 8, backgroundColor: COLORS.successTint, borderRadius: RADIUS.md, alignItems: 'center', minWidth: 90 },
+  soldBtnText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.success },
+  deleteBtn: { width: 36, height: 36, backgroundColor: COLORS.errorTint, borderRadius: RADIUS.md, justifyContent: 'center', alignItems: 'center' },
+  emptyState: { alignItems: 'center', paddingVertical: 60, gap: 4, backgroundColor: COLORS.white, borderRadius: RADIUS.md },
+  emptyIconWrap: { width: 72, height: 72, borderRadius: 36, backgroundColor: COLORS.background, justifyContent: 'center', alignItems: 'center', marginBottom: 8 },
+  emptyText: { fontSize: FONT_SIZES.lg, fontWeight: '600', color: COLORS.textSecondary },
+  emptySubText: { fontSize: FONT_SIZES.sm, color: COLORS.border },
+  addFirstBtn: { marginTop: 8, paddingHorizontal: 24, paddingVertical: 12, backgroundColor: COLORS.accent, borderRadius: RADIUS.md },
+  addFirstBtnText: { fontSize: FONT_SIZES.md, fontWeight: '600', color: COLORS.accentInk },
+  modal: { flex: 1, backgroundColor: COLORS.background },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: SPACING.lg, paddingTop: 60, backgroundColor: COLORS.white, borderBottomWidth: 1, borderBottomColor: COLORS.background },
+  modalTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.text },
+  modalSubtitle: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, marginTop: 2 },
   modalBody: { padding: SPACING.lg },
-  label: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: '#374151', marginBottom: 6, marginTop: 14 },
-  input: { backgroundColor: '#fff', borderRadius: RADIUS.md, borderWidth: 1, borderColor: '#e5e7eb', padding: 12, fontSize: FONT_SIZES.md, color: '#1b1b1b' },
+  label: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.text, marginBottom: 6, marginTop: 14 },
+  input: { backgroundColor: COLORS.white, borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.border, padding: 12, fontSize: FONT_SIZES.md, color: COLORS.text },
   textArea: { height: 80, textAlignVertical: 'top' },
   chipScroll: { marginBottom: 4 },
   conditionRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  conditionChip: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: RADIUS.full, borderWidth: 1, borderColor: '#e5e7eb', backgroundColor: '#fff', marginRight: 6, marginBottom: 6 },
-  conditionChipActive: { backgroundColor: ACCENT, borderColor: ACCENT },
-  conditionText: { fontSize: FONT_SIZES.sm, color: '#6b7280', fontWeight: '600' },
-  conditionTextActive: { color: '#fff' },
+  conditionChip: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: RADIUS.full, borderWidth: 1, borderColor: COLORS.border, backgroundColor: COLORS.white, marginRight: 6, marginBottom: 6 },
+  conditionChipActive: { backgroundColor: COLORS.accent, borderColor: COLORS.accent },
+  conditionText: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, fontWeight: '600' },
+  conditionTextActive: { color: COLORS.accentInk },
   submitBtn: { marginTop: 24, borderRadius: RADIUS.md, overflow: 'hidden' },
   submitGradient: { padding: 16, alignItems: 'center' },
-  submitText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: '#fff' },
-  imagePickerBtn: { width: 120, height: 120, borderRadius: RADIUS.md, backgroundColor: '#fff', borderWidth: 1.5, borderColor: '#e5e7eb', borderStyle: 'dashed', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' },
+  submitText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.accentInk },
+  imagePickerBtn: { width: 120, height: 120, borderRadius: RADIUS.md, backgroundColor: COLORS.white, borderWidth: 1.5, borderColor: COLORS.border, borderStyle: 'dashed', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' },
   imagePickerPlaceholder: { alignItems: 'center', gap: 6 },
   imagePickerText: { fontSize: FONT_SIZES.xs, color: ACCENT, fontWeight: '600' },
   imagePreview: { width: '100%', height: '100%' },
   imageUploadingOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'center', alignItems: 'center' },
-  imageCheckBadge: { position: 'absolute', top: 4, right: 4, backgroundColor: '#fff', borderRadius: 10 },
+  imageCheckBadge: { position: 'absolute', top: 4, right: 4, backgroundColor: COLORS.white, borderRadius: 10 },
   changePhotoText: { fontSize: FONT_SIZES.sm, color: ACCENT, fontWeight: '600', marginTop: 8 },
-  buyerCard: { backgroundColor: '#fff', borderRadius: RADIUS.md, padding: SPACING.md, marginBottom: SPACING.md, borderWidth: 1, borderColor: '#f3f4f6' },
+  buyerCard: { backgroundColor: COLORS.white, borderRadius: RADIUS.md, padding: SPACING.md, marginBottom: SPACING.md, borderWidth: 1, borderColor: COLORS.background },
   buyerCardHeader: { flexDirection: 'row', alignItems: 'center', gap: SPACING.md, marginBottom: SPACING.sm },
-  buyerAvatar: { width: 40, height: 40, borderRadius: 20, backgroundColor: ACCENT, justifyContent: 'center', alignItems: 'center' },
-  buyerAvatarText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: '#fff' },
-  buyerName: { fontSize: FONT_SIZES.sm, fontWeight: '700', color: '#1b1b1b' },
-  buyerPrice: { fontSize: FONT_SIZES.xs, color: '#6b7280', marginTop: 2 },
+  buyerAvatar: { width: 40, height: 40, borderRadius: 20, backgroundColor: COLORS.secondary, justifyContent: 'center', alignItems: 'center' },
+  buyerAvatarText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.white },
+  buyerName: { fontSize: FONT_SIZES.sm, fontWeight: '700', color: COLORS.text },
+  buyerPrice: { fontSize: FONT_SIZES.xs, color: COLORS.textSecondary, marginTop: 2 },
   orderStatusBadge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: RADIUS.full },
   orderStatusText: { fontSize: 10, fontWeight: '700' },
-  messageBuyerBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, padding: 10, backgroundColor: '#fffbeb', borderRadius: RADIUS.md, borderWidth: 1, borderColor: '#fde68a' },
+  messageBuyerBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, padding: 10, backgroundColor: COLORS.warningTint, borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.accent },
   messageBuyerBtnText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: ACCENT },
   alertOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.55)', justifyContent: 'center', alignItems: 'center', padding: SPACING.lg },
 });

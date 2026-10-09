@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { COLORS, SPACING, FONT_SIZES, RADIUS } from '../../constants';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   StatusBar, ActivityIndicator, TextInput, Modal, Switch, Platform, Animated, Image
 } from 'react-native';
-import MapView, { Marker, PROVIDER_DEFAULT } from 'react-native-maps';
+import MapView, { Marker, PROVIDER_DEFAULT } from '../../components/PlatformMap';
 import * as ImagePicker from 'expo-image-picker';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -17,12 +18,11 @@ import { authService } from '../../services/authService';
 import { partsService } from '../../services/partsService';
 import ConfirmDialog from '../../components/ConfirmDialog';
 import { AppAlertCard } from '../../components/AppAlert';
-import { SPACING, FONT_SIZES, RADIUS } from '../../constants';
 import { locationService } from '../../services/locationService';
 import { useFocusEffect } from '@react-navigation/native';
 
-const ACCENT = '#000814';
-const ACCENT_DEEP = '#001D3D';
+const ACCENT = COLORS.primary;
+const ACCENT_DEEP = COLORS.secondary;
 
 const formatTime = (time: string | null) => {
   if (!time) return '--:--';
@@ -73,7 +73,7 @@ function ReviewCard({ review, index }: { review: any; index: number }) {
                 key={star}
                 name={star <= review.rating ? 'star' : 'star-outline'}
                 size={13}
-                color="#f59e0b"
+                color={COLORS.warning}
               />
             ))}
           </View>
@@ -372,7 +372,7 @@ export default function MechanicProfileScreen({ navigation }: any) {
           {profile?.bio && <Text style={styles.bio}>{profile.bio}</Text>}
           {profile?.location && (
             <View style={styles.locationRow}>
-              <Ionicons name="location-outline" size={14} color="#fde68a" />
+              <Ionicons name="location-outline" size={14} color={COLORS.accent} />
               <Text style={styles.locationText}>{profile.location}</Text>
             </View>
           )}
@@ -411,14 +411,14 @@ export default function MechanicProfileScreen({ navigation }: any) {
                 <View style={{ flex: 1 }}>
                   <Text style={styles.availabilityLabel}>Available for bookings</Text>
                   <Text style={styles.availabilitySubtext}>
-                    {acceptingBookings ? "Owners can book you within your hours" : "You won't appear as bookable"}
+                    {acceptingBookings ? "Customers can book you within your hours" : "You won't appear as bookable"}
                   </Text>
                 </View>
                 <Switch
                   value={acceptingBookings}
                   onValueChange={handleToggleBookings}
-                  trackColor={{ false: '#e5e7eb', true: '#fbbf24' }}
-                  thumbColor={acceptingBookings ? ACCENT : '#f4f3f4'}
+                  trackColor={{ false: COLORS.border, true: COLORS.accent }}
+                  thumbColor={acceptingBookings ? ACCENT : COLORS.background}
                   disabled={savingAvailability}
                 />
               </View>
@@ -431,7 +431,7 @@ export default function MechanicProfileScreen({ navigation }: any) {
                       <Text style={styles.timeBtnValue}>{formatTime(availabilityStart)}</Text>
                     </View>
                   </TouchableOpacity>
-                  <Ionicons name="arrow-forward" size={16} color="#9ca3af" />
+                  <Ionicons name="arrow-forward" size={16} color={COLORS.textSecondary} />
                   <TouchableOpacity style={styles.timeBtn} onPress={() => setShowEndPicker(true)}>
                     <Ionicons name="time-outline" size={16} color={ACCENT} />
                     <View>
@@ -449,7 +449,7 @@ export default function MechanicProfileScreen({ navigation }: any) {
                     display={Platform.OS === 'ios' ? 'spinner' : 'default'}
                     onChange={handleStartTimeChange}
                     themeVariant="light"
-                    textColor="#1b1b1b"
+                    textColor={COLORS.text}
                   />
                   {Platform.OS === 'ios' && (
                     <TouchableOpacity
@@ -471,7 +471,7 @@ export default function MechanicProfileScreen({ navigation }: any) {
                     display={Platform.OS === 'ios' ? 'spinner' : 'default'}
                     onChange={handleEndTimeChange}
                     themeVariant="light"
-                    textColor="#1b1b1b"
+                    textColor={COLORS.text}
                   />
                   {Platform.OS === 'ios' && (
                     <TouchableOpacity
@@ -497,7 +497,7 @@ export default function MechanicProfileScreen({ navigation }: any) {
             {reviews.length === 0 ? (
               <View style={styles.emptyState}>
                 <View style={styles.emptyIconWrap}>
-                  <Ionicons name="star-outline" size={32} color="#9ca3af" />
+                  <Ionicons name="star-outline" size={32} color={COLORS.textSecondary} />
                 </View>
                 <Text style={styles.emptyText}>No reviews yet</Text>
               </View>
@@ -519,10 +519,10 @@ export default function MechanicProfileScreen({ navigation }: any) {
             <Ionicons name="wallet-outline" size={20} color={ACCENT} />
             <Text style={styles.walletBtnText}>Wallet</Text>
           </View>
-          <Ionicons name="chevron-forward" size={18} color="#9ca3af" />
+          <Ionicons name="chevron-forward" size={18} color={COLORS.textSecondary} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.logoutBtn} onPress={() => setLogoutConfirm(true)}>
-          <Ionicons name="log-out-outline" size={20} color="#dc2626" />
+          <Ionicons name="log-out-outline" size={20} color={COLORS.error} />
           <Text style={styles.logoutText}>Log Out</Text>
         </TouchableOpacity>
         {pendingDeletion ? (
@@ -536,10 +536,10 @@ export default function MechanicProfileScreen({ navigation }: any) {
             onPress={() => setDeleteAccountConfirm(true)}
             disabled={sendingDeletionCode}>
             {sendingDeletionCode ? (
-              <ActivityIndicator size="small" color="#dc2626" />
+              <ActivityIndicator size="small" color={COLORS.error} />
             ) : (
               <>
-                <Ionicons name="trash-outline" size={18} color="#dc2626" />
+                <Ionicons name="trash-outline" size={18} color={COLORS.error} />
                 <Text style={styles.deleteAccountText}>Delete Account</Text>
               </>
             )}
@@ -604,11 +604,11 @@ export default function MechanicProfileScreen({ navigation }: any) {
             <>
               <View style={styles.modalHeader}>
                 <TouchableOpacity onPress={() => setShowMapPickerView(false)} style={styles.backRow}>
-                  <Ionicons name="arrow-back" size={22} color="#1b1b1b" />
+                  <Ionicons name="arrow-back" size={22} color={COLORS.text} />
                   <Text style={styles.modalTitle}>Drop a Pin</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => setEditModal(false)}>
-                  <Ionicons name="close" size={24} color="#1b1b1b" />
+                  <Ionicons name="close" size={24} color={COLORS.text} />
                 </TouchableOpacity>
               </View>
               {loadingMapLocation || !pinCoords ? (
@@ -622,21 +622,21 @@ export default function MechanicProfileScreen({ navigation }: any) {
                       initialRegion={{ latitude: pinCoords.latitude, longitude: pinCoords.longitude, latitudeDelta: 0.01, longitudeDelta: 0.01 }}>
                       <Marker coordinate={pinCoords} draggable onDragEnd={(e) => setPinCoords(e.nativeEvent.coordinate)}>
                         <View style={styles.dropPinCircle}>
-                          <Ionicons name="location" size={18} color="#fff" />
+                          <Ionicons name="location" size={18} color={COLORS.white} />
                         </View>
                       </Marker>
                     </MapView>
                     <View style={styles.mapPickerHint}>
-                      <Ionicons name="hand-left-outline" size={14} color="#6b7280" />
+                      <Ionicons name="hand-left-outline" size={14} color={COLORS.textSecondary} />
                       <Text style={styles.mapPickerHintText}>Drag the pin to your exact location</Text>
                     </View>
                   </View>
                   <View style={styles.mapPickerFooter}>
                     <TouchableOpacity style={styles.confirmPinBtn} onPress={confirmMapPin} disabled={geocoding} activeOpacity={0.85}>
-                      <LinearGradient colors={[ACCENT, ACCENT_DEEP]} style={styles.confirmPinGradient}>
-                        {geocoding ? <ActivityIndicator color="#fff" /> : (
+                      <LinearGradient colors={[COLORS.accent, COLORS.accent]} style={styles.confirmPinGradient}>
+                        {geocoding ? <ActivityIndicator color={COLORS.accentInk} /> : (
                           <>
-                            <Ionicons name="checkmark" size={18} color="#fff" />
+                            <Ionicons name="checkmark" size={18} color={COLORS.accentInk} />
                             <Text style={styles.confirmPinText}>Confirm This Location</Text>
                           </>
                         )}
@@ -651,7 +651,7 @@ export default function MechanicProfileScreen({ navigation }: any) {
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Edit Profile</Text>
             <TouchableOpacity onPress={() => setEditModal(false)}>
-              <Ionicons name="close" size={24} color="#1b1b1b" />
+              <Ionicons name="close" size={24} color={COLORS.text} />
             </TouchableOpacity>
           </View>
           <ScrollView style={styles.modalBody}>
@@ -665,11 +665,11 @@ export default function MechanicProfileScreen({ navigation }: any) {
               )}
               {uploadingAvatar ? (
                 <View style={styles.avatarUploadingOverlay}>
-                  <ActivityIndicator color="#fff" />
+                  <ActivityIndicator color={COLORS.white} />
                 </View>
               ) : (
                 <View style={styles.avatarEditBadge}>
-                  <Ionicons name="pencil" size={12} color="#fff" />
+                  <Ionicons name="pencil" size={12} color={COLORS.white} />
                 </View>
               )}
             </TouchableOpacity>
@@ -686,14 +686,14 @@ export default function MechanicProfileScreen({ navigation }: any) {
               <TouchableOpacity style={styles.attachMenuOverlay} activeOpacity={1} onPress={() => setAvatarMenuVisible(false)}>
                 <View style={styles.attachMenu}>
                   <TouchableOpacity style={styles.attachMenuOption} onPress={() => triggerAvatarAction(takeAvatarPhoto)}>
-                    <View style={[styles.attachMenuIconWrap, { backgroundColor: '#f0fdf4' }]}>
-                      <Ionicons name="camera" size={20} color="#10b981" />
+                    <View style={[styles.attachMenuIconWrap, { backgroundColor: COLORS.successTint }]}>
+                      <Ionicons name="camera" size={20} color={COLORS.success} />
                     </View>
                     <Text style={styles.attachMenuText}>Take Photo</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.attachMenuOption} onPress={() => triggerAvatarAction(pickAvatarFromLibrary)}>
-                    <View style={[styles.attachMenuIconWrap, { backgroundColor: '#eff6ff' }]}>
-                      <Ionicons name="image" size={20} color="#2563eb" />
+                    <View style={[styles.attachMenuIconWrap, { backgroundColor: COLORS.infoTint }]}>
+                      <Ionicons name="image" size={20} color={COLORS.info} />
                     </View>
                     <Text style={styles.attachMenuText}>Choose Photo</Text>
                   </TouchableOpacity>
@@ -708,7 +708,7 @@ export default function MechanicProfileScreen({ navigation }: any) {
             <Text style={styles.label}>Phone</Text>
             <TextInput style={styles.input} value={editForm.phone} onChangeText={t => setEditForm({ ...editForm, phone: t })} keyboardType="phone-pad" />
             <Text style={styles.label}>Bio</Text>
-            <TextInput style={[styles.input, styles.textArea]} value={editForm.bio} onChangeText={t => setEditForm({ ...editForm, bio: t })} multiline numberOfLines={3} placeholder="Tell car owners about your experience..." />
+            <TextInput style={[styles.input, styles.textArea]} value={editForm.bio} onChangeText={t => setEditForm({ ...editForm, bio: t })} multiline numberOfLines={3} placeholder="Tell customers about your experience..." />
             <Text style={styles.label}>Location</Text>
             <TextInput style={styles.input} value={editForm.location} onChangeText={t => setEditForm({ ...editForm, location: t })} placeholder="e.g. Kumasi, Ghana" />
             <View style={styles.locationBtnRow}>
@@ -724,19 +724,19 @@ export default function MechanicProfileScreen({ navigation }: any) {
                 <Ionicons
                   name={editForm.latitude ? 'navigate' : 'navigate-outline'}
                   size={16}
-                  color={editForm.latitude ? '#10b981' : ACCENT}
+                  color={editForm.latitude ? COLORS.success : ACCENT}
                 />
-                <Text style={[styles.gpsBtnText, editForm.latitude ? { color: '#10b981' } : {}]}>
+                <Text style={[styles.gpsBtnText, editForm.latitude ? { color: COLORS.success } : {}]}>
                   {editForm.latitude ? '✓ GPS set' : 'Use my GPS'}
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity style={[styles.mapPickBtn, { flex: 1 }]} onPress={openMapPicker}>
-                <Ionicons name="map-outline" size={16} color="#2563eb" />
+                <Ionicons name="map-outline" size={16} color={COLORS.info} />
                 <Text style={styles.mapPickBtnText}>Pick on map</Text>
               </TouchableOpacity>
             </View>
             <TouchableOpacity style={styles.submitBtn} onPress={handleUpdateProfile}>
-              <LinearGradient colors={[ACCENT, ACCENT_DEEP]} style={styles.submitGradient}>
+              <LinearGradient colors={[COLORS.accent, COLORS.accent]} style={styles.submitGradient}>
                 <Text style={styles.submitText}>Save Changes</Text>
               </LinearGradient>
             </TouchableOpacity>
@@ -750,92 +750,92 @@ export default function MechanicProfileScreen({ navigation }: any) {
   );
 }
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f9fafb' },
+  container: { flex: 1, backgroundColor: COLORS.background },
   header: { paddingTop: 60, paddingBottom: SPACING.xl, alignItems: 'center', gap: SPACING.sm, borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
-  avatar: { width: 80, height: 80, borderRadius: 40, backgroundColor: '#fbbf24', justifyContent: 'center', alignItems: 'center' },
-  avatarText: { fontSize: 32, fontWeight: '700', color: '#001D3D' },
-  name: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: '#fff' },
-  email: { fontSize: FONT_SIZES.sm, color: '#fde68a' },
-  bio: { fontSize: FONT_SIZES.sm, color: '#fef3c7', textAlign: 'center', paddingHorizontal: SPACING.xl },
+  avatar: { width: 80, height: 80, borderRadius: 40, backgroundColor: COLORS.secondary, justifyContent: 'center', alignItems: 'center' },
+  avatarText: { fontSize: 32, fontWeight: '700', color: COLORS.white },
+  name: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.white },
+  email: { fontSize: FONT_SIZES.sm, color: COLORS.accent },
+  bio: { fontSize: FONT_SIZES.sm, color: COLORS.warningTint, textAlign: 'center', paddingHorizontal: SPACING.xl },
   locationRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  locationText: { fontSize: FONT_SIZES.sm, color: '#fde68a' },
-  verifiedBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: '#fef3c7', paddingHorizontal: 12, paddingVertical: 4, borderRadius: RADIUS.full },
+  locationText: { fontSize: FONT_SIZES.sm, color: COLORS.accent },
+  verifiedBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: COLORS.warningTint, paddingHorizontal: 12, paddingVertical: 4, borderRadius: RADIUS.full },
   verifiedText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: ACCENT },
-  editBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#fef3c7', paddingHorizontal: 16, paddingVertical: 8, borderRadius: RADIUS.full },
+  editBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: COLORS.warningTint, paddingHorizontal: 16, paddingVertical: 8, borderRadius: RADIUS.full },
   editBtnText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: ACCENT },
   statsRow: { flexDirection: 'row', padding: SPACING.lg, gap: SPACING.md },
-  statCard: { flex: 1, backgroundColor: '#fff', borderRadius: RADIUS.md, padding: SPACING.md, alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 },
+  statCard: { flex: 1, backgroundColor: COLORS.white, borderRadius: RADIUS.md, padding: SPACING.md, alignItems: 'center', shadowColor: COLORS.black, shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 },
   statValue: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: ACCENT },
-  statLabel: { fontSize: FONT_SIZES.xs, color: '#6b7280', marginTop: 2 },
+  statLabel: { fontSize: FONT_SIZES.xs, color: COLORS.textSecondary, marginTop: 2 },
   section: { paddingHorizontal: SPACING.lg, marginBottom: SPACING.md },
-  sectionTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: '#1b1b1b' },
+  sectionTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.text },
   sectionHeaderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACING.md },
-  reviewCountText: { fontSize: FONT_SIZES.xs, color: '#9ca3af', fontWeight: '600' },
-  availabilityCard: { backgroundColor: '#fff', borderRadius: RADIUS.md, padding: SPACING.md, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 },
+  reviewCountText: { fontSize: FONT_SIZES.xs, color: COLORS.textSecondary, fontWeight: '600' },
+  availabilityCard: { backgroundColor: COLORS.white, borderRadius: RADIUS.md, padding: SPACING.md, shadowColor: COLORS.black, shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 },
   availabilityToggleRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING.md },
-  availabilityLabel: { fontSize: FONT_SIZES.md, fontWeight: '700', color: '#1b1b1b' },
-  availabilitySubtext: { fontSize: FONT_SIZES.xs, color: '#9ca3af', marginTop: 2 },
-  hoursRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: SPACING.md, paddingTop: SPACING.md, borderTopWidth: 1, borderTopColor: '#f3f4f6' },
-  timeBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#fffbeb', paddingHorizontal: 12, paddingVertical: 8, borderRadius: RADIUS.md, borderWidth: 1, borderColor: '#fde68a', flex: 1 },
-  timeBtnLabel: { fontSize: 10, color: '#9ca3af', fontWeight: '600' },
+  availabilityLabel: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.text },
+  availabilitySubtext: { fontSize: FONT_SIZES.xs, color: COLORS.textSecondary, marginTop: 2 },
+  hoursRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: SPACING.md, paddingTop: SPACING.md, borderTopWidth: 1, borderTopColor: COLORS.background },
+  timeBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: COLORS.warningTint, paddingHorizontal: 12, paddingVertical: 8, borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.accent, flex: 1 },
+  timeBtnLabel: { fontSize: 10, color: COLORS.textSecondary, fontWeight: '600' },
   timeBtnValue: { fontSize: FONT_SIZES.sm, fontWeight: '700', color: ACCENT },
-  pickerWrap: { backgroundColor: '#fff', borderRadius: RADIUS.md, borderWidth: 1, borderColor: '#e5e7eb', marginTop: SPACING.md, overflow: 'hidden' },
-  pickerDoneBtn: { padding: 12, alignItems: 'center', borderTopWidth: 1, borderTopColor: '#f3f4f6' },
+  pickerWrap: { backgroundColor: COLORS.white, borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.border, marginTop: SPACING.md, overflow: 'hidden' },
+  pickerDoneBtn: { padding: 12, alignItems: 'center', borderTopWidth: 1, borderTopColor: COLORS.background },
   pickerDoneBtnText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: ACCENT },
-  reviewCard: { width: 220, backgroundColor: '#fff', borderRadius: RADIUS.md, padding: SPACING.md, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 },
+  reviewCard: { width: 220, backgroundColor: COLORS.white, borderRadius: RADIUS.md, padding: SPACING.md, shadowColor: COLORS.black, shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 },
   reviewHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6, gap: 8 },
   stars: { flexDirection: 'row', gap: 2 },
-  reviewDate: { fontSize: FONT_SIZES.xs, color: '#9ca3af' },
-  reviewComment: { fontSize: FONT_SIZES.sm, color: '#6b7280', lineHeight: 18 },
-  reviewNoComment: { fontSize: FONT_SIZES.sm, color: '#d1d5db', fontStyle: 'italic' },
-  emptyState: { alignItems: 'center', paddingVertical: 30, gap: 4, backgroundColor: '#fff', borderRadius: RADIUS.md },
-  emptyIconWrap: { width: 60, height: 60, borderRadius: 30, backgroundColor: '#f3f4f6', justifyContent: 'center', alignItems: 'center', marginBottom: 8 },
-  emptyText: { fontSize: FONT_SIZES.md, color: '#9ca3af' },
-  walletBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginHorizontal: SPACING.lg, marginTop: SPACING.md, padding: SPACING.md, backgroundColor: '#fff', borderRadius: RADIUS.md, borderWidth: 1, borderColor: '#f3f4f6' },
+  reviewDate: { fontSize: FONT_SIZES.xs, color: COLORS.textSecondary },
+  reviewComment: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, lineHeight: 18 },
+  reviewNoComment: { fontSize: FONT_SIZES.sm, color: COLORS.border, fontStyle: 'italic' },
+  emptyState: { alignItems: 'center', paddingVertical: 30, gap: 4, backgroundColor: COLORS.white, borderRadius: RADIUS.md },
+  emptyIconWrap: { width: 60, height: 60, borderRadius: 30, backgroundColor: COLORS.background, justifyContent: 'center', alignItems: 'center', marginBottom: 8 },
+  emptyText: { fontSize: FONT_SIZES.md, color: COLORS.textSecondary },
+  walletBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginHorizontal: SPACING.lg, marginTop: SPACING.md, padding: SPACING.md, backgroundColor: COLORS.white, borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.background },
   walletBtnLeft: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  walletBtnText: { fontSize: FONT_SIZES.md, fontWeight: '600', color: '#1b1b1b' },
-  logoutBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: SPACING.sm, marginHorizontal: SPACING.lg, marginTop: SPACING.lg, padding: SPACING.md, backgroundColor: '#fef2f2', borderRadius: RADIUS.md, borderWidth: 1, borderColor: '#fecaca' },
-  logoutText: { fontSize: FONT_SIZES.md, fontWeight: '600', color: '#dc2626' },
-  deleteAccountBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: SPACING.sm, margin: SPACING.lg, marginTop: SPACING.sm, padding: SPACING.md, borderRadius: RADIUS.md, borderWidth: 1, borderColor: '#f3f4f6' },
-  deleteAccountText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: '#dc2626' },
+  walletBtnText: { fontSize: FONT_SIZES.md, fontWeight: '600', color: COLORS.text },
+  logoutBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: SPACING.sm, marginHorizontal: SPACING.lg, marginTop: SPACING.lg, padding: SPACING.md, backgroundColor: COLORS.errorTint, borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.errorTint },
+  logoutText: { fontSize: FONT_SIZES.md, fontWeight: '600', color: COLORS.error },
+  deleteAccountBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: SPACING.sm, margin: SPACING.lg, marginTop: SPACING.sm, padding: SPACING.md, borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.background },
+  deleteAccountText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.error },
   deleteAccountPendingText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: ACCENT },
   alertOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.55)', justifyContent: 'center', alignItems: 'center', padding: SPACING.lg },
-  modal: { flex: 1, backgroundColor: '#f9fafb' },
-  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: SPACING.lg, paddingTop: 60, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#f3f4f6' },
-  modalTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: '#1b1b1b' },
+  modal: { flex: 1, backgroundColor: COLORS.background },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: SPACING.lg, paddingTop: 60, backgroundColor: COLORS.white, borderBottomWidth: 1, borderBottomColor: COLORS.background },
+  modalTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.text },
   modalBody: { padding: SPACING.lg },
-  label: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: '#374151', marginBottom: 6, marginTop: 14 },
-  input: { backgroundColor: '#fff', borderRadius: RADIUS.md, borderWidth: 1, borderColor: '#e5e7eb', padding: 12, fontSize: FONT_SIZES.md, color: '#1b1b1b' },
+  label: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.text, marginBottom: 6, marginTop: 14 },
+  input: { backgroundColor: COLORS.white, borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.border, padding: 12, fontSize: FONT_SIZES.md, color: COLORS.text },
   textArea: { height: 80, textAlignVertical: 'top' },
   submitBtn: { marginTop: 24, borderRadius: RADIUS.md, overflow: 'hidden' },
   submitGradient: { padding: 16, alignItems: 'center' },
-  submitText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: '#fff' },
+  submitText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.accentInk },
   devBtn: { alignItems: 'center', padding: SPACING.md },
-  devBtnText: { fontSize: FONT_SIZES.xs, color: '#9ca3af' },
-  gpsBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, padding: 10, backgroundColor: '#fffbeb', borderRadius: RADIUS.md, borderWidth: 1, borderColor: '#fde68a' },
+  devBtnText: { fontSize: FONT_SIZES.xs, color: COLORS.textSecondary },
+  gpsBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, padding: 10, backgroundColor: COLORS.warningTint, borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.accent },
   gpsBtnText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: ACCENT },
   locationBtnRow: { flexDirection: 'row', gap: 8, marginTop: 8 },
-  mapPickBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, padding: 10, backgroundColor: '#eff6ff', borderRadius: RADIUS.md, borderWidth: 1, borderColor: '#bfdbfe' },
-  mapPickBtnText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: '#2563eb' },
+  mapPickBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, padding: 10, backgroundColor: COLORS.infoTint, borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.infoTint },
+  mapPickBtnText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.info },
   avatarImage: { width: 80, height: 80, borderRadius: 40 },
   avatarPickerBtn: { alignSelf: 'center', width: 84, height: 84, marginBottom: SPACING.md },
   avatarPickerImage: { width: 84, height: 84, borderRadius: 42 },
-  avatarPickerPlaceholder: { width: 84, height: 84, borderRadius: 42, backgroundColor: '#fffbeb', borderWidth: 1.5, borderColor: '#fde68a', borderStyle: 'dashed', justifyContent: 'center', alignItems: 'center' },
+  avatarPickerPlaceholder: { width: 84, height: 84, borderRadius: 42, backgroundColor: COLORS.warningTint, borderWidth: 1.5, borderColor: COLORS.accent, borderStyle: 'dashed', justifyContent: 'center', alignItems: 'center' },
   avatarUploadingOverlay: { ...StyleSheet.absoluteFillObject, borderRadius: 42, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'center', alignItems: 'center' },
-  avatarEditBadge: { position: 'absolute', bottom: 0, right: 0, width: 26, height: 26, borderRadius: 13, backgroundColor: ACCENT, justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: '#fff' },
+  avatarEditBadge: { position: 'absolute', bottom: 0, right: 0, width: 26, height: 26, borderRadius: 13, backgroundColor: ACCENT, justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: COLORS.white },
   backRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   mapPickerContainer: { flex: 1 },
   mapPicker: { flex: 1 },
-  mapPickerHint: { position: 'absolute', top: 16, left: 16, right: 16, flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#fff', paddingHorizontal: 12, paddingVertical: 8, borderRadius: RADIUS.full, alignSelf: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3 },
-  mapPickerHintText: { fontSize: FONT_SIZES.xs, color: '#6b7280', fontWeight: '600' },
-  dropPinCircle: { width: 36, height: 36, borderRadius: 18, backgroundColor: ACCENT, justifyContent: 'center', alignItems: 'center', borderWidth: 3, borderColor: '#fff', elevation: 4 },
-  mapPickerFooter: { padding: SPACING.lg, backgroundColor: '#fff', borderTopWidth: 1, borderTopColor: '#f3f4f6' },
+  mapPickerHint: { position: 'absolute', top: 16, left: 16, right: 16, flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: COLORS.white, paddingHorizontal: 12, paddingVertical: 8, borderRadius: RADIUS.full, alignSelf: 'center', shadowColor: COLORS.black, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3 },
+  mapPickerHintText: { fontSize: FONT_SIZES.xs, color: COLORS.textSecondary, fontWeight: '600' },
+  dropPinCircle: { width: 36, height: 36, borderRadius: 18, backgroundColor: ACCENT, justifyContent: 'center', alignItems: 'center', borderWidth: 3, borderColor: COLORS.white, elevation: 4 },
+  mapPickerFooter: { padding: SPACING.lg, backgroundColor: COLORS.white, borderTopWidth: 1, borderTopColor: COLORS.background },
   confirmPinBtn: { borderRadius: RADIUS.md, overflow: 'hidden' },
   confirmPinGradient: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, padding: 16 },
-  confirmPinText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: '#fff' },
+  confirmPinText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.accentInk },
   attachMenuOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.3)', justifyContent: 'flex-end' },
-  attachMenu: { backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingVertical: SPACING.md, paddingBottom: 40 },
+  attachMenu: { backgroundColor: COLORS.white, borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingVertical: SPACING.md, paddingBottom: 40 },
   attachMenuOption: { flexDirection: 'row', alignItems: 'center', gap: SPACING.md, paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md },
   attachMenuIconWrap: { width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center' },
-  attachMenuText: { fontSize: FONT_SIZES.md, fontWeight: '600', color: '#1b1b1b' },
+  attachMenuText: { fontSize: FONT_SIZES.md, fontWeight: '600', color: COLORS.text },
 });

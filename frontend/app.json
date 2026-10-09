@@ -4,7 +4,9 @@
     "slug": "gearup-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/GearUp-Icon.png",
+    "backgroundColor": "#0B1220",
+    "primaryColor": "#0B1220",
     "userInterfaceStyle": "light",
     "scheme": "gearup",
     "ios": {
@@ -16,10 +18,8 @@
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
+        "backgroundColor": "#0B1220",
+        "foregroundImage": "./assets/GearUp-Icon.png"
       },
       "predictiveBackGestureEnabled": false,
       "softwareKeyboardLayoutMode": "resize",
@@ -32,7 +32,7 @@
       "package": "com.alfred.quist.gearupmobile"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/GearUp-Icon.png"
     },
     "plugins": [
       "expo-secure-store",
@@ -49,7 +49,17 @@
           "photosPermission": "GearUp needs access to your photos so you can add pictures of your parts listings."
         }
       ],
-      "expo-audio"
+      "expo-audio",
+      "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#0B1220",
+          "image": "./assets/GearUp-Logo.png",
+          "imageWidth": 220,
+          "resizeMode": "contain"
+        }
+      ]
     ],
     "extra": {
       "eas": {

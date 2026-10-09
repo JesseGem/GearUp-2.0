@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
+import { COLORS, FONT_FAMILY } from '../../constants';
 import {
   View, Text, TouchableOpacity,
   StyleSheet, StatusBar, ActivityIndicator,
@@ -11,6 +12,7 @@ import PasswordRequirementsChecklist from '../../components/PasswordRequirements
 import { AppAlertCard } from '../../components/AppAlert';
 import { authService } from '../../services/authService';
 import { isAllowedEmailDomain, isPasswordValid } from '../../utils/validation';
+import BrandLogo from '../../components/BrandLogo';
 
 export default function RegisterScreen({ navigation }: any) {
   const [firstName, setFirstName] = useState('');
@@ -64,14 +66,9 @@ export default function RegisterScreen({ navigation }: any) {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <StatusBar barStyle="light-content" />
-      <LinearGradient colors={['#1b4332', '#2d6a4f']} style={styles.hero}>
+      <LinearGradient colors={[COLORS.primary, COLORS.primary]} style={styles.hero}>
         <Animated.View style={{ opacity: heroAnim, alignItems: 'center' }}>
-          <View style={styles.iconOuter}>
-            <View style={styles.iconInner}>
-              <Ionicons name="construct" size={36} color="#1b4332" />
-            </View>
-          </View>
-          <Text style={styles.logoText}>GearUp</Text>
+          <BrandLogo appearance="dark" width={160} />
           <Text style={styles.tagline}>Join the community</Text>
         </Animated.View>
       </LinearGradient>
@@ -87,16 +84,16 @@ export default function RegisterScreen({ navigation }: any) {
           <AppTextInput label="Email" icon="mail-outline" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
           <AppTextInput label="Phone" icon="call-outline" value={phone} onChangeText={setPhone} keyboardType="phone-pad" />
           <AppTextInput label="Password" icon="lock-closed-outline" value={password} onChangeText={setPassword} isPassword />
-          <PasswordRequirementsChecklist password={password} accentColor="#1b4332" />
+          <PasswordRequirementsChecklist password={password} accentColor={COLORS.primary} />
 
           <TouchableOpacity style={styles.registerBtn} onPress={handleRegister} disabled={loading}>
-            <LinearGradient colors={['#1b4332', '#2d6a4f']} style={styles.registerGradient}>
+            <LinearGradient colors={[COLORS.accent, COLORS.accent]} style={styles.registerGradient}>
               {loading ? (
-                <ActivityIndicator color="#fff" />
+                <ActivityIndicator color={COLORS.accentInk} />
               ) : (
                 <>
                   <Text style={styles.registerBtnText}>Create Account</Text>
-                  <Ionicons name="arrow-forward" size={18} color="#fff" />
+                  <Ionicons name="arrow-forward" size={18} color={COLORS.accentInk} />
                 </>
               )}
             </LinearGradient>
@@ -131,36 +128,33 @@ export default function RegisterScreen({ navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#1b4332' },
+  container: { flex: 1, backgroundColor: COLORS.primary },
   hero: { height: 200, justifyContent: 'center', alignItems: 'center' },
-  iconOuter: { width: 76, height: 76, borderRadius: 38, backgroundColor: 'rgba(255,255,255,0.15)', justifyContent: 'center', alignItems: 'center', marginBottom: 12 },
-  iconInner: { width: 56, height: 56, borderRadius: 28, backgroundColor: '#fbbf24', justifyContent: 'center', alignItems: 'center' },
-  logoText: { fontSize: 24, fontWeight: '800', color: '#ffffff', marginBottom: 4 },
-  tagline: { fontSize: 13, color: '#86efac' },
+  tagline: { fontSize: 13, color: COLORS.darkTextSecondary, marginTop: 8, fontFamily: FONT_FAMILY.body },
   card: {
     flex: 1,
     marginTop: -28,
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.white,
     borderTopLeftRadius: 32,
     borderTopRightRadius: 32,
-    shadowColor: '#000',
+    shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: -4 },
     shadowOpacity: 0.1,
     shadowRadius: 16,
     elevation: 12,
   },
   cardContent: { paddingHorizontal: 24, paddingTop: 12, paddingBottom: 32 },
-  cardHandle: { width: 40, height: 4, borderRadius: 2, backgroundColor: '#e5e7eb', alignSelf: 'center', marginBottom: 16 },
-  title: { fontSize: 22, fontWeight: '700', color: '#1b1b1b', marginBottom: 4 },
-  subtitle: { fontSize: 14, color: '#6b7280', marginBottom: 18 },
+  cardHandle: { width: 40, height: 4, borderRadius: 2, backgroundColor: COLORS.border, alignSelf: 'center', marginBottom: 16 },
+  title: { fontSize: 22, fontWeight: '700', color: COLORS.text, marginBottom: 4, fontFamily: FONT_FAMILY.headingBold },
+  subtitle: { fontSize: 14, color: COLORS.textSecondary, marginBottom: 18, fontFamily: FONT_FAMILY.body },
   registerBtn: { marginTop: 4, borderRadius: 14, overflow: 'hidden' },
   registerGradient: { height: 54, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 8 },
-  registerBtnText: { fontSize: 16, fontWeight: '700', color: '#ffffff' },
+  registerBtnText: { fontSize: 16, fontWeight: '700', color: COLORS.accentInk, fontFamily: FONT_FAMILY.bodyBold },
   dividerRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 24, marginBottom: 20 },
-  dividerLine: { flex: 1, height: 1, backgroundColor: '#e5e7eb' },
-  dividerText: { fontSize: 12, color: '#9ca3af', fontWeight: '600' },
+  dividerLine: { flex: 1, height: 1, backgroundColor: COLORS.border },
+  dividerText: { fontSize: 12, color: COLORS.textSecondary, fontWeight: '600' },
   loginLink: { alignItems: 'center' },
-  loginText: { fontSize: 14, color: '#6b7280' },
-  loginHighlight: { color: '#1b4332', fontWeight: '700' },
+  loginText: { fontSize: 14, color: COLORS.textSecondary },
+  loginHighlight: { color: COLORS.primary, fontWeight: '700' },
   alertOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.55)', justifyContent: 'center', alignItems: 'center', padding: 20 },
 });

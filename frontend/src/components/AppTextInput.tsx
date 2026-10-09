@@ -1,10 +1,10 @@
 import React, { useState, useRef } from 'react';
+import { COLORS, FONT_FAMILY, FONT_SIZES, RADIUS } from '../constants';
 import {
   View, TextInput, Text, StyleSheet, Animated,
   TouchableOpacity, TextInputProps, ViewStyle
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { FONT_SIZES, RADIUS } from '../constants';
 
 interface AppTextInputProps extends TextInputProps {
   label: string;
@@ -20,7 +20,7 @@ export default function AppTextInput({
   label,
   icon,
   error,
-  accentColor = '#1b4332',
+  accentColor = COLORS.primary,
   containerStyle,
   isPassword,
   secureTextEntry,
@@ -29,7 +29,7 @@ export default function AppTextInput({
   onBlur,
   style,
   multiline,
-  backgroundColor = '#f9fafb',
+  backgroundColor = COLORS.background,
   ...rest
 }: AppTextInputProps) {
   const [isFocused, setIsFocused] = useState(false);
@@ -50,7 +50,8 @@ export default function AppTextInput({
     onBlur?.(e);
   };
 
-  const borderColor = error ? '#dc2626' : isFocused ? accentColor : '#e5e7eb';
+  const focusedBorderColor = accentColor === COLORS.primary ? COLORS.accent : accentColor;
+  const borderColor = error ? COLORS.error : isFocused ? focusedBorderColor : COLORS.border;
 
   const labelTop = animatedLabel.interpolate({ inputRange: [0, 1], outputRange: [multiline ? 28 : 18, -9] });
   const labelFontSize = animatedLabel.interpolate({ inputRange: [0, 1], outputRange: [FONT_SIZES.md, 12] });
@@ -60,7 +61,7 @@ export default function AppTextInput({
       <View style={[styles.inputRow, { borderColor }, multiline && styles.multilineRow]}>
         {icon && (
           <View style={styles.iconWrap}>
-            <Ionicons name={icon} size={18} color={isFocused ? accentColor : '#9ca3af'} />
+            <Ionicons name={icon} size={18} color={isFocused ? COLORS.primary : COLORS.textSecondary} />
           </View>
         )}
         <View style={styles.fieldArea}>
@@ -70,10 +71,10 @@ export default function AppTextInput({
               {
                 top: labelTop,
                 fontSize: labelFontSize,
-                color: error ? '#dc2626' : isFocused ? accentColor : '#9ca3af',
+                color: error ? COLORS.error : isFocused ? COLORS.primary : COLORS.textSecondary,
                 backgroundColor: animatedLabel.interpolate({
                   inputRange: [0, 1],
-                  outputRange: ['transparent', backgroundColor === '#f9fafb' ? '#ffffff' : backgroundColor],
+                  outputRange: ['transparent', backgroundColor === COLORS.background ? COLORS.white : backgroundColor],
                 }) as any,
               },
             ]}
@@ -93,7 +94,7 @@ export default function AppTextInput({
         </View>
         {isPassword && (
           <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeBtn}>
-            <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={18} color="#9ca3af" />
+            <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={18} color={COLORS.textSecondary} />
           </TouchableOpacity>
         )}
       </View>
@@ -106,17 +107,17 @@ const styles = StyleSheet.create({
   wrapper: { marginBottom: 14 },
   inputRow: {
     flexDirection: 'row', alignItems: 'center',
-    backgroundColor: '#ffffff', borderRadius: RADIUS.md, borderWidth: 1.5,
+    backgroundColor: COLORS.white, borderRadius: RADIUS.md, borderWidth: 1.5,
     paddingHorizontal: 12, height: 56,
   },
   multilineRow: { height: undefined, minHeight: 80, alignItems: 'flex-start', paddingVertical: 8 },
   iconWrap: { width: 26, alignItems: 'center', justifyContent: 'center', marginRight: 6 },
   fieldArea: { flex: 1, justifyContent: 'center' },
   floatingLabel: {
-    position: 'absolute', left: 0, fontWeight: '500', borderRadius: 4, overflow: 'hidden',
+    position: 'absolute', left: 0, fontWeight: '500', fontFamily: FONT_FAMILY.bodyMedium, borderRadius: 4, overflow: 'hidden',
   },
-  input: { fontSize: FONT_SIZES.md, color: '#1b1b1b', height: 56, paddingTop: 0 },
+  input: { fontSize: FONT_SIZES.md, color: COLORS.text, height: 56, paddingTop: 0, fontFamily: FONT_FAMILY.body },
   multilineInput: { height: undefined, minHeight: 60, paddingTop: 20, textAlignVertical: 'top' },
   eyeBtn: { marginLeft: 8 },
-  errorText: { fontSize: FONT_SIZES.xs, color: '#dc2626', marginTop: 4, marginLeft: 4 },
+  errorText: { fontSize: FONT_SIZES.xs, color: COLORS.error, marginTop: 4, marginLeft: 4, fontFamily: FONT_FAMILY.body },
 });

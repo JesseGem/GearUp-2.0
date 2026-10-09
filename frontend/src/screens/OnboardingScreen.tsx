@@ -1,3 +1,4 @@
+import { COLORS } from '../constants';
 // This is the Onboarding screens
 import React, { useState, useRef } from 'react';
 import {
@@ -12,36 +13,36 @@ const { width } = Dimensions.get('window');
 const SLIDES = [
   {
     icon: 'search',
-    colors: ['#1b4332', '#2d6a4f'],
-    accent: '#86efac',
+    colors: [COLORS.primary, COLORS.secondary],
+    accent: COLORS.accent,
     title: 'Find Nearby Mechanics',
     subtitle: 'Search verified mechanics around you, sorted by distance, and see them right on the map.',
   },
   {
     icon: 'navigate',
-    colors: ['#1e3a5f', '#2563eb'],
-    accent: '#93c5fd',
+    colors: [COLORS.primary, COLORS.secondary],
+    accent: COLORS.accent,
     title: 'Track Your Job in Real Time',
     subtitle: 'Watch your mechanic\'s route, get live directions, and know exactly when help arrives.',
   },
   {
     icon: 'warning',
-    colors: ['#7f1d1d', '#dc2626'],
-    accent: '#fca5a5',
+    colors: [COLORS.primary, COLORS.secondary],
+    accent: COLORS.accent,
     title: 'SOS Emergency Assistance',
-    subtitle: 'Stranded? One tap finds the nearest available mechanic and sends an emergency request instantly.',
+    subtitle: 'Stranded? One tap finds the nearest available mechanic and creates an emergency job instantly.',
   },
   {
     icon: 'star',
-    colors: ['#001D3D', '#000814'],
-    accent: '#fde68a',
+    colors: [COLORS.secondary, COLORS.primary],
+    accent: COLORS.accent,
     title: 'Save Your Favorite Mechanics',
     subtitle: 'Star the mechanics you trust and book them directly next time, or schedule ahead of time.',
   },
   {
     icon: 'chatbubbles',
-    colors: ['#4c1d95', '#7c3aed'],
-    accent: '#c4b5fd',
+    colors: [COLORS.primary, COLORS.secondary],
+    accent: COLORS.accent,
     title: 'Chat, Pay & Rate — All in One',
     subtitle: 'Message your mechanic, review the price, pay securely, and leave a rating once the job\'s done.',
   },
@@ -244,7 +245,7 @@ const styles = StyleSheet.create({
   slide: { alignItems: 'center', justifyContent: 'center', paddingHorizontal: 36, paddingTop: 80 },
   iconCircle: { width: 180, height: 180, borderRadius: 90, justifyContent: 'center', alignItems: 'center', marginBottom: 40 },
   iconCircleInner: { width: 130, height: 130, borderRadius: 65, justifyContent: 'center', alignItems: 'center' },
-  title: { fontSize: 24, fontWeight: '800', color: '#fff', textAlign: 'center', marginBottom: 14 },
+  title: { fontSize: 24, fontWeight: '800', color: COLORS.white, textAlign: 'center', marginBottom: 14 },
   subtitle: { fontSize: 15, color: 'rgba(255,255,255,0.85)', textAlign: 'center', lineHeight: 22 },
   footer: { paddingHorizontal: 32, paddingBottom: 50, alignItems: 'center', gap: 28, zIndex: 2 },
   dotsRow: { flexDirection: 'row', gap: 8 },

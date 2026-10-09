@@ -18,7 +18,7 @@ export const jobService = {
     return await post(`${api.JOB}/api/jobs`, data, true);
   },
 
-  getMyJobsAsOwner: async () => {
+  getMyJobsAsCustomer: async () => {
     const api = await getAPI();
     return await get(`${api.JOB}/api/jobs/my/owner`);
   },

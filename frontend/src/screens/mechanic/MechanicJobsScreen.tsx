@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { COLORS, JOB_STATUS_COLORS, SPACING, FONT_SIZES, RADIUS } from '../../constants';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   StatusBar, RefreshControl, ActivityIndicator, Alert, Modal, TextInput,
@@ -15,14 +16,13 @@ import { messageService, JobCardMetadata } from '../../services/messageService';
 import { useFocusEffect } from '@react-navigation/native';
 import ConfirmDialog from '../../components/ConfirmDialog';
 import { AppAlertCard } from '../../components/AppAlert';
-import { SPACING, FONT_SIZES, RADIUS } from '../../constants';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-const ACCENT = '#000814';
-const ACCENT_DEEP = '#001D3D';
+const ACCENT = COLORS.primary;
+const ACCENT_DEEP = COLORS.secondary;
 
 const getWeekGroup = (dateStr: string): string => {
   const date = new Date(dateStr);
@@ -35,28 +35,21 @@ const getWeekGroup = (dateStr: string): string => {
 };
 
 const getStatusColor = (status: string) => {
-  switch (status) {
-    case 'PENDING': return '#f59e0b';
-    case 'ACCEPTED': return '#3b82f6';
-    case 'IN_PROGRESS': return '#8b5cf6';
-    case 'COMPLETED': return '#10b981';
-    case 'CANCELLED': return '#ef4444';
-    default: return '#6b7280';
-  }
+  return JOB_STATUS_COLORS[status] || COLORS.textSecondary;
 };
 
 // ─── JobCard: its own component so entrance-animation hooks are safe/stable ───
 function JobCard({
-  job, index, owner, paidJobs, onStart, onComplete, onEditPrice, onMessage, onViewMap, messagingBusy,
+  job, index, customer, paidJobs, onStart, onComplete, onEditPrice, onMessage, onViewMap, messagingBusy,
 }: {
   job: any;
   index: number;
-  owner: any;
+  customer: any;
   paidJobs: number[];
   onStart: (job: any) => void;
   onComplete: (job: any) => void;
   onEditPrice: (job: any) => void;
-  onMessage: (job: any, ownerName: string) => void;
+  onMessage: (job: any, customerName: string) => void;
   onViewMap: (job: any) => void;
   messagingBusy: boolean;
 }) {
@@ -91,15 +84,15 @@ function JobCard({
         </Text>
         <Text style={styles.jobDesc} numberOfLines={2}>{job.description}</Text>
         <View style={styles.jobMeta}>
-          <Ionicons name="construct-outline" size={13} color="#9ca3af" />
+          <Ionicons name="construct-outline" size={13} color={COLORS.textSecondary} />
           <Text style={styles.metaText}>{job.type}</Text>
           {job.location && <>
-            <Ionicons name="location-outline" size={13} color="#9ca3af" />
+            <Ionicons name="location-outline" size={13} color={COLORS.textSecondary} />
             <Text style={styles.metaText} numberOfLines={1}>{job.location}</Text>
           </>}
           {job.latitude && (
             <View style={styles.gpsPill}>
-              <Ionicons name="navigate" size={9} color="#10b981" />
+              <Ionicons name="navigate" size={9} color={COLORS.success} />
               <Text style={styles.gpsText}>GPS</Text>
             </View>
           )}
@@ -108,24 +101,24 @@ function JobCard({
           <Text style={styles.costText}>Final: GHS {job.finalCost}</Text>
         )}
 
-        {owner && (
-          <View style={styles.ownerRow}>
-            <View style={styles.ownerAvatar}>
-              <Text style={styles.ownerAvatarText}>{owner.name?.[0]?.toUpperCase()}</Text>
+        {customer && (
+          <View style={styles.customerRow}>
+            <View style={styles.customerAvatar}>
+              <Text style={styles.customerAvatarText}>{customer.name?.[0]?.toUpperCase()}</Text>
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={styles.ownerLabel}>Car Owner</Text>
-              <Text style={styles.ownerName} numberOfLines={1}>{owner.name}</Text>
+              <Text style={styles.customerLabel}>Customer</Text>
+              <Text style={styles.customerName} numberOfLines={1}>{customer.name}</Text>
             </View>
             <TouchableOpacity
               style={styles.messageIconBtn}
               activeOpacity={0.85}
               disabled={messagingBusy}
-              onPress={() => onMessage(job, owner.name)}>
+              onPress={() => onMessage(job, customer.name)}>
               {messagingBusy ? (
-                <ActivityIndicator size="small" color="#fff" />
+                <ActivityIndicator size="small" color={COLORS.white} />
               ) : (
-                <Ionicons name="chatbubble" size={15} color="#fff" />
+                <Ionicons name="chatbubble" size={15} color={COLORS.white} />
               )}
             </TouchableOpacity>
           </View>
@@ -133,20 +126,20 @@ function JobCard({
 
         {job.status === 'ACCEPTED' && (
           <TouchableOpacity style={styles.startBtn} onPress={() => onStart(job)} activeOpacity={0.85}>
-            <Ionicons name="play" size={14} color="#fff" />
+            <Ionicons name="play" size={14} color={COLORS.white} />
             <Text style={styles.startBtnText}>Start Job</Text>
           </TouchableOpacity>
         )}
         {job.status === 'IN_PROGRESS' && (
           <TouchableOpacity style={styles.completeBtn} onPress={() => onComplete(job)} activeOpacity={0.85}>
-            <Ionicons name="checkmark-done" size={14} color="#fff" />
+            <Ionicons name="checkmark-done" size={14} color={COLORS.white} />
             <Text style={styles.completeBtnText}>Complete Job</Text>
           </TouchableOpacity>
         )}
         {job.latitude && job.status !== 'CANCELLED' && job.status !== 'COMPLETED' && (
           <TouchableOpacity style={styles.mapBtn} onPress={() => onViewMap(job)} activeOpacity={0.85}>
-            <Ionicons name="map-outline" size={14} color="#2563eb" />
-            <Text style={styles.mapBtnText}>View Owner Location</Text>
+            <Ionicons name="map-outline" size={14} color={COLORS.info} />
+            <Text style={styles.mapBtnText}>View Customer Location</Text>
           </TouchableOpacity>
         )}
         {job.status === 'COMPLETED' && !paidJobs.includes(job.id) && (
@@ -157,7 +150,7 @@ function JobCard({
         )}
         {job.status === 'COMPLETED' && paidJobs.includes(job.id) && (
           <View style={styles.paidBadge}>
-            <Ionicons name="checkmark-circle" size={14} color="#10b981" />
+            <Ionicons name="checkmark-circle" size={14} color={COLORS.success} />
             <Text style={styles.paidText}>Paid</Text>
           </View>
         )}
@@ -170,7 +163,7 @@ export default function MechanicJobsScreen({ navigation }: any) {
   const { user } = useSelector((state: RootState) => state.auth);
   const [jobs, setJobs] = useState<any[]>([]);
   const [paidJobs, setPaidJobs] = useState<number[]>([]);
-  const [ownerProfiles, setOwnerProfiles] = useState<Record<number, any>>({});
+  const [customerProfiles, setCustomerProfiles] = useState<Record<number, any>>({});
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState('ALL');
@@ -205,7 +198,7 @@ export default function MechanicJobsScreen({ navigation }: any) {
         completedJobs.map(async (job: any) => {
           try {
             const payment = await paymentService.getPaymentByJob(job.id);
-            if (payment && payment.status === 'COMPLETED') {
+            if (payment && payment.status === 'success') {
               paidIds.push(job.id);
             }
           } catch {
@@ -215,8 +208,8 @@ export default function MechanicJobsScreen({ navigation }: any) {
       );
       setPaidJobs(paidIds);
 
-      const ownerIds = Array.from(new Set(sorted.map((j: any) => j.ownerId)));
-      const missingIds = ownerIds.filter(id => !ownerProfiles[id as number]);
+      const customerIds = Array.from(new Set(sorted.map((j: any) => j.ownerId)));
+      const missingIds = customerIds.filter(id => !customerProfiles[id as number]);
       if (missingIds.length > 0) {
         const fetched = await Promise.all(
           missingIds.map(async (id) => {
@@ -228,7 +221,7 @@ export default function MechanicJobsScreen({ navigation }: any) {
             }
           })
         );
-        setOwnerProfiles(prev => {
+        setCustomerProfiles(prev => {
           const updated = { ...prev };
           fetched.forEach(([id, profile]) => { if (profile) updated[id as number] = profile; });
           return updated;
@@ -255,7 +248,7 @@ export default function MechanicJobsScreen({ navigation }: any) {
   const onRefresh = () => { setRefreshing(true); fetchJobs(); };
 
   // Pushes the current job state into the shared chat thread's job card,
-  // reusing an existing conversation with the owner if one exists.
+  // reusing an existing conversation with the customer if one exists.
   const syncJobCard = async (job: any, patch: Partial<JobCardMetadata>) => {
     try {
       const existing = await messageService.getConversationWithUser(user?.userId, job.ownerId).catch(() => null);
@@ -329,7 +322,7 @@ export default function MechanicJobsScreen({ navigation }: any) {
     }
   };
 
-  const handleMessage = async (job: any, ownerName: string) => {
+  const handleMessage = async (job: any, customerName: string) => {
     setOpeningChatJobId(job.id);
     try {
       const existing = await messageService.getConversationWithUser(user?.userId, job.ownerId).catch(() => null);
@@ -337,7 +330,7 @@ export default function MechanicJobsScreen({ navigation }: any) {
       navigation.navigate('Chat', {
         job: { ...job, id: chatJobId },
         otherUserId: job.ownerId,
-        otherUserName: ownerName,
+        otherUserName: customerName,
       });
     } finally {
       setOpeningChatJobId(null);
@@ -390,7 +383,7 @@ export default function MechanicJobsScreen({ navigation }: any) {
         ) : filteredJobs.length === 0 ? (
           <View style={styles.emptyState}>
             <View style={styles.emptyIconWrap}>
-              <Ionicons name="construct-outline" size={40} color="#9ca3af" />
+              <Ionicons name="construct-outline" size={40} color={COLORS.textSecondary} />
             </View>
             <Text style={styles.emptyText}>No jobs found</Text>
           </View>
@@ -407,7 +400,7 @@ export default function MechanicJobsScreen({ navigation }: any) {
                     <Text style={styles.sectionHeader}>{section.title}</Text>
                     <View style={styles.sectionHeaderRight}>
                       <Text style={styles.sectionCount}>{section.data.length}</Text>
-                      <Ionicons name={isCollapsed ? 'chevron-down' : 'chevron-up'} size={16} color="#9ca3af" />
+                      <Ionicons name={isCollapsed ? 'chevron-down' : 'chevron-up'} size={16} color={COLORS.textSecondary} />
                     </View>
                   </TouchableOpacity>
                   {!isCollapsed && section.data.map((job, idx) => (
@@ -415,7 +408,7 @@ export default function MechanicJobsScreen({ navigation }: any) {
                       key={job.id}
                       job={job}
                       index={idx}
-                      owner={ownerProfiles[job.ownerId]}
+                      customer={customerProfiles[job.ownerId]}
                       paidJobs={paidJobs}
                       onStart={handleStart}
                       onComplete={openCompleteModal}
@@ -462,8 +455,8 @@ export default function MechanicJobsScreen({ navigation }: any) {
                 <Text style={styles.priceCancelText}>Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.priceSubmitBtn} onPress={handleSubmitPrice} disabled={processing} activeOpacity={0.85}>
-                <LinearGradient colors={[ACCENT, ACCENT_DEEP]} style={styles.priceSubmitGradient}>
-                  {processing ? <ActivityIndicator size="small" color="#fff" /> : (
+                <LinearGradient colors={[COLORS.accent, COLORS.accent]} style={styles.priceSubmitGradient}>
+                  {processing ? <ActivityIndicator size="small" color={COLORS.white} /> : (
                     <Text style={styles.priceSubmitText}>{priceModal?.mode === 'edit' ? 'Save' : 'Complete'}</Text>
                   )}
                 </LinearGradient>
@@ -489,62 +482,62 @@ export default function MechanicJobsScreen({ navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f9fafb' },
+  container: { flex: 1, backgroundColor: COLORS.background },
   header: { paddingTop: 60, paddingBottom: SPACING.lg, paddingHorizontal: SPACING.lg, borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
-  headerTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: '#ffffff' },
-  tabs: { paddingHorizontal: SPACING.lg, paddingVertical: SPACING.sm, backgroundColor: '#fff', maxHeight: 52 },
-  tab: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 8, borderRadius: RADIUS.full, marginRight: 8, backgroundColor: '#f3f4f6' },
+  headerTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.white },
+  tabs: { paddingHorizontal: SPACING.lg, paddingVertical: SPACING.sm, backgroundColor: COLORS.white, maxHeight: 52 },
+  tab: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 8, borderRadius: RADIUS.full, marginRight: 8, backgroundColor: COLORS.background },
   tabActive: { backgroundColor: ACCENT },
-  tabText: { fontSize: FONT_SIZES.xs, fontWeight: '600', color: '#6b7280' },
-  tabTextActive: { color: '#fff' },
+  tabText: { fontSize: FONT_SIZES.xs, fontWeight: '600', color: COLORS.textSecondary },
+  tabTextActive: { color: COLORS.white },
   list: { flex: 1, padding: SPACING.lg },
   sectionHeaderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: SPACING.md, marginBottom: SPACING.sm },
-  sectionHeader: { fontSize: FONT_SIZES.sm, fontWeight: '800', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: 0.5 },
+  sectionHeader: { fontSize: FONT_SIZES.sm, fontWeight: '800', color: COLORS.textSecondary, textTransform: 'uppercase', letterSpacing: 0.5 },
   sectionHeaderRight: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  sectionCount: { fontSize: 11, fontWeight: '700', color: '#9ca3af', backgroundColor: '#f3f4f6', paddingHorizontal: 7, paddingVertical: 2, borderRadius: RADIUS.full },
-  jobCard: { backgroundColor: '#fff', borderRadius: 14, padding: SPACING.md, marginBottom: SPACING.sm, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 6, elevation: 2, borderWidth: 1, borderColor: '#f3f4f6' },
+  sectionCount: { fontSize: 11, fontWeight: '700', color: COLORS.textSecondary, backgroundColor: COLORS.background, paddingHorizontal: 7, paddingVertical: 2, borderRadius: RADIUS.full },
+  jobCard: { backgroundColor: COLORS.white, borderRadius: 14, padding: SPACING.md, marginBottom: SPACING.sm, shadowColor: COLORS.black, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 6, elevation: 2, borderWidth: 1, borderColor: COLORS.background },
   jobHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4, gap: 8 },
-  jobTitle: { fontSize: FONT_SIZES.md, fontWeight: '700', color: '#111827', flex: 1 },
+  jobTitle: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.text, flex: 1 },
   statusBadge: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 9, paddingVertical: 4, borderRadius: RADIUS.full },
   statusDot: { width: 6, height: 6, borderRadius: 3 },
   statusText: { fontSize: 10, fontWeight: '800' },
-  dateText: { fontSize: 11, color: '#9ca3af', marginBottom: 4 },
-  jobDesc: { fontSize: FONT_SIZES.xs, color: '#6b7280', marginBottom: 6, lineHeight: 17 },
+  dateText: { fontSize: 11, color: COLORS.textSecondary, marginBottom: 4 },
+  jobDesc: { fontSize: FONT_SIZES.xs, color: COLORS.textSecondary, marginBottom: 6, lineHeight: 17 },
   jobMeta: { flexDirection: 'row', alignItems: 'center', gap: 4, flexWrap: 'wrap' },
-  metaText: { fontSize: 11, color: '#9ca3af', flexShrink: 1 },
-  gpsPill: { flexDirection: 'row', alignItems: 'center', gap: 2, backgroundColor: '#f0fdf4', paddingHorizontal: 6, paddingVertical: 2, borderRadius: RADIUS.full },
-  gpsText: { fontSize: 9, fontWeight: '600', color: '#10b981' },
+  metaText: { fontSize: 11, color: COLORS.textSecondary, flexShrink: 1 },
+  gpsPill: { flexDirection: 'row', alignItems: 'center', gap: 2, backgroundColor: COLORS.successTint, paddingHorizontal: 6, paddingVertical: 2, borderRadius: RADIUS.full },
+  gpsText: { fontSize: 9, fontWeight: '600', color: COLORS.success },
   costText: { fontSize: FONT_SIZES.sm, fontWeight: '700', color: ACCENT, marginTop: 6 },
-  ownerRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8, padding: 8, backgroundColor: '#f9fafb', borderRadius: RADIUS.sm },
-  ownerAvatar: { width: 32, height: 32, borderRadius: 16, backgroundColor: ACCENT, justifyContent: 'center', alignItems: 'center' },
-  ownerAvatarText: { fontSize: 12, fontWeight: '700', color: '#fff' },
-  ownerLabel: { fontSize: 9, color: '#9ca3af', fontWeight: '600', textTransform: 'uppercase' },
-  ownerName: { fontSize: FONT_SIZES.xs, fontWeight: '700', color: '#1b1b1b' },
+  customerRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8, padding: 8, backgroundColor: COLORS.background, borderRadius: RADIUS.sm },
+  customerAvatar: { width: 32, height: 32, borderRadius: 16, backgroundColor: ACCENT, justifyContent: 'center', alignItems: 'center' },
+  customerAvatarText: { fontSize: 12, fontWeight: '700', color: COLORS.white },
+  customerLabel: { fontSize: 9, color: COLORS.textSecondary, fontWeight: '600', textTransform: 'uppercase' },
+  customerName: { fontSize: FONT_SIZES.xs, fontWeight: '700', color: COLORS.text },
   messageIconBtn: { width: 30, height: 30, borderRadius: 15, backgroundColor: ACCENT, justifyContent: 'center', alignItems: 'center' },
-  startBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 8, padding: 10, backgroundColor: '#8b5cf6', borderRadius: RADIUS.sm },
-  startBtnText: { fontSize: FONT_SIZES.xs, fontWeight: '700', color: '#fff' },
-  completeBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 8, padding: 10, backgroundColor: '#10b981', borderRadius: RADIUS.sm },
-  completeBtnText: { fontSize: FONT_SIZES.xs, fontWeight: '700', color: '#fff' },
-  mapBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 8, padding: 10, backgroundColor: '#eff6ff', borderRadius: RADIUS.sm, borderWidth: 1, borderColor: '#bfdbfe' },
-  mapBtnText: { fontSize: FONT_SIZES.xs, fontWeight: '700', color: '#2563eb' },
-  editPriceBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 8, padding: 10, backgroundColor: '#fffbeb', borderRadius: RADIUS.sm, borderWidth: 1, borderColor: '#fde68a' },
+  startBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 8, padding: 10, backgroundColor: COLORS.secondary, borderRadius: RADIUS.sm },
+  startBtnText: { fontSize: FONT_SIZES.xs, fontWeight: '700', color: COLORS.white },
+  completeBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 8, padding: 10, backgroundColor: COLORS.success, borderRadius: RADIUS.sm },
+  completeBtnText: { fontSize: FONT_SIZES.xs, fontWeight: '700', color: COLORS.white },
+  mapBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 8, padding: 10, backgroundColor: COLORS.infoTint, borderRadius: RADIUS.sm, borderWidth: 1, borderColor: COLORS.infoTint },
+  mapBtnText: { fontSize: FONT_SIZES.xs, fontWeight: '700', color: COLORS.info },
+  editPriceBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 8, padding: 10, backgroundColor: COLORS.warningTint, borderRadius: RADIUS.sm, borderWidth: 1, borderColor: COLORS.accent },
   editPriceBtnText: { fontSize: FONT_SIZES.xs, fontWeight: '700', color: ACCENT },
-  paidBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 8, padding: 8, backgroundColor: '#f0fdf4', borderRadius: RADIUS.sm, justifyContent: 'center' },
-  paidText: { fontSize: FONT_SIZES.xs, fontWeight: '700', color: '#10b981' },
-  emptyState: { alignItems: 'center', paddingVertical: 60, backgroundColor: '#fff', borderRadius: RADIUS.md },
-  emptyIconWrap: { width: 72, height: 72, borderRadius: 36, backgroundColor: '#f3f4f6', justifyContent: 'center', alignItems: 'center', marginBottom: 12 },
-  emptyText: { fontSize: FONT_SIZES.lg, fontWeight: '600', color: '#374151' },
+  paidBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 8, padding: 8, backgroundColor: COLORS.successTint, borderRadius: RADIUS.sm, justifyContent: 'center' },
+  paidText: { fontSize: FONT_SIZES.xs, fontWeight: '700', color: COLORS.success },
+  emptyState: { alignItems: 'center', paddingVertical: 60, backgroundColor: COLORS.white, borderRadius: RADIUS.md },
+  emptyIconWrap: { width: 72, height: 72, borderRadius: 36, backgroundColor: COLORS.background, justifyContent: 'center', alignItems: 'center', marginBottom: 12 },
+  emptyText: { fontSize: FONT_SIZES.lg, fontWeight: '600', color: COLORS.text },
   priceOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: SPACING.xl },
-  priceCard: { backgroundColor: '#fff', borderRadius: RADIUS.lg, padding: SPACING.xl, width: '100%', alignItems: 'center' },
-  priceIconWrap: { width: 56, height: 56, borderRadius: 28, backgroundColor: '#fffbeb', justifyContent: 'center', alignItems: 'center', marginBottom: SPACING.md },
-  priceTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: '#1b1b1b', marginBottom: 4, textAlign: 'center' },
-  priceSubtitle: { fontSize: FONT_SIZES.sm, color: '#6b7280', textAlign: 'center', marginBottom: SPACING.lg },
-  priceInput: { alignSelf: 'stretch', backgroundColor: '#f9fafb', borderRadius: RADIUS.md, borderWidth: 1, borderColor: '#e5e7eb', padding: 12, fontSize: FONT_SIZES.md, color: '#1b1b1b', marginBottom: SPACING.lg, textAlign: 'center' },
+  priceCard: { backgroundColor: COLORS.white, borderRadius: RADIUS.lg, padding: SPACING.xl, width: '100%', alignItems: 'center' },
+  priceIconWrap: { width: 56, height: 56, borderRadius: 28, backgroundColor: COLORS.warningTint, justifyContent: 'center', alignItems: 'center', marginBottom: SPACING.md },
+  priceTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.text, marginBottom: 4, textAlign: 'center' },
+  priceSubtitle: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, textAlign: 'center', marginBottom: SPACING.lg },
+  priceInput: { alignSelf: 'stretch', backgroundColor: COLORS.background, borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.border, padding: 12, fontSize: FONT_SIZES.md, color: COLORS.text, marginBottom: SPACING.lg, textAlign: 'center' },
   priceActionsRow: { flexDirection: 'row', gap: SPACING.md, alignSelf: 'stretch' },
-  priceCancelBtn: { flex: 1, padding: 14, borderRadius: RADIUS.md, backgroundColor: '#f3f4f6', alignItems: 'center' },
-  priceCancelText: { fontSize: FONT_SIZES.md, fontWeight: '600', color: '#6b7280' },
+  priceCancelBtn: { flex: 1, padding: 14, borderRadius: RADIUS.md, backgroundColor: COLORS.background, alignItems: 'center' },
+  priceCancelText: { fontSize: FONT_SIZES.md, fontWeight: '600', color: COLORS.textSecondary },
   priceSubmitBtn: { flex: 1, borderRadius: RADIUS.md, overflow: 'hidden' },
   priceSubmitGradient: { padding: 14, alignItems: 'center' },
-  priceSubmitText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: '#fff' },
+  priceSubmitText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.accentInk },
   fullOverlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: SPACING.xl },
 });

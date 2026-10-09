@@ -15,12 +15,12 @@ import RegisterScreen from '../screens/auth/RegisterScreen';
 import OtpScreen from '../screens/auth/OtpScreen';
 import ForgotPasswordScreen from '../screens/auth/ForgotPasswordScreen';
 import ResetNewPasswordScreen from '../screens/auth/ResetNewPasswordScreen';
-import OwnerTabNavigator from './OwnerTabNavigator';
+import CustomerTabNavigator from './CustomerTabNavigator';
 import MechanicTabNavigator from './MechanicTabNavigator';
 import DevSettingsScreen from '../screens/DevSettingsScreen';
 
 import ChatScreen from '../screens/ChatScreen';
-import OwnerSOSScreen from '../screens/owner/OwnerSOSScreen';
+import CustomerSOSScreen from '../screens/customer/CustomerSOSScreen';
 import WalletScreen from '../screens/WalletScreen';
 import TopUpScreen from '../screens/TopUpScreen';
 import BankAccountScreen from '../screens/mechanic/BankAccountScreen';
@@ -29,16 +29,6 @@ import WithdrawScreen from '../screens/mechanic/WithdrawScreen';
 const Stack = createNativeStackNavigator();
 const SPLASH_DURATION = 2800;
 const SPLASH_FADE_DURATION = 500;
-
-const isCustomerRole = (role?: string | null) => {
-  const value = (role ?? '').toString().toLowerCase();
-  return value === 'customer' || value === 'owner' || value === 'car_owner';
-};
-
-const isMechanicRole = (role?: string | null) => {
-  const value = (role ?? '').toString().toLowerCase();
-  return value === 'mechanic';
-};
 
 export default function Navigation() {
   const dispatch = useDispatch<AppDispatch>();
@@ -75,17 +65,17 @@ export default function Navigation() {
                 <Stack.Screen name="ResetNewPassword" component={ResetNewPasswordScreen} />
                 <Stack.Screen name="DevSettings" component={DevSettingsScreen} />
               </>
-            ) : isCustomerRole(role) ? (
+            ) : role === 'customer' ? (
               <>
-                <Stack.Screen name="OwnerTabs" component={OwnerTabNavigator} />
+                <Stack.Screen name="CustomerTabs" component={CustomerTabNavigator} />
                 <Stack.Screen name="DevSettings" component={DevSettingsScreen} />
                 <Stack.Screen name="Chat" component={ChatScreen} />
-                <Stack.Screen name="SOS" component={OwnerSOSScreen} />
+                <Stack.Screen name="CustomerSOS" component={CustomerSOSScreen} />
                 <Stack.Screen name="Wallet" component={WalletScreen} />
                 <Stack.Screen name="TopUp" component={TopUpScreen} />
                 <Stack.Screen name="Otp" component={OtpScreen} />
               </>
-            ) : isMechanicRole(role) ? (
+            ) : role === 'mechanic' ? (
               <>
                 <Stack.Screen name="MechanicTabs" component={MechanicTabNavigator} />
                 <Stack.Screen name="DevSettings" component={DevSettingsScreen} />

@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { COLORS, JOB_STATUS_COLORS, SPACING, FONT_SIZES, RADIUS } from '../../constants';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   StatusBar, RefreshControl, ActivityIndicator, Alert, Modal, TextInput,
@@ -17,7 +18,6 @@ import { messageService, JobCardMetadata } from '../../services/messageService';
 import ConfirmDialog from '../../components/ConfirmDialog';
 import WalletPaymentSheet from '../../components/WalletPaymentSheet';
 import CreateJobModal from '../../components/CreateJobModal';
-import { SPACING, FONT_SIZES, RADIUS } from '../../constants';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -37,14 +37,7 @@ const formatScheduled = (date: Date) => {
     ' · ' + date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
 };
 const getStatusColor = (status: string) => {
-  switch (status) {
-    case 'PENDING': return '#f59e0b';
-    case 'ACCEPTED': return '#3b82f6';
-    case 'IN_PROGRESS': return '#8b5cf6';
-    case 'COMPLETED': return '#10b981';
-    case 'CANCELLED': return '#ef4444';
-    default: return '#6b7280';
-  }
+  return JOB_STATUS_COLORS[status] || COLORS.textSecondary;
 };
 const isDeletable = (job: any, paidJobs: number[]) =>
   job.status === 'CANCELLED' || (job.status === 'COMPLETED' && paidJobs.includes(job.id));
@@ -84,7 +77,7 @@ function JobCard({
         activeOpacity={0.85}
         onPress={() => { swipeableRef.current?.close(); onDelete(job); }}>
         <Animated.View style={{ transform: [{ scale }], alignItems: 'center', gap: 4 }}>
-          <Ionicons name="trash" size={20} color="#fff" />
+          <Ionicons name="trash" size={20} color={COLORS.white} />
           <Text style={styles.deleteActionText}>Delete</Text>
         </Animated.View>
       </TouchableOpacity>
@@ -105,7 +98,7 @@ function JobCard({
         </Text>
         {job.scheduledDate && (
           <View style={styles.scheduledPill}>
-            <Ionicons name="calendar-outline" size={11} color="#7c3aed" />
+            <Ionicons name="calendar-outline" size={11} color={COLORS.info} />
             <Text style={styles.scheduledPillText}>
               Scheduled: {formatScheduled(new Date(job.scheduledDate))}
             </Text>
@@ -113,21 +106,21 @@ function JobCard({
         )}
         {job.requestType === 'DIRECT' && (
           <View style={styles.directPill}>
-            <Ionicons name="person-outline" size={11} color="#2563eb" />
+            <Ionicons name="person-outline" size={11} color={COLORS.info} />
             <Text style={styles.directPillText}>Requested a specific mechanic</Text>
           </View>
         )}
         <Text style={styles.jobDesc} numberOfLines={2}>{job.description}</Text>
         <View style={styles.jobMeta}>
-          <Ionicons name="construct-outline" size={13} color="#9ca3af" />
+          <Ionicons name="construct-outline" size={13} color={COLORS.textSecondary} />
           <Text style={styles.metaText}>{job.type}</Text>
           {job.location && <>
-            <Ionicons name="location-outline" size={13} color="#9ca3af" />
+            <Ionicons name="location-outline" size={13} color={COLORS.textSecondary} />
             <Text style={styles.metaText} numberOfLines={1}>{job.location}</Text>
           </>}
           {job.latitude && (
             <View style={styles.gpsPill}>
-              <Ionicons name="navigate" size={9} color="#10b981" />
+              <Ionicons name="navigate" size={9} color={COLORS.success} />
               <Text style={styles.gpsText}>GPS</Text>
             </View>
           )}
@@ -150,9 +143,9 @@ function JobCard({
               disabled={messagingBusy}
               onPress={() => onMessage(job, mechanic.name)}>
               {messagingBusy ? (
-                <ActivityIndicator size="small" color="#fff" />
+                <ActivityIndicator size="small" color={COLORS.white} />
               ) : (
-                <Ionicons name="chatbubble" size={15} color="#fff" />
+                <Ionicons name="chatbubble" size={15} color={COLORS.white} />
               )}
             </TouchableOpacity>
           </View>
@@ -169,13 +162,13 @@ function JobCard({
         )}
         {job.status === 'COMPLETED' && paidJobs.includes(job.id) && (
           <View style={styles.paidBadge}>
-            <Ionicons name="checkmark-circle" size={14} color="#10b981" />
+            <Ionicons name="checkmark-circle" size={14} color={COLORS.success} />
             <Text style={styles.paidText}>Paid</Text>
           </View>
         )}
         {isDeletable(job, paidJobs) && (
           <View style={styles.swipeHint}>
-            <Ionicons name="chevron-back" size={11} color="#d1d5db" />
+            <Ionicons name="chevron-back" size={11} color={COLORS.border} />
             <Text style={styles.swipeHintText}>Swipe to delete</Text>
           </View>
         )}
@@ -195,7 +188,7 @@ function JobCard({
   return card;
 }
 
-export default function OwnerJobsScreen({ navigation }: any) {
+export default function CustomerJobsScreen({ navigation }: any) {
   const { user } = useSelector((state: RootState) => state.auth);
   const [jobs, setJobs] = useState<any[]>([]);
   const [vehicles, setVehicles] = useState<any[]>([]);
@@ -231,7 +224,7 @@ export default function OwnerJobsScreen({ navigation }: any) {
   const fetchData = async () => {
     try {
       const [jobsData, vehiclesData] = await Promise.all([
-        jobService.getMyJobsAsOwner(),
+        jobService.getMyJobsAsCustomer(),
         vehicleService.getMyVehicles()
       ]);
       const sorted = [...jobsData].sort((a: any, b: any) =>
@@ -245,7 +238,7 @@ export default function OwnerJobsScreen({ navigation }: any) {
         completedJobs.map(async (job: any) => {
           try {
             const payment = await paymentService.getPaymentByJob(job.id);
-            if (payment && payment.status === 'COMPLETED') {
+            if (payment && payment.status === 'success') {
               paidIds.push(job.id);
             }
           } catch {
@@ -438,7 +431,7 @@ export default function OwnerJobsScreen({ navigation }: any) {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
-      <LinearGradient colors={['#1b4332', '#2d6a4f']} style={styles.header}>
+      <LinearGradient colors={[COLORS.primary, COLORS.secondary]} style={styles.header}>
         <Text style={styles.headerTitle}>My Jobs</Text>
       </LinearGradient>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tabs}>
@@ -456,15 +449,15 @@ export default function OwnerJobsScreen({ navigation }: any) {
       </ScrollView>
       <ScrollView
         showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#1b4332" />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.primary} />}
         style={styles.list}
         contentContainerStyle={{ paddingBottom: 140 }}>
         {loading ? (
-          <ActivityIndicator color="#1b4332" style={{ marginTop: 40 }} />
+          <ActivityIndicator color={COLORS.primary} style={{ marginTop: 40 }} />
         ) : filteredJobs.length === 0 ? (
           <View style={styles.emptyState}>
             <View style={styles.emptyIconWrap}>
-              <Ionicons name="construct-outline" size={40} color="#9ca3af" />
+              <Ionicons name="construct-outline" size={40} color={COLORS.textSecondary} />
             </View>
             <Text style={styles.emptyText}>No jobs found</Text>
           </View>
@@ -481,7 +474,7 @@ export default function OwnerJobsScreen({ navigation }: any) {
                     <Text style={styles.sectionHeader}>{section.title}</Text>
                     <View style={styles.sectionHeaderRight}>
                       <Text style={styles.sectionCount}>{section.data.length}</Text>
-                      <Ionicons name={isCollapsed ? 'chevron-down' : 'chevron-up'} size={16} color="#9ca3af" />
+                      <Ionicons name={isCollapsed ? 'chevron-down' : 'chevron-up'} size={16} color={COLORS.textSecondary} />
                     </View>
                   </TouchableOpacity>
                   {!isCollapsed && section.data.map((job, idx) => (
@@ -509,8 +502,8 @@ export default function OwnerJobsScreen({ navigation }: any) {
         activeOpacity={0.9}
         style={styles.fab}>
         <Animated.View style={{ transform: [{ scale: fabScale }, { rotate: fabRotateInterpolate }] }}>
-          <LinearGradient colors={['#1b4332', '#2d6a4f']} style={styles.fabGradient}>
-            <Ionicons name="add" size={28} color="#fff" />
+          <LinearGradient colors={[COLORS.accent, COLORS.accent]} style={styles.fabGradient}>
+            <Ionicons name="add" size={28} color={COLORS.accentInk} />
           </LinearGradient>
         </Animated.View>
       </TouchableOpacity>
@@ -524,7 +517,7 @@ export default function OwnerJobsScreen({ navigation }: any) {
               {reviewSubmitted ? (
                 <View style={styles.reviewSuccessWrap}>
                   <View style={styles.reviewSuccessIconWrap}>
-                    <Ionicons name="checkmark-circle" size={48} color="#10b981" />
+                    <Ionicons name="checkmark-circle" size={48} color={COLORS.success} />
                   </View>
                   <Text style={styles.reviewSuccessTitle}>Thank you!</Text>
                   <Text style={styles.reviewSuccessSubtitle}>Your review has been submitted.</Text>
@@ -542,7 +535,7 @@ export default function OwnerJobsScreen({ navigation }: any) {
                         <Ionicons
                           name={star <= selectedRating ? 'star' : 'star-outline'}
                           size={40}
-                          color={star <= selectedRating ? '#f59e0b' : '#d1d5db'}
+                          color={star <= selectedRating ? COLORS.warning : COLORS.border}
                         />
                       </TouchableOpacity>
                     ))}
@@ -559,12 +552,12 @@ export default function OwnerJobsScreen({ navigation }: any) {
                     onChangeText={setRatingComment}
                     multiline
                     numberOfLines={3}
-                    placeholderTextColor="#9ca3af"
+                    placeholderTextColor={COLORS.textSecondary}
                   />
                   <TouchableOpacity style={styles.submitRatingBtn} onPress={handleSubmitReview} disabled={submittingReview} activeOpacity={0.85}>
-                    <LinearGradient colors={['#1b4332', '#2d6a4f']} style={styles.submitRatingGradient}>
+                    <LinearGradient colors={[COLORS.accent, COLORS.accent]} style={styles.submitRatingGradient}>
                       {submittingReview ? (
-                        <ActivityIndicator color="#fff" />
+                        <ActivityIndicator color={COLORS.accentInk} />
                       ) : (
                         <Text style={styles.submitRatingText}>Submit Review</Text>
                       )}
@@ -627,73 +620,73 @@ export default function OwnerJobsScreen({ navigation }: any) {
   );
 }
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f9fafb' },
+  container: { flex: 1, backgroundColor: COLORS.background },
   header: { paddingTop: 60, paddingBottom: SPACING.lg, paddingHorizontal: SPACING.lg, borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
-  headerTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: '#ffffff' },
-  tabs: { paddingHorizontal: SPACING.lg, paddingVertical: SPACING.sm, backgroundColor: '#fff', maxHeight: 52 },
-  tab: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 8, borderRadius: RADIUS.full, marginRight: 8, backgroundColor: '#f3f4f6' },
-  tabActive: { backgroundColor: '#1b4332' },
-  tabText: { fontSize: FONT_SIZES.xs, fontWeight: '600', color: '#6b7280' },
-  tabTextActive: { color: '#fff' },
+  headerTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.white },
+  tabs: { paddingHorizontal: SPACING.lg, paddingVertical: SPACING.sm, backgroundColor: COLORS.white, maxHeight: 52 },
+  tab: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 8, borderRadius: RADIUS.full, marginRight: 8, backgroundColor: COLORS.background },
+  tabActive: { backgroundColor: COLORS.primary },
+  tabText: { fontSize: FONT_SIZES.xs, fontWeight: '600', color: COLORS.textSecondary },
+  tabTextActive: { color: COLORS.white },
   list: { flex: 1, padding: SPACING.lg },
   sectionHeaderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: SPACING.md, marginBottom: SPACING.sm },
-  sectionHeader: { fontSize: FONT_SIZES.sm, fontWeight: '800', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: 0.5 },
+  sectionHeader: { fontSize: FONT_SIZES.sm, fontWeight: '800', color: COLORS.textSecondary, textTransform: 'uppercase', letterSpacing: 0.5 },
   sectionHeaderRight: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  sectionCount: { fontSize: 11, fontWeight: '700', color: '#9ca3af', backgroundColor: '#f3f4f6', paddingHorizontal: 7, paddingVertical: 2, borderRadius: RADIUS.full },
-  jobCard: { backgroundColor: '#fff', borderRadius: 14, padding: SPACING.md, marginBottom: SPACING.sm, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 6, elevation: 2, borderWidth: 1, borderColor: '#f3f4f6' },
+  sectionCount: { fontSize: 11, fontWeight: '700', color: COLORS.textSecondary, backgroundColor: COLORS.background, paddingHorizontal: 7, paddingVertical: 2, borderRadius: RADIUS.full },
+  jobCard: { backgroundColor: COLORS.white, borderRadius: 14, padding: SPACING.md, marginBottom: SPACING.sm, shadowColor: COLORS.black, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 6, elevation: 2, borderWidth: 1, borderColor: COLORS.background },
   jobHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4, gap: 8 },
-  jobTitle: { fontSize: FONT_SIZES.md, fontWeight: '700', color: '#111827', flex: 1 },
+  jobTitle: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.text, flex: 1 },
   statusBadge: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 9, paddingVertical: 4, borderRadius: RADIUS.full },
   statusDot: { width: 6, height: 6, borderRadius: 3 },
   statusText: { fontSize: 10, fontWeight: '800' },
-  dateText: { fontSize: 11, color: '#9ca3af', marginBottom: 4 },
-  scheduledPill: { flexDirection: 'row', alignItems: 'center', gap: 4, alignSelf: 'flex-start', backgroundColor: '#f5f3ff', paddingHorizontal: 8, paddingVertical: 3, borderRadius: RADIUS.full, marginBottom: 6 },
-  scheduledPillText: { fontSize: 10, fontWeight: '600', color: '#7c3aed' },
-  directPill: { flexDirection: 'row', alignItems: 'center', gap: 4, alignSelf: 'flex-start', backgroundColor: '#eff6ff', paddingHorizontal: 8, paddingVertical: 3, borderRadius: RADIUS.full, marginBottom: 6 },
-  directPillText: { fontSize: 10, fontWeight: '600', color: '#2563eb' },
-  jobDesc: { fontSize: FONT_SIZES.xs, color: '#6b7280', marginBottom: 6, lineHeight: 17 },
+  dateText: { fontSize: 11, color: COLORS.textSecondary, marginBottom: 4 },
+  scheduledPill: { flexDirection: 'row', alignItems: 'center', gap: 4, alignSelf: 'flex-start', backgroundColor: COLORS.infoTint, paddingHorizontal: 8, paddingVertical: 3, borderRadius: RADIUS.full, marginBottom: 6 },
+  scheduledPillText: { fontSize: 10, fontWeight: '600', color: COLORS.info },
+  directPill: { flexDirection: 'row', alignItems: 'center', gap: 4, alignSelf: 'flex-start', backgroundColor: COLORS.infoTint, paddingHorizontal: 8, paddingVertical: 3, borderRadius: RADIUS.full, marginBottom: 6 },
+  directPillText: { fontSize: 10, fontWeight: '600', color: COLORS.info },
+  jobDesc: { fontSize: FONT_SIZES.xs, color: COLORS.textSecondary, marginBottom: 6, lineHeight: 17 },
   jobMeta: { flexDirection: 'row', alignItems: 'center', gap: 4, flexWrap: 'wrap' },
-  metaText: { fontSize: 11, color: '#9ca3af', flexShrink: 1 },
-  gpsPill: { flexDirection: 'row', alignItems: 'center', gap: 2, backgroundColor: '#f0fdf4', paddingHorizontal: 6, paddingVertical: 2, borderRadius: RADIUS.full },
-  gpsText: { fontSize: 9, fontWeight: '600', color: '#10b981' },
-  costText: { fontSize: FONT_SIZES.sm, fontWeight: '700', color: '#1b4332', marginTop: 6 },
-  mechanicRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8, padding: 8, backgroundColor: '#f9fafb', borderRadius: RADIUS.sm },
-  mechanicAvatar: { width: 32, height: 32, borderRadius: 16, backgroundColor: '#1b4332', justifyContent: 'center', alignItems: 'center' },
-  mechanicAvatarText: { fontSize: 12, fontWeight: '700', color: '#fff' },
-  mechanicLabel: { fontSize: 9, color: '#9ca3af', fontWeight: '600', textTransform: 'uppercase' },
-  mechanicName: { fontSize: FONT_SIZES.xs, fontWeight: '700', color: '#1b1b1b' },
-  messageIconBtn: { width: 30, height: 30, borderRadius: 15, backgroundColor: '#1b4332', justifyContent: 'center', alignItems: 'center' },
-  cancelBtn: { marginTop: 8, padding: 8, backgroundColor: '#fef2f2', borderRadius: RADIUS.sm, alignItems: 'center' },
-  cancelText: { fontSize: FONT_SIZES.xs, fontWeight: '700', color: '#dc2626' },
-  payBtn: { marginTop: 8, padding: 10, backgroundColor: '#1b4332', borderRadius: RADIUS.sm, alignItems: 'center' },
-  payBtnText: { fontSize: FONT_SIZES.xs, fontWeight: '800', color: '#fff' },
-  paidBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 8, padding: 8, backgroundColor: '#f0fdf4', borderRadius: RADIUS.sm, justifyContent: 'center' },
-  paidText: { fontSize: FONT_SIZES.xs, fontWeight: '700', color: '#10b981' },
+  metaText: { fontSize: 11, color: COLORS.textSecondary, flexShrink: 1 },
+  gpsPill: { flexDirection: 'row', alignItems: 'center', gap: 2, backgroundColor: COLORS.successTint, paddingHorizontal: 6, paddingVertical: 2, borderRadius: RADIUS.full },
+  gpsText: { fontSize: 9, fontWeight: '600', color: COLORS.success },
+  costText: { fontSize: FONT_SIZES.sm, fontWeight: '700', color: COLORS.primary, marginTop: 6 },
+  mechanicRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8, padding: 8, backgroundColor: COLORS.background, borderRadius: RADIUS.sm },
+  mechanicAvatar: { width: 32, height: 32, borderRadius: 16, backgroundColor: COLORS.primary, justifyContent: 'center', alignItems: 'center' },
+  mechanicAvatarText: { fontSize: 12, fontWeight: '700', color: COLORS.white },
+  mechanicLabel: { fontSize: 9, color: COLORS.textSecondary, fontWeight: '600', textTransform: 'uppercase' },
+  mechanicName: { fontSize: FONT_SIZES.xs, fontWeight: '700', color: COLORS.text },
+  messageIconBtn: { width: 30, height: 30, borderRadius: 15, backgroundColor: COLORS.primary, justifyContent: 'center', alignItems: 'center' },
+  cancelBtn: { marginTop: 8, padding: 8, backgroundColor: COLORS.errorTint, borderRadius: RADIUS.sm, alignItems: 'center' },
+  cancelText: { fontSize: FONT_SIZES.xs, fontWeight: '700', color: COLORS.error },
+  payBtn: { marginTop: 8, padding: 10, backgroundColor: COLORS.primary, borderRadius: RADIUS.sm, alignItems: 'center' },
+  payBtnText: { fontSize: FONT_SIZES.xs, fontWeight: '800', color: COLORS.white },
+  paidBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 8, padding: 8, backgroundColor: COLORS.successTint, borderRadius: RADIUS.sm, justifyContent: 'center' },
+  paidText: { fontSize: FONT_SIZES.xs, fontWeight: '700', color: COLORS.success },
   swipeHint: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: 2, marginTop: 6 },
-  swipeHintText: { fontSize: 9, color: '#d1d5db' },
-  deleteAction: { backgroundColor: '#dc2626', justifyContent: 'center', alignItems: 'center', width: 76, marginBottom: SPACING.sm, borderRadius: 14 },
-  deleteActionText: { fontSize: 11, fontWeight: '700', color: '#fff' },
-  fab: { position: 'absolute', right: SPACING.lg, bottom: 130, borderRadius: 28, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 8 },
+  swipeHintText: { fontSize: 9, color: COLORS.border },
+  deleteAction: { backgroundColor: COLORS.error, justifyContent: 'center', alignItems: 'center', width: 76, marginBottom: SPACING.sm, borderRadius: 14 },
+  deleteActionText: { fontSize: 11, fontWeight: '700', color: COLORS.white },
+  fab: { position: 'absolute', right: SPACING.lg, bottom: 130, borderRadius: 28, shadowColor: COLORS.black, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 8 },
   fabGradient: { width: 56, height: 56, borderRadius: 28, justifyContent: 'center', alignItems: 'center' },
-  emptyState: { alignItems: 'center', paddingVertical: 60, backgroundColor: '#fff', borderRadius: RADIUS.md },
-  emptyIconWrap: { width: 72, height: 72, borderRadius: 36, backgroundColor: '#f3f4f6', justifyContent: 'center', alignItems: 'center', marginBottom: 12 },
-  emptyText: { fontSize: FONT_SIZES.lg, fontWeight: '600', color: '#374151' },
+  emptyState: { alignItems: 'center', paddingVertical: 60, backgroundColor: COLORS.white, borderRadius: RADIUS.md },
+  emptyIconWrap: { width: 72, height: 72, borderRadius: 36, backgroundColor: COLORS.background, justifyContent: 'center', alignItems: 'center', marginBottom: 12 },
+  emptyText: { fontSize: FONT_SIZES.lg, fontWeight: '600', color: COLORS.text },
   ratingOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
-  ratingCard: { backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: SPACING.xl, paddingBottom: 40, alignItems: 'center' },
-  ratingIconContainer: { width: 64, height: 64, borderRadius: 32, backgroundColor: '#fffbeb', justifyContent: 'center', alignItems: 'center', marginBottom: SPACING.md },
+  ratingCard: { backgroundColor: COLORS.white, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: SPACING.xl, paddingBottom: 40, alignItems: 'center' },
+  ratingIconContainer: { width: 64, height: 64, borderRadius: 32, backgroundColor: COLORS.warningTint, justifyContent: 'center', alignItems: 'center', marginBottom: SPACING.md },
   ratingEmoji: { fontSize: 32 },
-  ratingTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: '#1b1b1b', marginBottom: 4 },
-  ratingSubtitle: { fontSize: FONT_SIZES.sm, color: '#6b7280', marginBottom: SPACING.lg },
+  ratingTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.text, marginBottom: 4 },
+  ratingSubtitle: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, marginBottom: SPACING.lg },
   starsRow: { flexDirection: 'row', gap: 8, marginBottom: SPACING.md },
-  ratingLabel: { fontSize: FONT_SIZES.md, fontWeight: '600', color: '#f59e0b', marginBottom: SPACING.md },
-  commentInput: { width: '100%', backgroundColor: '#f9fafb', borderRadius: RADIUS.md, borderWidth: 1, borderColor: '#e5e7eb', padding: 12, fontSize: FONT_SIZES.md, color: '#1b1b1b', textAlignVertical: 'top', minHeight: 80, marginBottom: SPACING.lg },
+  ratingLabel: { fontSize: FONT_SIZES.md, fontWeight: '600', color: COLORS.warning, marginBottom: SPACING.md },
+  commentInput: { width: '100%', backgroundColor: COLORS.background, borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.border, padding: 12, fontSize: FONT_SIZES.md, color: COLORS.text, textAlignVertical: 'top', minHeight: 80, marginBottom: SPACING.lg },
   submitRatingBtn: { width: '100%', borderRadius: RADIUS.md, overflow: 'hidden', marginBottom: SPACING.md },
   submitRatingGradient: { padding: 16, alignItems: 'center' },
-  submitRatingText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: '#fff' },
+  submitRatingText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.accentInk },
   skipBtn: { padding: 8 },
-  skipText: { fontSize: FONT_SIZES.sm, color: '#9ca3af' },
+  skipText: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary },
   reviewSuccessWrap: { alignItems: 'center', paddingVertical: SPACING.lg },
   reviewSuccessIconWrap: { marginBottom: SPACING.md },
-  reviewSuccessTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: '#1b1b1b', marginBottom: 4 },
-  reviewSuccessSubtitle: { fontSize: FONT_SIZES.sm, color: '#6b7280' },
+  reviewSuccessTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.text, marginBottom: 4 },
+  reviewSuccessSubtitle: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary },
 });

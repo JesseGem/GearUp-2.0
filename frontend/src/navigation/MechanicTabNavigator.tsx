@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { COLORS, FONT_FAMILY } from '../constants';
 import { View, TouchableOpacity, Text, StyleSheet, Animated, Platform } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -32,8 +33,8 @@ const LABELS: Record<string, string> = {
   Messages: 'Chats',
   Profile: 'Profile',
 };
-const ACTIVE_COLOR = '#000814';
-const INACTIVE_COLOR = '#9ca3af';
+const ACTIVE_COLOR = COLORS.primary;
+const INACTIVE_COLOR = COLORS.textSecondary;
 
 function TabButton({ routeName, focused, onPress, showDot }: { routeName: string; focused: boolean; onPress: () => void; showDot?: boolean }) {
   const scale = useRef(new Animated.Value(1)).current;
@@ -51,7 +52,9 @@ function TabButton({ routeName, focused, onPress, showDot }: { routeName: string
     <TouchableOpacity style={styles.tabBtn} onPress={onPress} activeOpacity={0.7}>
       <Animated.View style={{ transform: [{ scale }] }}>
         <View>
-          <Ionicons name={(focused ? filled : outline) as any} size={22} color={color} />
+          <View style={[styles.tabIconWrap, focused && styles.tabIconWrapActive]}>
+            <Ionicons name={(focused ? filled : outline) as any} size={22} color={color} />
+          </View>
           {showDot && <View style={styles.tabDot} />}
         </View>
       </Animated.View>
@@ -126,7 +129,7 @@ const styles = StyleSheet.create({
   shadowWrapper: {
     width: '100%',
     borderRadius: 30,
-    shadowColor: '#1b1b1b',
+    shadowColor: COLORS.text,
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.28,
     shadowRadius: 20,
@@ -155,9 +158,12 @@ const styles = StyleSheet.create({
     gap: 3,
     paddingVertical: 4,
   },
+  tabIconWrap: { minWidth: 34, minHeight: 28, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
+  tabIconWrapActive: { backgroundColor: COLORS.accent },
   tabLabel: {
     fontSize: 10.5,
     fontWeight: '600',
+    fontFamily: FONT_FAMILY.bodySemiBold,
   },
   tabDot: {
     position: 'absolute',
@@ -166,8 +172,8 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#ef4444',
+    backgroundColor: COLORS.error,
     borderWidth: 1.5,
-    borderColor: '#fff',
+    borderColor: COLORS.white,
   },
 });

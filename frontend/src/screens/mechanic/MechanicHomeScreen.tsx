@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { COLORS, FONT_FAMILY, JOB_STATUS_COLORS, SPACING, FONT_SIZES, RADIUS } from '../../constants';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   StatusBar, RefreshControl, ActivityIndicator, TextInput, Modal,
@@ -14,19 +15,12 @@ import { userService } from '../../services/userService';
 import { useFocusEffect } from '@react-navigation/native';
 import { AppAlertCard } from '../../components/AppAlert';
 import { Image } from 'react-native';
-import { SPACING, FONT_SIZES, RADIUS } from '../../constants';
 
-const ACCENT = '#000814';
-const ACCENT_DEEP = '#001D3D';
+const ACCENT = COLORS.primary;
+const ACCENT_DEEP = COLORS.secondary;
 
 const getStatusColor = (status: string) => {
-  switch (status) {
-    case 'PENDING': return '#f59e0b';
-    case 'ACCEPTED': return '#3b82f6';
-    case 'IN_PROGRESS': return '#8b5cf6';
-    case 'COMPLETED': return '#10b981';
-    default: return '#6b7280';
-  }
+  return JOB_STATUS_COLORS[status] || COLORS.textSecondary;
 };
 
 // ─── JobRow: its own component so entrance-animation hooks are safe/stable ───
@@ -101,7 +95,7 @@ export default function MechanicHomeScreen({ navigation }: any) {
         completedJobs.map(async (job: any) => {
           try {
             const payment = await paymentService.getPaymentByJob(job.id);
-            if (payment && payment.status === 'COMPLETED') {
+            if (payment && payment.status === 'success') {
               paidIds.push(job.id);
             }
           } catch {
@@ -214,7 +208,7 @@ export default function MechanicHomeScreen({ navigation }: any) {
         <View style={styles.headerContent}>
           <View>
             <Text style={styles.greeting}>Hello, {user?.name?.split(' ')[0]}</Text>
-            <Text style={styles.subGreeting}>Ready to help car owners?</Text>
+            <Text style={styles.subGreeting}>Ready to help customers?</Text>
           </View>
           <TouchableOpacity onPress={() => navigation.navigate('Profile')} activeOpacity={0.85}>
             {profileImage ? (
@@ -233,8 +227,8 @@ export default function MechanicHomeScreen({ navigation }: any) {
           <Switch
             value={acceptingBookings}
             onValueChange={handleToggleAvailability}
-            trackColor={{ false: '#6b7280', true: '#fbbf24' }}
-            thumbColor={acceptingBookings ? '#fff' : '#f4f3f4'}
+            trackColor={{ false: COLORS.textSecondary, true: COLORS.accent }}
+            thumbColor={acceptingBookings ? COLORS.white : COLORS.background}
             disabled={savingAvailability}
           />
         </View>
@@ -269,7 +263,7 @@ export default function MechanicHomeScreen({ navigation }: any) {
                   <Text style={styles.jobDesc} numberOfLines={2}>{job.description}</Text>
                   {job.location && (
                     <View style={styles.jobMeta}>
-                      <Ionicons name="location-outline" size={14} color="#6b7280" />
+                      <Ionicons name="location-outline" size={14} color={COLORS.textSecondary} />
                       <Text style={styles.metaText}>{job.location}</Text>
                     </View>
                   )}
@@ -277,8 +271,8 @@ export default function MechanicHomeScreen({ navigation }: any) {
                     <TouchableOpacity
                       style={styles.mapBtn}
                       onPress={() => navigation.getParent()?.navigate('MechanicMap', { job })}>
-                      <Ionicons name="map-outline" size={14} color="#2563eb" />
-                      <Text style={styles.mapBtnText}>View Owner Location</Text>
+                      <Ionicons name="map-outline" size={14} color={COLORS.info} />
+                      <Text style={styles.mapBtnText}>View Customer Location</Text>
                     </TouchableOpacity>
                   )}
                   {job.status === 'ACCEPTED' && (
@@ -320,7 +314,7 @@ export default function MechanicHomeScreen({ navigation }: any) {
             ) : availableJobs.length === 0 ? (
               <View style={styles.emptyState}>
                 <View style={styles.emptyIconWrap}>
-                  <Ionicons name="search-outline" size={40} color="#9ca3af" />
+                  <Ionicons name="search-outline" size={40} color={COLORS.textSecondary} />
                 </View>
                 <Text style={styles.emptyText}>No available jobs</Text>
                 <Text style={styles.emptySubText}>Pull down to refresh</Text>
@@ -331,7 +325,7 @@ export default function MechanicHomeScreen({ navigation }: any) {
                   <Text style={styles.jobDesc} numberOfLines={2}>{job.description}</Text>
                   {job.location && (
                     <View style={styles.jobMeta}>
-                      <Ionicons name="location-outline" size={14} color="#6b7280" />
+                      <Ionicons name="location-outline" size={14} color={COLORS.textSecondary} />
                       <Text style={styles.metaText}>{job.location}</Text>
                     </View>
                   )}
@@ -339,7 +333,7 @@ export default function MechanicHomeScreen({ navigation }: any) {
                     <Text style={styles.costText}>Est. GHS {job.estimatedCost}</Text>
                   )}
                   <TouchableOpacity style={styles.acceptBtn} onPress={() => handleAcceptJob(job.id)}>
-                    <LinearGradient colors={[ACCENT, ACCENT_DEEP]} style={styles.acceptGradient}>
+                    <LinearGradient colors={[COLORS.accent, COLORS.accent]} style={styles.acceptGradient}>
                       <Text style={styles.acceptText}>Accept Job</Text>
                     </LinearGradient>
                   </TouchableOpacity>
@@ -380,8 +374,8 @@ export default function MechanicHomeScreen({ navigation }: any) {
                 <Text style={styles.priceCancelText}>Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.priceSubmitBtn} onPress={handleSubmitPrice} disabled={processing} activeOpacity={0.85}>
-                <LinearGradient colors={[ACCENT, ACCENT_DEEP]} style={styles.priceSubmitGradient}>
-                  {processing ? <ActivityIndicator size="small" color="#fff" /> : (
+                <LinearGradient colors={[COLORS.accent, COLORS.accent]} style={styles.priceSubmitGradient}>
+                  {processing ? <ActivityIndicator size="small" color={COLORS.white} /> : (
                     <Text style={styles.priceSubmitText}>{priceModal?.mode === 'edit' ? 'Save' : 'Complete'}</Text>
                   )}
                 </LinearGradient>
@@ -408,57 +402,57 @@ export default function MechanicHomeScreen({ navigation }: any) {
   );
 }
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f9fafb' },
+  container: { flex: 1, backgroundColor: COLORS.background },
   header: { paddingTop: 60, paddingBottom: SPACING.xl, paddingHorizontal: SPACING.lg, borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
   headerContent: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACING.lg },
-  greeting: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: '#ffffff' },
-  subGreeting: { fontSize: FONT_SIZES.sm, color: '#fde68a', marginTop: 2 },
-  avatar: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#fbbf24', justifyContent: 'center', alignItems: 'center' },
+  greeting: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.white, fontFamily: FONT_FAMILY.headingBold },
+  subGreeting: { fontSize: FONT_SIZES.sm, color: COLORS.darkTextSecondary, marginTop: 2, fontFamily: FONT_FAMILY.body },
+  avatar: { width: 44, height: 44, borderRadius: 22, backgroundColor: COLORS.secondary, justifyContent: 'center', alignItems: 'center' },
   avatarImage: { width: 44, height: 44, borderRadius: 22 },
-  avatarText: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: '#001D3D' },
+  avatarText: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.secondary },
   availabilityRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: RADIUS.md, padding: SPACING.md },
-  availabilityText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: '#fff' },
+  availabilityText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.white },
   statsRow: { flexDirection: 'row', padding: SPACING.lg, gap: SPACING.md },
-  statCard: { flex: 1, backgroundColor: '#fff', borderRadius: RADIUS.md, padding: SPACING.md, alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 },
-  statValue: { fontSize: FONT_SIZES.xxl, fontWeight: '700', color: ACCENT },
-  statLabel: { fontSize: FONT_SIZES.xs, color: '#6b7280', marginTop: 2 },
+  statCard: { flex: 1, backgroundColor: COLORS.white, borderRadius: RADIUS.md, padding: SPACING.md, alignItems: 'center', shadowColor: COLORS.black, shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 },
+  statValue: { fontSize: FONT_SIZES.xxl, fontWeight: '700', color: ACCENT, fontFamily: FONT_FAMILY.headingBold },
+  statLabel: { fontSize: FONT_SIZES.xs, color: COLORS.textSecondary, marginTop: 2, fontFamily: FONT_FAMILY.body },
   section: { paddingHorizontal: SPACING.lg, paddingBottom: SPACING.md },
-  sectionTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: '#1b1b1b', marginBottom: SPACING.md },
-  jobCard: { backgroundColor: '#fff', borderRadius: RADIUS.md, padding: SPACING.md, marginBottom: SPACING.md, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 },
+  sectionTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.text, marginBottom: SPACING.md, fontFamily: FONT_FAMILY.headingBold },
+  jobCard: { backgroundColor: COLORS.white, borderRadius: RADIUS.md, padding: SPACING.md, marginBottom: SPACING.md, shadowColor: COLORS.black, shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 },
   jobHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6, gap: 8 },
-  jobTitle: { fontSize: FONT_SIZES.md, fontWeight: '600', color: '#1b1b1b', flex: 1 },
+  jobTitle: { fontSize: FONT_SIZES.md, fontWeight: '600', color: COLORS.text, flex: 1, fontFamily: FONT_FAMILY.heading },
   statusBadge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: RADIUS.full },
   statusText: { fontSize: FONT_SIZES.xs, fontWeight: '600' },
-  jobDesc: { fontSize: FONT_SIZES.sm, color: '#6b7280', marginBottom: 8 },
+  jobDesc: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, marginBottom: 8 },
   jobMeta: { flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 4 },
-  metaText: { fontSize: FONT_SIZES.xs, color: '#6b7280' },
+  metaText: { fontSize: FONT_SIZES.xs, color: COLORS.textSecondary },
   costText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: ACCENT, marginBottom: 8 },
   acceptBtn: { borderRadius: RADIUS.md, overflow: 'hidden', marginTop: 8 },
   acceptGradient: { padding: 12, alignItems: 'center' },
-  acceptText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: '#fff' },
-  startBtn: { marginTop: 8, padding: 10, backgroundColor: '#eff6ff', borderRadius: RADIUS.md, alignItems: 'center' },
-  startBtnText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: '#2563eb' },
-  completeBtn: { marginTop: 8, padding: 10, backgroundColor: '#f0fdf4', borderRadius: RADIUS.md, alignItems: 'center' },
-  completeBtnText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: '#10b981' },
-  mapBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 8, padding: 10, backgroundColor: '#eff6ff', borderRadius: RADIUS.md, borderWidth: 1, borderColor: '#bfdbfe' },
-  mapBtnText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: '#2563eb' },
-  editPriceBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 4, padding: 10, backgroundColor: '#fffbeb', borderRadius: RADIUS.md, borderWidth: 1, borderColor: '#fde68a' },
+  acceptText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.accentInk },
+  startBtn: { marginTop: 8, padding: 10, backgroundColor: COLORS.infoTint, borderRadius: RADIUS.md, alignItems: 'center' },
+  startBtnText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.info },
+  completeBtn: { marginTop: 8, padding: 10, backgroundColor: COLORS.successTint, borderRadius: RADIUS.md, alignItems: 'center' },
+  completeBtnText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.success },
+  mapBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 8, padding: 10, backgroundColor: COLORS.infoTint, borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.infoTint },
+  mapBtnText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.info },
+  editPriceBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 4, padding: 10, backgroundColor: COLORS.warningTint, borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.accent },
   editPriceBtnText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: ACCENT },
-  emptyState: { alignItems: 'center', paddingVertical: 40, backgroundColor: '#fff', borderRadius: RADIUS.md },
-  emptyIconWrap: { width: 72, height: 72, borderRadius: 36, backgroundColor: '#f3f4f6', justifyContent: 'center', alignItems: 'center', marginBottom: 12 },
-  emptyText: { fontSize: FONT_SIZES.lg, fontWeight: '600', color: '#374151' },
-  emptySubText: { fontSize: FONT_SIZES.sm, color: '#9ca3af', marginTop: 4 },
+  emptyState: { alignItems: 'center', paddingVertical: 40, backgroundColor: COLORS.white, borderRadius: RADIUS.md },
+  emptyIconWrap: { width: 72, height: 72, borderRadius: 36, backgroundColor: COLORS.background, justifyContent: 'center', alignItems: 'center', marginBottom: 12 },
+  emptyText: { fontSize: FONT_SIZES.lg, fontWeight: '600', color: COLORS.text },
+  emptySubText: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, marginTop: 4 },
   priceOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: SPACING.xl },
-  priceCard: { backgroundColor: '#fff', borderRadius: RADIUS.lg, padding: SPACING.xl, width: '100%', alignItems: 'center' },
-  priceIconWrap: { width: 56, height: 56, borderRadius: 28, backgroundColor: '#fffbeb', justifyContent: 'center', alignItems: 'center', marginBottom: SPACING.md },
-  priceTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: '#1b1b1b', marginBottom: 4, textAlign: 'center' },
-  priceSubtitle: { fontSize: FONT_SIZES.sm, color: '#6b7280', textAlign: 'center', marginBottom: SPACING.lg },
-  priceInput: { alignSelf: 'stretch', backgroundColor: '#f9fafb', borderRadius: RADIUS.md, borderWidth: 1, borderColor: '#e5e7eb', padding: 12, fontSize: FONT_SIZES.md, color: '#1b1b1b', marginBottom: SPACING.lg, textAlign: 'center' },
+  priceCard: { backgroundColor: COLORS.white, borderRadius: RADIUS.lg, padding: SPACING.xl, width: '100%', alignItems: 'center' },
+  priceIconWrap: { width: 56, height: 56, borderRadius: 28, backgroundColor: COLORS.warningTint, justifyContent: 'center', alignItems: 'center', marginBottom: SPACING.md },
+  priceTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.text, marginBottom: 4, textAlign: 'center' },
+  priceSubtitle: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, textAlign: 'center', marginBottom: SPACING.lg },
+  priceInput: { alignSelf: 'stretch', backgroundColor: COLORS.background, borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.border, padding: 12, fontSize: FONT_SIZES.md, color: COLORS.text, marginBottom: SPACING.lg, textAlign: 'center' },
   priceActionsRow: { flexDirection: 'row', gap: SPACING.md, alignSelf: 'stretch' },
-  priceCancelBtn: { flex: 1, padding: 14, borderRadius: RADIUS.md, backgroundColor: '#f3f4f6', alignItems: 'center' },
-  priceCancelText: { fontSize: FONT_SIZES.md, fontWeight: '600', color: '#6b7280' },
+  priceCancelBtn: { flex: 1, padding: 14, borderRadius: RADIUS.md, backgroundColor: COLORS.background, alignItems: 'center' },
+  priceCancelText: { fontSize: FONT_SIZES.md, fontWeight: '600', color: COLORS.textSecondary },
   priceSubmitBtn: { flex: 1, borderRadius: RADIUS.md, overflow: 'hidden' },
   priceSubmitGradient: { padding: 14, alignItems: 'center' },
-  priceSubmitText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: '#fff' },
+  priceSubmitText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.accentInk },
   alertOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.55)', justifyContent: 'center', alignItems: 'center', padding: SPACING.lg },
 });

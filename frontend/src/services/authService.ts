@@ -1,7 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getAPI, post, removeToken, setToken } from './api';
-
-export type AppRole = 'customer' | 'mechanic' | 'admin';
+import type { UserRole } from '../types';
 
 export interface RegisterData {
   firstName: string;
@@ -27,14 +26,13 @@ export interface VerifyRegistrationData {
   code?: string;
 }
 
-const normalizeRole = (role?: string | null): AppRole => {
+export const normalizeUserRole = (role?: string | null): UserRole => {
   const normalized = (role ?? '').toString().trim().toLowerCase();
 
-  if (normalized === 'owner' || normalized === 'car_owner' || normalized === 'customer') return 'customer';
-  if (normalized === 'mechanic') return 'mechanic';
-  if (normalized === 'admin') return 'admin';
-
-  return 'customer';
+  if (normalized === 'customer' || normalized === 'mechanic' || normalized === 'admin') {
+    return normalized;
+  }
+  throw new Error(`Unsupported user role: ${role ?? '(empty)'}`);
 };
 
 const normalizeUser = (payload: any) => {
@@ -47,7 +45,7 @@ const normalizeUser = (payload: any) => {
     lastName: user.lastName ?? '',
     email: user.email ?? '',
     phone: user.phone ?? null,
-    role: normalizeRole(user.role),
+    role: normalizeUserRole(user.role),
     isActive: user.isActive ?? true,
   };
 };
