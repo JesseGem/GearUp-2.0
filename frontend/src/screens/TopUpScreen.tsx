@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react';
+import { COLORS, SPACING, FONT_SIZES, RADIUS } from '../constants';
 import {
   View, Text, StyleSheet, StatusBar, TouchableOpacity,
   ActivityIndicator, KeyboardAvoidingView, Platform, Modal
@@ -11,16 +12,14 @@ import { RootState } from '../store';
 import AppTextInput from '../components/AppTextInput';
 import { AppAlertCard } from '../components/AppAlert';
 import { walletService } from '../services/walletService';
-import { SPACING, FONT_SIZES, RADIUS } from '../constants';
 
 const QUICK_AMOUNTS = [50, 100, 200, 500];
 
 export default function TopUpScreen({ navigation }: any) {
   const { user } = useSelector((state: RootState) => state.auth);
   const { popup } = usePaystack();
-  const isOwner = user?.role === 'OWNER';
-  const accentColor = isOwner ? '#1b4332' : '#000814';
-  const gradientColors = isOwner ? ['#1b4332', '#2d6a4f'] : ['#000814', '#001D3D'];
+  const accentColor = COLORS.accent;
+  const gradientColors = [COLORS.primary, COLORS.secondary];
 
 const [amount, setAmount] = useState('');
   const [verifying, setVerifying] = useState(false);
@@ -89,7 +88,7 @@ const [amount, setAmount] = useState('');
       <StatusBar barStyle="light-content" />
       <LinearGradient colors={gradientColors as any} style={styles.header}>
         <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={22} color="#fff" />
+          <Ionicons name="arrow-back" size={22} color={COLORS.white} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Top Up Wallet</Text>
         <View style={{ width: 36 }} />
@@ -125,9 +124,9 @@ const [amount, setAmount] = useState('');
             onPress={handlePay}
             disabled={!isValidAmount || verifying}
             activeOpacity={0.85}>
-            <LinearGradient colors={gradientColors as any} style={styles.continueGradient}>
+            <LinearGradient colors={[COLORS.accent, COLORS.accent]} style={styles.continueGradient}>
               {verifying ? (
-                <ActivityIndicator color="#fff" />
+                <ActivityIndicator color={COLORS.accentInk} />
               ) : (
                 <Text style={styles.continueText}>
                   Pay{isValidAmount ? ` — GHS ${parsedAmount.toFixed(2)}` : ''}
@@ -156,18 +155,18 @@ const [amount, setAmount] = useState('');
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f9fafb' },
+  container: { flex: 1, backgroundColor: COLORS.background },
   header: { paddingTop: 60, paddingBottom: SPACING.lg, paddingHorizontal: SPACING.lg, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   backBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.2)', justifyContent: 'center', alignItems: 'center' },
-  headerTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: '#fff' },
+  headerTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.white },
   body: { flex: 1, padding: SPACING.lg },
-  label: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: '#374151', marginBottom: 8 },
+  label: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.text, marginBottom: 8 },
   quickRow: { flexDirection: 'row', gap: SPACING.sm, marginBottom: SPACING.xl },
-  quickChip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: RADIUS.full, backgroundColor: '#fff', borderWidth: 1, borderColor: '#e5e7eb' },
-  quickChipText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: '#374151' },
+  quickChip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: RADIUS.full, backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.border },
+  quickChipText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.text },
   continueBtn: { borderRadius: RADIUS.md, overflow: 'hidden' },
   continueGradient: { padding: 16, alignItems: 'center' },
-  continueText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: '#fff' },
-  hint: { fontSize: FONT_SIZES.xs, color: '#9ca3af', textAlign: 'center', marginTop: SPACING.md },
+  continueText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.accentInk },
+  hint: { fontSize: FONT_SIZES.xs, color: COLORS.textSecondary, textAlign: 'center', marginTop: SPACING.md },
   alertOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.55)', justifyContent: 'center', alignItems: 'center', padding: SPACING.lg },
 });

@@ -1,8 +1,8 @@
 import React from 'react';
+import { COLORS, FONT_FAMILY, SPACING, FONT_SIZES, RADIUS } from '../constants';
 import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { SPACING, FONT_SIZES, RADIUS } from '../constants';
 
 type AlertType = 'success' | 'error' | 'warning' | 'info';
 
@@ -18,10 +18,10 @@ interface AppAlertProps {
 }
 
 const TYPE_CONFIG: Record<AlertType, { icon: keyof typeof Ionicons.glyphMap; color: string; bg: string }> = {
-  success: { icon: 'checkmark-circle', color: '#10b981', bg: '#f0fdf4' },
-  error: { icon: 'close-circle', color: '#dc2626', bg: '#fef2f2' },
-  warning: { icon: 'warning', color: '#000814', bg: '#fffbeb' },
-  info: { icon: 'information-circle', color: '#2563eb', bg: '#eff6ff' },
+  success: { icon: 'checkmark-circle', color: COLORS.success, bg: COLORS.successTint },
+  error: { icon: 'close-circle', color: COLORS.error, bg: COLORS.errorTint },
+  warning: { icon: 'warning', color: COLORS.warning, bg: COLORS.warningTint },
+  info: { icon: 'information-circle', color: COLORS.info, bg: COLORS.infoTint },
 };
 
 // Inline version — use inside a screen that's ALREADY showing another Modal,
@@ -61,11 +61,11 @@ export default function AppAlert(props: AppAlertProps) {
 
 const styles = StyleSheet.create({
   overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: SPACING.xl },
-  card: { backgroundColor: '#fff', borderRadius: RADIUS.lg, padding: SPACING.xl, width: '100%', alignItems: 'center' },
+  card: { backgroundColor: COLORS.white, borderRadius: RADIUS.lg, padding: SPACING.xl, width: '100%', alignItems: 'center' },
   iconWrap: { width: 60, height: 60, borderRadius: 30, justifyContent: 'center', alignItems: 'center', marginBottom: SPACING.md },
-  title: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: '#1b1b1b', marginBottom: 8, textAlign: 'center' },
-  message: { fontSize: FONT_SIZES.sm, color: '#6b7280', textAlign: 'center', lineHeight: 20, marginBottom: SPACING.xl },
+  title: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.text, marginBottom: 8, textAlign: 'center', fontFamily: FONT_FAMILY.headingBold },
+  message: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, textAlign: 'center', lineHeight: 20, marginBottom: SPACING.xl, fontFamily: FONT_FAMILY.body },
   btn: { alignSelf: 'stretch', borderRadius: RADIUS.md, overflow: 'hidden' },
   btnGradient: { padding: 14, alignItems: 'center' },
-  btnText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: '#fff' },
+  btnText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.white, fontFamily: FONT_FAMILY.bodyBold },
 });

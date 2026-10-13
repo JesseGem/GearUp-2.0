@@ -1,6 +1,8 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Animated, Image } from 'react-native';
+import { COLORS } from '../constants';
+import { View, Text, StyleSheet, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import BrandLogo from '../components/BrandLogo';
 
 export default function SplashScreen() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -23,18 +25,13 @@ export default function SplashScreen() {
   }, []);
 
   return (
-    <LinearGradient colors={['#1b4332', '#2d6a4f']} style={styles.container}>
+    <LinearGradient colors={[COLORS.primary, COLORS.primary]} style={styles.container}>
       <Animated.View
         style={[
           styles.content,
           { opacity: fadeAnim, transform: [{ scale: scaleAnim }] },
         ]}>
-        <Image
-          source={require('../../assets/LOGO.png')}
-          style={styles.logo}
-          resizeMode="contain"
-        />
-        <Text style={styles.title}>GearUp</Text>
+        <BrandLogo appearance="dark" width={220} />
         <Text style={styles.tagline}>Your mechanic, wherever you are.</Text>
       </Animated.View>
     </LinearGradient>
@@ -43,12 +40,6 @@ export default function SplashScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  content: { alignItems: 'center', gap: 12 },
-  logo: {
-    width: 96,
-    height: 96,
-    marginBottom: 8,
-  },
-  title: { fontSize: 36, fontWeight: '800', color: '#ffffff', letterSpacing: 0.5 },
-  tagline: { fontSize: 14, color: '#86efac' },
+  content: { alignItems: 'center', gap: 16 },
+  tagline: { fontSize: 14, color: COLORS.darkTextSecondary },
 });

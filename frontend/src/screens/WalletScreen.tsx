@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from 'react';
+import { COLORS, SPACING, FONT_SIZES, RADIUS } from '../constants';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   StatusBar, RefreshControl, ActivityIndicator, Alert
@@ -9,13 +10,12 @@ import { useSelector } from 'react-redux';
 import { useFocusEffect } from '@react-navigation/native';
 import { RootState } from '../store';
 import { walletService, WalletTransactionDto, TransactionType } from '../services/walletService';
-import { SPACING, FONT_SIZES, RADIUS } from '../constants';
 
 const TRANSACTION_META: Record<TransactionType, { icon: any; color: string; sign: string }> = {
-  DEPOSIT: { icon: 'arrow-down-circle', color: '#10b981', sign: '+' },
-  JOB_PAYMENT_RECEIVED: { icon: 'arrow-down-circle', color: '#10b981', sign: '+' },
-  WITHDRAWAL: { icon: 'arrow-up-circle', color: '#dc2626', sign: '-' },
-  JOB_PAYMENT_SENT: { icon: 'arrow-up-circle', color: '#dc2626', sign: '-' },
+  DEPOSIT: { icon: 'arrow-down-circle', color: COLORS.success, sign: '+' },
+  JOB_PAYMENT_RECEIVED: { icon: 'arrow-down-circle', color: COLORS.success, sign: '+' },
+  WITHDRAWAL: { icon: 'arrow-up-circle', color: COLORS.error, sign: '-' },
+  JOB_PAYMENT_SENT: { icon: 'arrow-up-circle', color: COLORS.error, sign: '-' },
 };
 
 const formatDateTime = (dateStr: string) => {
@@ -26,9 +26,10 @@ const formatDateTime = (dateStr: string) => {
 
 export default function WalletScreen({ navigation }: any) {
   const { user } = useSelector((state: RootState) => state.auth);
-  const isOwner = user?.role === 'OWNER';
-  const accentColor = isOwner ? '#1b4332' : '#000814';
-  const gradientColors = isOwner ? ['#1b4332', '#2d6a4f'] : ['#000814', '#001D3D'];
+  const isCustomer = user?.role === 'customer';
+  const isMechanic = user?.role === 'mechanic';
+  const accentColor = isCustomer ? COLORS.primary : COLORS.primary;
+  const gradientColors = isCustomer ? [COLORS.primary, COLORS.primary] : [COLORS.primary, COLORS.secondary];
 
   const [balance, setBalance] = useState<number | null>(null);
   const [transactions, setTransactions] = useState<WalletTransactionDto[]>([]);
@@ -78,13 +79,13 @@ export default function WalletScreen({ navigation }: any) {
       <LinearGradient colors={gradientColors as any} style={styles.header}>
         <View style={styles.headerTopRow}>
           <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-            <Ionicons name="arrow-back" size={22} color="#fff" />
+            <Ionicons name="arrow-back" size={22} color={COLORS.white} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Wallet</Text>
           <View style={{ width: 36 }} />
         </View>
         {loading ? (
-          <ActivityIndicator color="#fff" style={{ marginVertical: 24 }} />
+          <ActivityIndicator color={COLORS.white} style={{ marginVertical: 24 }} />
         ) : (
           <>
             <Text style={styles.balanceLabel}>Available Balance</Text>
@@ -99,7 +100,7 @@ export default function WalletScreen({ navigation }: any) {
             <Ionicons name="add-circle" size={18} color={accentColor} />
             <Text style={[styles.actionBtnText, { color: accentColor }]}>Top Up</Text>
           </TouchableOpacity>
-          {!isOwner && (
+          {isMechanic && (
             <>
               <TouchableOpacity
                 style={styles.actionBtn}
@@ -127,7 +128,7 @@ export default function WalletScreen({ navigation }: any) {
         <Text style={styles.sectionTitle}>Transaction History</Text>
         {loading ? null : transactions.length === 0 ? (
           <View style={styles.emptyState}>
-            <Ionicons name="receipt-outline" size={40} color="#d1d5db" />
+            <Ionicons name="receipt-outline" size={40} color={COLORS.border} />
             <Text style={styles.emptyText}>No transactions yet</Text>
           </View>
         ) : (
@@ -142,7 +143,7 @@ export default function WalletScreen({ navigation }: any) {
                   <Text style={styles.txnTitle}>{describeTransaction(txn)}</Text>
                   <Text style={styles.txnDate}>{formatDateTime(txn.createdAt)}</Text>
                   {txn.status !== 'COMPLETED' && (
-                    <Text style={[styles.txnStatus, txn.status === 'FAILED' && { color: '#dc2626' }]}>
+                    <Text style={[styles.txnStatus, txn.status === 'FAILED' && { color: COLORS.error }]}>
                       {txn.status}
                     </Text>
                   )}
@@ -161,24 +162,24 @@ export default function WalletScreen({ navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f9fafb' },
+  container: { flex: 1, backgroundColor: COLORS.background },
   header: { paddingTop: 60, paddingBottom: SPACING.xl, paddingHorizontal: SPACING.lg, alignItems: 'center', borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
   headerTopRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginBottom: SPACING.md },
   backBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.2)', justifyContent: 'center', alignItems: 'center' },
-  headerTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: '#fff' },
+  headerTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.white },
   balanceLabel: { fontSize: FONT_SIZES.sm, color: 'rgba(255,255,255,0.75)', marginTop: 4 },
-  balanceValue: { fontSize: 36, fontWeight: '800', color: '#fff', marginTop: 4 },
+  balanceValue: { fontSize: 36, fontWeight: '800', color: COLORS.white, marginTop: 4 },
   actionsRow: { flexDirection: 'row', gap: SPACING.sm, marginTop: SPACING.lg },
-  actionBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#fff', paddingHorizontal: 14, paddingVertical: 9, borderRadius: RADIUS.full },
+  actionBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: COLORS.white, paddingHorizontal: 14, paddingVertical: 9, borderRadius: RADIUS.full },
   actionBtnText: { fontSize: FONT_SIZES.sm, fontWeight: '700' },
   body: { flex: 1, padding: SPACING.lg },
-  sectionTitle: { fontSize: FONT_SIZES.md, fontWeight: '700', color: '#1b1b1b', marginBottom: SPACING.md },
+  sectionTitle: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.text, marginBottom: SPACING.md },
   emptyState: { alignItems: 'center', paddingVertical: 40, gap: 8 },
-  emptyText: { fontSize: FONT_SIZES.md, color: '#9ca3af' },
-  txnRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING.md, backgroundColor: '#fff', borderRadius: RADIUS.md, padding: SPACING.md, marginBottom: SPACING.sm, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 },
+  emptyText: { fontSize: FONT_SIZES.md, color: COLORS.textSecondary },
+  txnRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING.md, backgroundColor: COLORS.white, borderRadius: RADIUS.md, padding: SPACING.md, marginBottom: SPACING.sm, shadowColor: COLORS.black, shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 },
   txnIconWrap: { width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center' },
-  txnTitle: { fontSize: FONT_SIZES.sm, fontWeight: '700', color: '#1b1b1b' },
-  txnDate: { fontSize: FONT_SIZES.xs, color: '#9ca3af', marginTop: 2 },
-  txnStatus: { fontSize: 10, fontWeight: '700', color: '#000814', marginTop: 2 },
+  txnTitle: { fontSize: FONT_SIZES.sm, fontWeight: '700', color: COLORS.text },
+  txnDate: { fontSize: FONT_SIZES.xs, color: COLORS.textSecondary, marginTop: 2 },
+  txnStatus: { fontSize: 10, fontWeight: '700', color: COLORS.primary, marginTop: 2 },
   txnAmount: { fontSize: FONT_SIZES.sm, fontWeight: '800' },
 });

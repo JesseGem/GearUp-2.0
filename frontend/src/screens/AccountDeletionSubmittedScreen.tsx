@@ -1,16 +1,18 @@
 import React from 'react';
+import { COLORS, SPACING, FONT_SIZES, RADIUS } from '../constants';
 import { View, Text, StyleSheet, TouchableOpacity, StatusBar } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
-import { SPACING, FONT_SIZES, RADIUS } from '../constants';
 
 export default function AccountDeletionSubmittedScreen({ navigation }: any) {
   const { user } = useSelector((state: RootState) => state.auth);
-  const isOwner = user?.role === 'OWNER';
-  const accentColor = isOwner ? '#1b4332' : '#000814';
-  const gradientColors = isOwner ? ['#1b4332', '#2d6a4f'] : ['#000814', '#001D3D'];
+  const isCustomer = user?.role === 'customer';
+  const isMechanic = user?.role === 'mechanic';
+  const roleTab = isCustomer ? 'CustomerTabs' : isMechanic ? 'MechanicTabs' : null;
+  const accentColor = isCustomer ? COLORS.primary : COLORS.primary;
+  const gradientColors = isCustomer ? [COLORS.primary, COLORS.primary] : [COLORS.primary, COLORS.secondary];
 
   return (
     <View style={styles.container}>
@@ -31,7 +33,9 @@ export default function AccountDeletionSubmittedScreen({ navigation }: any) {
         </Text>
         <TouchableOpacity
           style={styles.doneBtn}
-          onPress={() => navigation.reset({ index: 0, routes: [{ name: isOwner ? 'OwnerTabs' : 'MechanicTabs' }] })}>
+          onPress={() => {
+            if (roleTab) navigation.reset({ index: 0, routes: [{ name: roleTab }] });
+          }}>
           <LinearGradient colors={gradientColors as any} style={styles.doneGradient}>
             <Text style={styles.doneText}>Back to Profile</Text>
           </LinearGradient>
@@ -41,14 +45,14 @@ export default function AccountDeletionSubmittedScreen({ navigation }: any) {
   );
 }
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
+  container: { flex: 1, backgroundColor: COLORS.white },
   hero: { height: 220, justifyContent: 'center', alignItems: 'center' },
   iconOuter: { width: 88, height: 88, borderRadius: 44, backgroundColor: 'rgba(255,255,255,0.15)', justifyContent: 'center', alignItems: 'center' },
-  iconInner: { width: 64, height: 64, borderRadius: 32, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center' },
+  iconInner: { width: 64, height: 64, borderRadius: 32, backgroundColor: COLORS.white, justifyContent: 'center', alignItems: 'center' },
   body: { flex: 1, padding: SPACING.xl, justifyContent: 'center' },
-  title: { fontSize: FONT_SIZES.xxl, fontWeight: '700', color: '#1b1b1b', textAlign: 'center', marginBottom: SPACING.md },
-  subtitle: { fontSize: FONT_SIZES.md, color: '#6b7280', textAlign: 'center', lineHeight: 22, marginBottom: SPACING.xl },
+  title: { fontSize: FONT_SIZES.xxl, fontWeight: '700', color: COLORS.text, textAlign: 'center', marginBottom: SPACING.md },
+  subtitle: { fontSize: FONT_SIZES.md, color: COLORS.textSecondary, textAlign: 'center', lineHeight: 22, marginBottom: SPACING.xl },
   doneBtn: { borderRadius: RADIUS.md, overflow: 'hidden' },
   doneGradient: { padding: 16, alignItems: 'center' },
-  doneText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: '#fff' },
+  doneText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.white },
 });

@@ -5,7 +5,7 @@ export const paymentService = {
     jobId: number;
     payeeId: number;
     amount: number;
-    method: 'MOBILE_MONEY' | 'CASH' | 'BANK_TRANSFER';
+    method: 'cash' | 'card' | 'mobile_money' | 'bank_transfer';
     notes?: string;
   }) => {
     const api = await getAPI();

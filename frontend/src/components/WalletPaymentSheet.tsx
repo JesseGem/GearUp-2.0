@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { COLORS, FONT_FAMILY, SPACING, FONT_SIZES, RADIUS } from '../constants';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { walletService } from '../services/walletService';
 import { paymentService } from '../services/paymentService';
-import { SPACING, FONT_SIZES, RADIUS } from '../constants';
 
 interface WalletPaymentSheetProps {
   visible: boolean;
@@ -18,7 +18,7 @@ interface WalletPaymentSheetProps {
 }
 
 export default function WalletPaymentSheet({
-  visible, onClose, navigation, jobId, jobTitle, payeeId, amount, accentColor = '#1b4332', onPaid,
+  visible, onClose, navigation, jobId, jobTitle, payeeId, amount, accentColor = COLORS.accent, onPaid,
 }: WalletPaymentSheetProps) {
   const [loading, setLoading] = useState(true);
   const [balance, setBalance] = useState(0);
@@ -37,7 +37,7 @@ export default function WalletPaymentSheet({
       ])
         .then(([w, existingPayment]) => {
           setBalance(w.balance);
-          if (existingPayment && existingPayment.status === 'COMPLETED') {
+          if (existingPayment && existingPayment.status === 'success') {
             setAlreadyPaid(true);
           }
         })
@@ -55,7 +55,7 @@ export default function WalletPaymentSheet({
         jobId,
         payeeId,
         amount,
-        method: 'MOBILE_MONEY', // record-keeping label only — actual funds move via the wallet ledger on the backend
+        method: 'mobile_money', // record-keeping label only — actual funds move via the wallet ledger on the backend
       });
       await paymentService.completePayment(payment.id);
       onPaid();
@@ -84,18 +84,18 @@ export default function WalletPaymentSheet({
     <Modal visible={visible} transparent animationType="fade" onRequestClose={() => !paying && onClose()}>
       <View style={styles.overlay}>
         <View style={styles.card}>
-          <View style={[styles.iconWrap, { backgroundColor: accentColor + '18' }]}>
-            <Ionicons name="wallet" size={26} color={accentColor} />
+          <View style={styles.iconWrap}>
+            <Ionicons name="wallet" size={26} color={COLORS.primary} />
           </View>
           <Text style={styles.title}>Pay for "{jobTitle}"</Text>
           <Text style={styles.amountText}>GHS {amount.toFixed(2)}</Text>
 
           {loading ? (
-            <ActivityIndicator color={accentColor} style={{ marginVertical: SPACING.lg }} />
+            <ActivityIndicator color={COLORS.primary} style={{ marginVertical: SPACING.lg }} />
           ) : alreadyPaid ? (
             <View style={styles.shortfallBox}>
-              <Ionicons name="checkmark-circle-outline" size={16} color="#10b981" />
-              <Text style={[styles.shortfallText, { color: '#065f46' }]}>
+              <Ionicons name="checkmark-circle-outline" size={16} color={COLORS.success} />
+              <Text style={[styles.shortfallText, { color: COLORS.success }]}>
                 This job has already been paid for.
               </Text>
             </View>
@@ -107,13 +107,13 @@ export default function WalletPaymentSheet({
                 onPress={handlePay}
                 disabled={paying}
                 activeOpacity={0.85}>
-                {paying ? <ActivityIndicator color="#fff" /> : <Text style={styles.payBtnText}>Pay from Wallet</Text>}
+                {paying ? <ActivityIndicator color={COLORS.accentInk} /> : <Text style={styles.payBtnText}>Pay from Wallet</Text>}
               </TouchableOpacity>
             </>
           ) : (
             <>
               <View style={styles.shortfallBox}>
-                <Ionicons name="alert-circle-outline" size={16} color="#000814" />
+                <Ionicons name="alert-circle-outline" size={16} color={COLORS.primary} />
                 <Text style={styles.shortfallText}>
                   Your balance is GHS {balance.toFixed(2)}. You need GHS {(amount - balance).toFixed(2)} more to pay for this job.
                 </Text>
@@ -140,15 +140,15 @@ export default function WalletPaymentSheet({
 
 const styles = StyleSheet.create({
   overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.55)', justifyContent: 'center', alignItems: 'center', padding: SPACING.lg },
-  card: { backgroundColor: '#fff', borderRadius: RADIUS.lg, padding: SPACING.xl, width: '100%', alignItems: 'center' },
-  iconWrap: { width: 56, height: 56, borderRadius: 28, justifyContent: 'center', alignItems: 'center', marginBottom: SPACING.md },
-  title: { fontSize: FONT_SIZES.md, fontWeight: '700', color: '#1b1b1b', textAlign: 'center' },
-  amountText: { fontSize: FONT_SIZES.xxl, fontWeight: '800', color: '#1b1b1b', marginTop: 4, marginBottom: SPACING.md },
-  balanceText: { fontSize: FONT_SIZES.sm, color: '#6b7280', marginBottom: SPACING.md },
-  shortfallBox: { flexDirection: 'row', alignItems: 'flex-start', gap: 8, backgroundColor: '#fffbeb', borderRadius: RADIUS.md, padding: SPACING.md, borderWidth: 1, borderColor: '#fde68a', marginBottom: SPACING.md },
-  shortfallText: { flex: 1, fontSize: FONT_SIZES.xs, color: '#92400e', lineHeight: 17 },
+  card: { backgroundColor: COLORS.white, borderRadius: RADIUS.lg, padding: SPACING.xl, width: '100%', alignItems: 'center' },
+  iconWrap: { width: 56, height: 56, borderRadius: 28, backgroundColor: COLORS.background, justifyContent: 'center', alignItems: 'center', marginBottom: SPACING.md },
+  title: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.text, textAlign: 'center', fontFamily: FONT_FAMILY.headingBold },
+  amountText: { fontSize: FONT_SIZES.xxl, fontWeight: '800', color: COLORS.text, marginTop: 4, marginBottom: SPACING.md, fontFamily: FONT_FAMILY.headingBold },
+  balanceText: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, marginBottom: SPACING.md, fontFamily: FONT_FAMILY.body },
+  shortfallBox: { flexDirection: 'row', alignItems: 'flex-start', gap: 8, backgroundColor: COLORS.warningTint, borderRadius: RADIUS.md, padding: SPACING.md, borderWidth: 1, borderColor: COLORS.warning, marginBottom: SPACING.md },
+  shortfallText: { flex: 1, fontSize: FONT_SIZES.xs, color: COLORS.warning, lineHeight: 17, fontFamily: FONT_FAMILY.body },
   payBtn: { width: '100%', paddingVertical: 14, borderRadius: RADIUS.md, alignItems: 'center' },
-  payBtnText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: '#fff' },
+  payBtnText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.accentInk, fontFamily: FONT_FAMILY.bodyBold },
   cancelBtn: { marginTop: SPACING.md, padding: 8 },
-  cancelText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: '#9ca3af' },
+  cancelText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.textSecondary, fontFamily: FONT_FAMILY.bodySemiBold },
 });

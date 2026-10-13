@@ -31,3 +31,6 @@ Thumbs.db
 !.vscode/launch.json
 !.vscode/extensions.json
 .idea/
+
+# Generated Node.js diagnostic reports
+/frontend/report.*.json

@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
+import { COLORS, SPACING, FONT_SIZES, RADIUS } from '../../constants';
 import {
   View, Text, StyleSheet, TouchableOpacity,
   StatusBar, ActivityIndicator, Linking, Alert, Modal, Platform
 } from 'react-native';
-import MapView, { Marker, Polyline, PROVIDER_DEFAULT } from 'react-native-maps';
+import MapView, { Marker, Polyline, PROVIDER_DEFAULT } from '../../components/PlatformMap';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { locationService } from '../../services/locationService';
-import { SPACING, FONT_SIZES, RADIUS } from '../../constants';
 
 export default function MechanicMapScreen({ route, navigation }: any) {
   const { job } = route.params;
@@ -24,7 +24,7 @@ export default function MechanicMapScreen({ route, navigation }: any) {
         const coords = await locationService.getCurrentLocation();
         if (coords) setMyLocation(coords);
       } catch (e) {
-        // location unavailable — still show owner pin
+        // location unavailable — still show customer pin
       } finally {
         setLoadingLocation(false);
       }
@@ -62,7 +62,7 @@ export default function MechanicMapScreen({ route, navigation }: any) {
     }
   };
 
-  const ownerRegion = {
+  const customerRegion = {
     latitude: job.latitude,
     longitude: job.longitude,
     latitudeDelta: 0.01,
@@ -93,35 +93,35 @@ export default function MechanicMapScreen({ route, navigation }: any) {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
 
-      <LinearGradient colors={['#000814', '#001D3D']} style={styles.header}>
+      <LinearGradient colors={[COLORS.primary, COLORS.secondary]} style={styles.header}>
         <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={22} color="#fff" />
+          <Ionicons name="arrow-back" size={22} color={COLORS.white} />
         </TouchableOpacity>
         <View style={styles.headerText}>
           <Text style={styles.headerTitle} numberOfLines={1}>{job.title}</Text>
-          <Text style={styles.headerSubtitle}>Owner's location</Text>
+          <Text style={styles.headerSubtitle}>Customer's location</Text>
         </View>
       </LinearGradient>
 
       <MapView
         style={styles.map}
         provider={PROVIDER_DEFAULT}
-        initialRegion={ownerRegion}>
+        initialRegion={customerRegion}>
 
         {hasRoute && (
           <Polyline
             coordinates={routeCoords}
-            strokeColor="#2563eb"
+            strokeColor={COLORS.info}
             strokeWidth={4}
           />
         )}
 
         <Marker
           coordinate={{ latitude: job.latitude, longitude: job.longitude }}
-          title="Owner's Location"
+          title="Customer's Location"
           description={job.location || job.title}>
-          <View style={styles.ownerPin}>
-            <Ionicons name="car" size={20} color="#fff" />
+          <View style={styles.customerPin}>
+            <Ionicons name="car" size={20} color={COLORS.white} />
           </View>
         </Marker>
 
@@ -130,7 +130,7 @@ export default function MechanicMapScreen({ route, navigation }: any) {
             coordinate={myLocation}
             title="Your Location">
             <View style={styles.mechanicPin}>
-              <Ionicons name="construct" size={18} color="#fff" />
+              <Ionicons name="construct" size={18} color={COLORS.white} />
             </View>
           </Marker>
         )}
@@ -139,18 +139,18 @@ export default function MechanicMapScreen({ route, navigation }: any) {
       <View style={styles.infoCard}>
         <View style={styles.infoRow}>
           <View style={styles.legendItem}>
-            <View style={[styles.legendDot, { backgroundColor: '#1b4332' }]} />
-            <Text style={styles.legendText}>Owner</Text>
+            <View style={[styles.legendDot, { backgroundColor: COLORS.primary }]} />
+            <Text style={styles.legendText}>Customer</Text>
           </View>
           {myLocation && (
             <View style={styles.legendItem}>
-              <View style={[styles.legendDot, { backgroundColor: '#000814' }]} />
+              <View style={[styles.legendDot, { backgroundColor: COLORS.primary }]} />
               <Text style={styles.legendText}>You</Text>
             </View>
           )}
           {loadingLocation && (
             <View style={styles.legendItem}>
-              <ActivityIndicator size="small" color="#000814" />
+              <ActivityIndicator size="small" color={COLORS.primary} />
               <Text style={styles.legendText}>Getting your location...</Text>
             </View>
           )}
@@ -158,18 +158,18 @@ export default function MechanicMapScreen({ route, navigation }: any) {
 
         {routeInfo && (
           <View style={styles.routeInfoRow}>
-            <Ionicons name="time-outline" size={14} color="#000814" />
+            <Ionicons name="time-outline" size={14} color={COLORS.primary} />
             <Text style={styles.routeInfoText}>{routeInfo.duration}</Text>
-            <Ionicons name="speedometer-outline" size={14} color="#000814" style={{ marginLeft: 10 }} />
+            <Ionicons name="speedometer-outline" size={14} color={COLORS.primary} style={{ marginLeft: 10 }} />
             <Text style={styles.routeInfoText}>{routeInfo.distance}</Text>
           </View>
         )}
 
         <View style={styles.jobInfoRow}>
-          <Ionicons name="construct-outline" size={14} color="#6b7280" />
+          <Ionicons name="construct-outline" size={14} color={COLORS.textSecondary} />
           <Text style={styles.jobInfoText}>{job.type}</Text>
           {job.location && <>
-            <Ionicons name="location-outline" size={14} color="#6b7280" />
+            <Ionicons name="location-outline" size={14} color={COLORS.textSecondary} />
             <Text style={styles.jobInfoText}>{job.location}</Text>
           </>}
         </View>
@@ -188,11 +188,11 @@ export default function MechanicMapScreen({ route, navigation }: any) {
               fetchRoute();
             }
           }}>
-          <LinearGradient colors={['#000814', '#001D3D']} style={styles.directionsGradient}>
+          <LinearGradient colors={[COLORS.accent, COLORS.accent]} style={styles.directionsGradient}>
             {fetchingRoute ? (
-              <ActivityIndicator size="small" color="#fff" />
+              <ActivityIndicator size="small" color={COLORS.accentInk} />
             ) : (
-              <Ionicons name={hasRoute ? 'map-outline' : 'navigate'} size={18} color="#fff" />
+              <Ionicons name={hasRoute ? 'map-outline' : 'navigate'} size={18} color={COLORS.accentInk} />
             )}
             <Text style={styles.directionsBtnText}>
               {fetchingRoute ? 'Loading route...' : hasRoute ? 'Open in Maps' : 'Get Directions'}
@@ -217,20 +217,20 @@ export default function MechanicMapScreen({ route, navigation }: any) {
 
             {Platform.OS === 'ios' && (
               <TouchableOpacity style={styles.modalOption} onPress={openAppleMaps}>
-                <View style={[styles.modalIconWrap, { backgroundColor: '#e5e7eb' }]}>
-                  <Ionicons name="map" size={20} color="#1b1b1b" />
+                <View style={[styles.modalIconWrap, { backgroundColor: COLORS.border }]}>
+                  <Ionicons name="map" size={20} color={COLORS.text} />
                 </View>
                 <Text style={styles.modalOptionText}>Apple Maps</Text>
-                <Ionicons name="chevron-forward" size={18} color="#9ca3af" />
+                <Ionicons name="chevron-forward" size={18} color={COLORS.textSecondary} />
               </TouchableOpacity>
             )}
 
             <TouchableOpacity style={styles.modalOption} onPress={openGoogleMaps}>
-              <View style={[styles.modalIconWrap, { backgroundColor: '#fef3c7' }]}>
-                <Ionicons name="navigate" size={20} color="#000814" />
+              <View style={[styles.modalIconWrap, { backgroundColor: COLORS.warningTint }]}>
+                <Ionicons name="navigate" size={20} color={COLORS.primary} />
               </View>
               <Text style={styles.modalOptionText}>Google Maps</Text>
-              <Ionicons name="chevron-forward" size={18} color="#9ca3af" />
+              <Ionicons name="chevron-forward" size={18} color={COLORS.textSecondary} />
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.modalCancel} onPress={() => setShowMapModal(false)}>
@@ -244,36 +244,36 @@ export default function MechanicMapScreen({ route, navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f9fafb' },
+  container: { flex: 1, backgroundColor: COLORS.background },
   header: { paddingTop: 60, paddingBottom: SPACING.lg, paddingHorizontal: SPACING.lg, flexDirection: 'row', alignItems: 'center', gap: SPACING.md },
   backBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.2)', justifyContent: 'center', alignItems: 'center' },
   headerText: { flex: 1 },
-  headerTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: '#fff' },
-  headerSubtitle: { fontSize: FONT_SIZES.xs, color: '#fde68a', marginTop: 2 },
+  headerTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.white },
+  headerSubtitle: { fontSize: FONT_SIZES.xs, color: COLORS.accent, marginTop: 2 },
   map: { flex: 1 },
-  ownerPin: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#1b4332', justifyContent: 'center', alignItems: 'center', borderWidth: 3, borderColor: '#fff', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.3, shadowRadius: 4, elevation: 4 },
-  mechanicPin: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#000814', justifyContent: 'center', alignItems: 'center', borderWidth: 3, borderColor: '#fff', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.3, shadowRadius: 4, elevation: 4 },
-  infoCard: { backgroundColor: '#fff', padding: SPACING.lg, paddingBottom: 32, shadowColor: '#000', shadowOffset: { width: 0, height: -2 }, shadowOpacity: 0.08, shadowRadius: 8, elevation: 8 },
+  customerPin: { width: 40, height: 40, borderRadius: 20, backgroundColor: COLORS.primary, justifyContent: 'center', alignItems: 'center', borderWidth: 3, borderColor: COLORS.white, shadowColor: COLORS.black, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.3, shadowRadius: 4, elevation: 4 },
+  mechanicPin: { width: 40, height: 40, borderRadius: 20, backgroundColor: COLORS.primary, justifyContent: 'center', alignItems: 'center', borderWidth: 3, borderColor: COLORS.white, shadowColor: COLORS.black, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.3, shadowRadius: 4, elevation: 4 },
+  infoCard: { backgroundColor: COLORS.white, padding: SPACING.lg, paddingBottom: 32, shadowColor: COLORS.black, shadowOffset: { width: 0, height: -2 }, shadowOpacity: 0.08, shadowRadius: 8, elevation: 8 },
   infoRow: { flexDirection: 'row', gap: SPACING.lg, marginBottom: SPACING.md },
   legendItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   legendDot: { width: 12, height: 12, borderRadius: 6 },
-  legendText: { fontSize: FONT_SIZES.sm, color: '#6b7280', fontWeight: '500' },
-  routeInfoRow: { flexDirection: 'row', alignItems: 'center', marginBottom: SPACING.md, backgroundColor: '#fffbeb', paddingHorizontal: 10, paddingVertical: 6, borderRadius: RADIUS.md, alignSelf: 'flex-start' },
-  routeInfoText: { fontSize: FONT_SIZES.sm, fontWeight: '700', color: '#000814', marginLeft: 4 },
+  legendText: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, fontWeight: '500' },
+  routeInfoRow: { flexDirection: 'row', alignItems: 'center', marginBottom: SPACING.md, backgroundColor: COLORS.warningTint, paddingHorizontal: 10, paddingVertical: 6, borderRadius: RADIUS.md, alignSelf: 'flex-start' },
+  routeInfoText: { fontSize: FONT_SIZES.sm, fontWeight: '700', color: COLORS.primary, marginLeft: 4 },
   jobInfoRow: { flexDirection: 'row', alignItems: 'center', gap: 4, flexWrap: 'wrap', marginBottom: 4 },
-  jobInfoText: { fontSize: FONT_SIZES.xs, color: '#6b7280' },
-  costText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: '#1b4332', marginTop: 6 },
+  jobInfoText: { fontSize: FONT_SIZES.xs, color: COLORS.textSecondary },
+  costText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.primary, marginTop: 6 },
   directionsBtn: { marginTop: SPACING.md, borderRadius: RADIUS.md, overflow: 'hidden' },
   directionsGradient: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, padding: 14 },
-  directionsBtnText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: '#fff' },
+  directionsBtnText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.accentInk },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
-  modalSheet: { backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: SPACING.lg, paddingBottom: 40 },
-  modalHandle: { width: 40, height: 4, borderRadius: 2, backgroundColor: '#e5e7eb', alignSelf: 'center', marginBottom: SPACING.md },
-  modalTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: '#1b1b1b', textAlign: 'center' },
-  modalSubtitle: { fontSize: FONT_SIZES.sm, color: '#6b7280', textAlign: 'center', marginTop: 4, marginBottom: SPACING.lg },
-  modalOption: { flexDirection: 'row', alignItems: 'center', gap: SPACING.md, paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: '#f3f4f6' },
+  modalSheet: { backgroundColor: COLORS.white, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: SPACING.lg, paddingBottom: 40 },
+  modalHandle: { width: 40, height: 4, borderRadius: 2, backgroundColor: COLORS.border, alignSelf: 'center', marginBottom: SPACING.md },
+  modalTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.text, textAlign: 'center' },
+  modalSubtitle: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, textAlign: 'center', marginTop: 4, marginBottom: SPACING.lg },
+  modalOption: { flexDirection: 'row', alignItems: 'center', gap: SPACING.md, paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: COLORS.background },
   modalIconWrap: { width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center' },
-  modalOptionText: { flex: 1, fontSize: FONT_SIZES.md, fontWeight: '600', color: '#1b1b1b' },
-  modalCancel: { marginTop: SPACING.md, padding: 14, alignItems: 'center', backgroundColor: '#f3f4f6', borderRadius: RADIUS.md },
-  modalCancelText: { fontSize: FONT_SIZES.md, fontWeight: '600', color: '#6b7280' },
+  modalOptionText: { flex: 1, fontSize: FONT_SIZES.md, fontWeight: '600', color: COLORS.text },
+  modalCancel: { marginTop: SPACING.md, padding: 14, alignItems: 'center', backgroundColor: COLORS.background, borderRadius: RADIUS.md },
+  modalCancelText: { fontSize: FONT_SIZES.md, fontWeight: '600', color: COLORS.textSecondary },
 });

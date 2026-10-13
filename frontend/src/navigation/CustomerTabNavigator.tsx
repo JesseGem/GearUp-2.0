@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { COLORS, FONT_FAMILY } from '../constants';
 import { View, TouchableOpacity, Text, StyleSheet, Animated, Platform } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -7,11 +8,11 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { useUnreadMessagesCount } from '../hooks/useUnreadMessagesCount';
-import OwnerHomeScreen from '../screens/owner/OwnerHomeScreen';
-import OwnerSearchScreen from '../screens/owner/OwnerSearchScreen';
-import OwnerJobsScreen from '../screens/owner/OwnerJobsScreen';
-import OwnerMessagesScreen from '../screens/owner/OwnerMessagesScreen';
-import OwnerProfileScreen from '../screens/owner/OwnerProfileScreen';
+import CustomerHomeScreen from '../screens/customer/CustomerHomeScreen';
+import CustomerSearchScreen from '../screens/customer/CustomerSearchScreen';
+import CustomerJobsScreen from '../screens/customer/CustomerJobsScreen';
+import CustomerMessagesScreen from '../screens/customer/CustomerMessagesScreen';
+import CustomerProfileScreen from '../screens/customer/CustomerProfileScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -31,8 +32,8 @@ const LABELS: Record<string, string> = {
   Profile: 'Profile',
 };
 
-const ACTIVE_COLOR = '#1b4332';
-const INACTIVE_COLOR = '#9ca3af';
+const ACTIVE_COLOR = COLORS.primary;
+const INACTIVE_COLOR = COLORS.textSecondary;
 
 function TabButton({ routeName, focused, onPress, showDot }: { routeName: string; focused: boolean; onPress: () => void; showDot?: boolean }) {
   const scale = useRef(new Animated.Value(1)).current;
@@ -50,7 +51,9 @@ function TabButton({ routeName, focused, onPress, showDot }: { routeName: string
     <TouchableOpacity style={styles.tabBtn} onPress={onPress} activeOpacity={0.7}>
       <Animated.View style={{ transform: [{ scale }] }}>
         <View>
-          <Ionicons name={(focused ? filled : outline) as any} size={22} color={color} />
+          <View style={[styles.tabIconWrap, focused && styles.tabIconWrapActive]}>
+            <Ionicons name={(focused ? filled : outline) as any} size={22} color={color} />
+          </View>
           {showDot && <View style={styles.tabDot} />}
         </View>
       </Animated.View>
@@ -89,17 +92,17 @@ function FloatingTabBar({ state, navigation }: any) {
     </View>
   );
 }
-export default function OwnerTabNavigator() {
+export default function CustomerTabNavigator() {
   return (
     <Tab.Navigator
       screenOptions={{ headerShown: false }}
       tabBar={(props) => <FloatingTabBar {...props} />}
     >
-      <Tab.Screen name="Home" component={OwnerHomeScreen} />
-      <Tab.Screen name="Search" component={OwnerSearchScreen} />
-      <Tab.Screen name="Jobs" component={OwnerJobsScreen} />
-      <Tab.Screen name="Messages" component={OwnerMessagesScreen} />
-      <Tab.Screen name="Profile" component={OwnerProfileScreen} />
+      <Tab.Screen name="Home" component={CustomerHomeScreen} />
+      <Tab.Screen name="Search" component={CustomerSearchScreen} />
+      <Tab.Screen name="Jobs" component={CustomerJobsScreen} />
+      <Tab.Screen name="Messages" component={CustomerMessagesScreen} />
+      <Tab.Screen name="Profile" component={CustomerProfileScreen} />
     </Tab.Navigator>
   );
 }
@@ -113,7 +116,7 @@ const styles = StyleSheet.create({
   shadowWrapper: {
     width: '100%',
     borderRadius: 30,
-    shadowColor: '#1b1b1b',
+    shadowColor: COLORS.text,
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.28,
     shadowRadius: 20,
@@ -142,9 +145,12 @@ const styles = StyleSheet.create({
     gap: 3,
     paddingVertical: 4,
   },
+  tabIconWrap: { minWidth: 34, minHeight: 28, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
+  tabIconWrapActive: { backgroundColor: COLORS.accent },
   tabLabel: {
     fontSize: 10.5,
     fontWeight: '600',
+    fontFamily: FONT_FAMILY.bodySemiBold,
   },
   tabDot: {
     position: 'absolute',
@@ -153,8 +159,8 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#ef4444',
+    backgroundColor: COLORS.error,
     borderWidth: 1.5,
-    borderColor: '#fff',
+    borderColor: COLORS.white,
   },
 });

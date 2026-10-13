@@ -1,8 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { authService } from '../../services/authService';
+import { authService, normalizeUserRole } from '../../services/authService';
 import { getToken } from '../../services/api';
-
-export type AppRole = 'customer' | 'mechanic' | 'admin';
 
 interface AuthState {
   user: any | null;
@@ -10,16 +8,6 @@ interface AuthState {
   loading: boolean;
   error: string | null;
 }
-
-const normalizeRole = (role?: string | null): AppRole => {
-  const normalized = (role ?? '').toString().trim().toLowerCase();
-
-  if (normalized === 'owner' || normalized === 'car_owner' || normalized === 'customer') return 'customer';
-  if (normalized === 'mechanic') return 'mechanic';
-  if (normalized === 'admin') return 'admin';
-
-  return 'customer';
-};
 
 const normalizeAuthPayload = (payload: any) => {
   const rawUser = payload?.user ?? payload ?? null;
@@ -35,7 +23,7 @@ const normalizeAuthPayload = (payload: any) => {
           lastName: rawUser.lastName ?? '',
           email: rawUser.email ?? '',
           phone: rawUser.phone ?? null,
-          role: normalizeRole(rawUser.role),
+          role: normalizeUserRole(rawUser.role),
           isActive: rawUser.isActive ?? true,
         }
       : null,

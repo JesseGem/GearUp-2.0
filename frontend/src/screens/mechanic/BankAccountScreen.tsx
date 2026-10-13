@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { COLORS, SPACING, FONT_SIZES, RADIUS } from '../../constants';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   StatusBar, ActivityIndicator, Modal, KeyboardAvoidingView, Platform
@@ -8,7 +9,6 @@ import { Ionicons } from '@expo/vector-icons';
 import AppTextInput from '../../components/AppTextInput';
 import { AppAlertCard } from '../../components/AppAlert';
 import { walletService, BankAccountDto, AccountType } from '../../services/walletService';
-import { SPACING, FONT_SIZES, RADIUS } from '../../constants';
 
 const MOBILE_MONEY_PROVIDERS = [
   { name: 'MTN Mobile Money', code: 'MTN' },
@@ -29,7 +29,7 @@ const BANK_PROVIDERS = [
   { name: 'Agricultural Development Bank', code: '080100' },
 ];
 
-const ACCENT = '#000814';
+const ACCENT = COLORS.primary;
 
 export default function BankAccountScreen({ navigation }: any) {
   const [loadingExisting, setLoadingExisting] = useState(true);
@@ -92,9 +92,9 @@ export default function BankAccountScreen({ navigation }: any) {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
-      <LinearGradient colors={['#000814', '#001D3D']} style={styles.header}>
+      <LinearGradient colors={[COLORS.primary, COLORS.secondary]} style={styles.header}>
         <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={22} color="#fff" />
+          <Ionicons name="arrow-back" size={22} color={COLORS.white} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Payout Account</Text>
         <View style={{ width: 36 }} />
@@ -109,7 +109,7 @@ export default function BankAccountScreen({ navigation }: any) {
         {existingAccount && !editing ? (
           <View style={styles.summaryCard}>
             <View style={styles.summaryIconWrap}>
-              <Ionicons name="checkmark-circle" size={22} color="#10b981" />
+              <Ionicons name="checkmark-circle" size={22} color={COLORS.success} />
             </View>
             <Text style={styles.summaryLabel}>Payout account on file</Text>
             <Text style={styles.summaryName}>{existingAccount.accountName}</Text>
@@ -126,13 +126,13 @@ export default function BankAccountScreen({ navigation }: any) {
               <TouchableOpacity
                 style={[styles.typeOption, accountType === 'MOBILE_MONEY' && styles.typeOptionActive]}
                 onPress={() => { setAccountType('MOBILE_MONEY'); setSelectedProvider(null); }}>
-                <Ionicons name="phone-portrait-outline" size={16} color={accountType === 'MOBILE_MONEY' ? '#fff' : ACCENT} />
+                <Ionicons name="phone-portrait-outline" size={16} color={accountType === 'MOBILE_MONEY' ? COLORS.white : ACCENT} />
                 <Text style={[styles.typeText, accountType === 'MOBILE_MONEY' && styles.typeTextActive]}>Mobile Money</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.typeOption, accountType === 'BANK' && styles.typeOptionActive]}
                 onPress={() => { setAccountType('BANK'); setSelectedProvider(null); }}>
-                <Ionicons name="card-outline" size={16} color={accountType === 'BANK' ? '#fff' : ACCENT} />
+                <Ionicons name="card-outline" size={16} color={accountType === 'BANK' ? COLORS.white : ACCENT} />
                 <Text style={[styles.typeText, accountType === 'BANK' && styles.typeTextActive]}>Bank</Text>
               </TouchableOpacity>
             </View>
@@ -147,7 +147,7 @@ export default function BankAccountScreen({ navigation }: any) {
                   <Text style={[styles.providerText, selectedProvider?.code === p.code && styles.providerTextActive]}>
                     {p.name}
                   </Text>
-                  {selectedProvider?.code === p.code && <Ionicons name="checkmark" size={18} color="#fff" />}
+                  {selectedProvider?.code === p.code && <Ionicons name="checkmark" size={18} color={COLORS.white} />}
                 </TouchableOpacity>
               ))}
             </View>
@@ -169,8 +169,8 @@ export default function BankAccountScreen({ navigation }: any) {
               onPress={handleSave}
               disabled={saving}
               activeOpacity={0.85}>
-              <LinearGradient colors={['#000814', '#001D3D']} style={styles.saveGradient}>
-                {saving ? <ActivityIndicator color="#fff" /> : <Text style={styles.saveText}>Verify & Save</Text>}
+              <LinearGradient colors={[COLORS.accent, COLORS.accent]} style={styles.saveGradient}>
+                {saving ? <ActivityIndicator color={COLORS.accentInk} /> : <Text style={styles.saveText}>Verify & Save</Text>}
               </LinearGradient>
             </TouchableOpacity>
 
@@ -202,33 +202,33 @@ export default function BankAccountScreen({ navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f9fafb' },
+  container: { flex: 1, backgroundColor: COLORS.background },
   header: { paddingTop: 60, paddingBottom: SPACING.lg, paddingHorizontal: SPACING.lg, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   backBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.2)', justifyContent: 'center', alignItems: 'center' },
-  headerTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: '#fff' },
+  headerTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.white },
   body: { flex: 1, padding: SPACING.lg },
-  label: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: '#374151', marginBottom: 8, marginTop: SPACING.md },
+  label: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.text, marginBottom: 8, marginTop: SPACING.md },
   typeRow: { flexDirection: 'row', gap: SPACING.sm },
-  typeOption: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 10, borderRadius: RADIUS.md, borderWidth: 1, borderColor: '#e5e7eb', backgroundColor: '#fff' },
+  typeOption: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 10, borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.border, backgroundColor: COLORS.white },
   typeOptionActive: { backgroundColor: ACCENT, borderColor: ACCENT },
   typeText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: ACCENT },
-  typeTextActive: { color: '#fff' },
+  typeTextActive: { color: COLORS.white },
   providerList: { gap: 8 },
-  providerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 12, borderRadius: RADIUS.md, borderWidth: 1, borderColor: '#e5e7eb', backgroundColor: '#fff' },
+  providerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 12, borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.border, backgroundColor: COLORS.white },
   providerRowActive: { backgroundColor: ACCENT, borderColor: ACCENT },
-  providerText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: '#374151' },
-  providerTextActive: { color: '#fff' },
+  providerText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.text },
+  providerTextActive: { color: COLORS.white },
   saveBtn: { marginTop: SPACING.xl, borderRadius: RADIUS.md, overflow: 'hidden' },
   saveGradient: { padding: 16, alignItems: 'center' },
-  saveText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: '#fff' },
+  saveText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.accentInk },
   cancelEditBtn: { marginTop: SPACING.md, padding: 10, alignItems: 'center' },
-  cancelEditText: { fontSize: FONT_SIZES.sm, color: '#9ca3af', fontWeight: '600' },
-  summaryCard: { backgroundColor: '#fff', borderRadius: RADIUS.md, padding: SPACING.lg, alignItems: 'center', borderWidth: 1, borderColor: '#f3f4f6', marginTop: SPACING.md },
+  cancelEditText: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, fontWeight: '600' },
+  summaryCard: { backgroundColor: COLORS.white, borderRadius: RADIUS.md, padding: SPACING.lg, alignItems: 'center', borderWidth: 1, borderColor: COLORS.background, marginTop: SPACING.md },
   summaryIconWrap: { marginBottom: SPACING.sm },
-  summaryLabel: { fontSize: FONT_SIZES.xs, color: '#9ca3af', fontWeight: '600', textTransform: 'uppercase' },
-  summaryName: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: '#1b1b1b', marginTop: 4 },
-  summaryDetail: { fontSize: FONT_SIZES.sm, color: '#6b7280', marginTop: 2 },
-  changeBtn: { marginTop: SPACING.lg, paddingHorizontal: 20, paddingVertical: 10, borderRadius: RADIUS.full, backgroundColor: '#fffbeb', borderWidth: 1, borderColor: '#fde68a' },
+  summaryLabel: { fontSize: FONT_SIZES.xs, color: COLORS.textSecondary, fontWeight: '600', textTransform: 'uppercase' },
+  summaryName: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.text, marginTop: 4 },
+  summaryDetail: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, marginTop: 2 },
+  changeBtn: { marginTop: SPACING.lg, paddingHorizontal: 20, paddingVertical: 10, borderRadius: RADIUS.full, backgroundColor: COLORS.warningTint, borderWidth: 1, borderColor: COLORS.accent },
   changeBtnText: { fontSize: FONT_SIZES.sm, fontWeight: '700', color: ACCENT },
   alertOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.55)', justifyContent: 'center', alignItems: 'center', padding: SPACING.lg },
 });

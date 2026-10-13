@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
+import { COLORS, FONT_FAMILY } from '../../constants';
 import {
   View, Text, TouchableOpacity,
   StyleSheet, StatusBar, ActivityIndicator, Modal,
@@ -12,6 +13,7 @@ import { RootState, AppDispatch } from '../../store';
 import AppTextInput from '../../components/AppTextInput';
 import { AppAlertCard } from '../../components/AppAlert';
 import { isAllowedEmailDomain } from '../../utils/validation';
+import BrandLogo from '../../components/BrandLogo';
 
 export default function LoginScreen({ navigation }: any) {
   const dispatch = useDispatch<AppDispatch>();
@@ -49,14 +51,9 @@ export default function LoginScreen({ navigation }: any) {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <StatusBar barStyle="light-content" />
-      <LinearGradient colors={['#1b4332', '#2d6a4f']} style={styles.hero}>
+      <LinearGradient colors={[COLORS.primary, COLORS.primary]} style={styles.hero}>
         <Animated.View style={{ opacity: heroAnim, alignItems: 'center' }}>
-          <View style={styles.iconOuter}>
-            <View style={styles.iconInner}>
-              <Ionicons name="construct" size={40} color="#1b4332" />
-            </View>
-          </View>
-          <Text style={styles.logoText}>GearUp</Text>
+          <BrandLogo appearance="dark" width={180} />
           <Text style={styles.tagline}>Your mechanic, wherever you are.</Text>
         </Animated.View>
       </LinearGradient>
@@ -89,13 +86,13 @@ export default function LoginScreen({ navigation }: any) {
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.loginBtn} onPress={handleLogin} disabled={loading}>
-            <LinearGradient colors={['#1b4332', '#2d6a4f']} style={styles.loginGradient}>
+            <LinearGradient colors={[COLORS.accent, COLORS.accent]} style={styles.loginGradient}>
               {loading ? (
-                <ActivityIndicator color="#fff" />
+                <ActivityIndicator color={COLORS.accentInk} />
               ) : (
                 <>
                   <Text style={styles.loginText}>Sign In</Text>
-                  <Ionicons name="arrow-forward" size={18} color="#fff" />
+                  <Ionicons name="arrow-forward" size={18} color={COLORS.accentInk} />
                 </>
               )}
             </LinearGradient>
@@ -131,38 +128,35 @@ export default function LoginScreen({ navigation }: any) {
   );
 }
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#1b4332' },
+  container: { flex: 1, backgroundColor: COLORS.primary },
   hero: { height: 280, justifyContent: 'center', alignItems: 'center' },
-  iconOuter: { width: 88, height: 88, borderRadius: 44, backgroundColor: 'rgba(255,255,255,0.15)', justifyContent: 'center', alignItems: 'center', marginBottom: 14 },
-  iconInner: { width: 66, height: 66, borderRadius: 33, backgroundColor: '#fbbf24', justifyContent: 'center', alignItems: 'center' },
-  logoText: { fontSize: 28, fontWeight: '800', color: '#ffffff', marginBottom: 6 },
-  tagline: { fontSize: 14, color: '#86efac' },
+  tagline: { fontSize: 14, color: COLORS.darkTextSecondary, marginTop: 10, fontFamily: FONT_FAMILY.body },
   card: {
     flex: 1,
     marginTop: -28,
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.white,
     borderTopLeftRadius: 32,
     borderTopRightRadius: 32,
-    shadowColor: '#000',
+    shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: -4 },
     shadowOpacity: 0.1,
     shadowRadius: 16,
     elevation: 12,
   },
   cardContent: { paddingHorizontal: 24, paddingTop: 12, paddingBottom: 32 },
-  cardHandle: { width: 40, height: 4, borderRadius: 2, backgroundColor: '#e5e7eb', alignSelf: 'center', marginBottom: 20 },
-  title: { fontSize: 24, fontWeight: '700', color: '#1b1b1b', marginBottom: 4 },
-  subtitle: { fontSize: 14, color: '#6b7280', marginBottom: 24 },
+  cardHandle: { width: 40, height: 4, borderRadius: 2, backgroundColor: COLORS.border, alignSelf: 'center', marginBottom: 20 },
+  title: { fontSize: 24, fontWeight: '700', color: COLORS.text, marginBottom: 4, fontFamily: FONT_FAMILY.headingBold },
+  subtitle: { fontSize: 14, color: COLORS.textSecondary, marginBottom: 24, fontFamily: FONT_FAMILY.body },
   forgotLink: { alignSelf: 'flex-end', marginTop: -6, marginBottom: 16 },
-  forgotText: { fontSize: 13, color: '#1b4332', fontWeight: '600' },
+  forgotText: { fontSize: 13, color: COLORS.primary, fontWeight: '600' },
   loginBtn: { marginTop: 4, borderRadius: 14, overflow: 'hidden' },
   loginGradient: { height: 54, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 8 },
-  loginText: { fontSize: 16, fontWeight: '700', color: '#ffffff' },
+  loginText: { fontSize: 16, fontWeight: '700', color: COLORS.accentInk, fontFamily: FONT_FAMILY.bodyBold },
   dividerRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 24, marginBottom: 20 },
-  dividerLine: { flex: 1, height: 1, backgroundColor: '#e5e7eb' },
-  dividerText: { fontSize: 12, color: '#9ca3af', fontWeight: '600' },
+  dividerLine: { flex: 1, height: 1, backgroundColor: COLORS.border },
+  dividerText: { fontSize: 12, color: COLORS.textSecondary, fontWeight: '600' },
   registerBtn: { alignItems: 'center' },
-  registerText: { fontSize: 14, color: '#6b7280' },
-  registerHighlight: { color: '#1b4332', fontWeight: '700' },
+  registerText: { fontSize: 14, color: COLORS.textSecondary },
+  registerHighlight: { color: COLORS.primary, fontWeight: '700' },
   alertOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.55)', justifyContent: 'center', alignItems: 'center', padding: 20 },
 });

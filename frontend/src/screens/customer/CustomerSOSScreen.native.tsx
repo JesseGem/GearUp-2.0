@@ -1,7 +1,15 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { COLORS, SPACING, FONT_SIZES, RADIUS } from '../../constants';
 import {
-  View, Text, TouchableOpacity,
-  StatusBar, ActivityIndicator, Alert, ScrollView, StyleSheet, Animated
+  View,
+  Text,
+  TouchableOpacity,
+  StatusBar,
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Animated,
 } from 'react-native';
 import MapView, { Marker, PROVIDER_DEFAULT } from 'react-native-maps';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -10,7 +18,6 @@ import { vehicleService } from '../../services/vehicleService';
 import { userService } from '../../services/userService';
 import { locationService } from '../../services/locationService';
 import { jobService } from '../../services/jobService';
-import { SPACING, FONT_SIZES, RADIUS } from '../../constants';
 
 const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
   const R = 6371;
@@ -23,7 +30,7 @@ const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: numbe
   return R * c;
 };
 
-export default function OwnerSOSScreen({ navigation }: any) {
+export default function CustomerSOSScreen({ navigation }: any) {
   const [step, setStep] = useState<'loading' | 'vehicle' | 'map' | 'confirm'>('loading');
   const [vehicles, setVehicles] = useState<any[]>([]);
   const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
@@ -78,7 +85,7 @@ export default function OwnerSOSScreen({ navigation }: any) {
         setStep('vehicle');
       }
     } catch (e: any) {
-      Alert.alert('Error', 'Could not start emergency request. Please check your connection.', [
+      Alert.alert('Error', 'Could not create the emergency job. Please check your connection.', [
         { text: 'OK', onPress: () => navigation.goBack() },
       ]);
     }
@@ -127,11 +134,11 @@ export default function OwnerSOSScreen({ navigation }: any) {
       });
       Alert.alert(
         'Help is on the way',
-        `${selectedMechanic.name} has been notified of your emergency request.`,
-        [{ text: 'OK', onPress: () => navigation.navigate('OwnerTabs', { screen: 'Jobs' }) }]
+        `${selectedMechanic.name} has been notified of your emergency job.`,
+        [{ text: 'OK', onPress: () => navigation.navigate('CustomerTabs', { screen: 'Jobs' }) }]
       );
     } catch (e: any) {
-      Alert.alert('Error', e.message || 'Could not send request. Please try again.');
+      Alert.alert('Error', e.message || 'Could not create the emergency job. Please try again.');
     } finally {
       setSubmitting(false);
     }
@@ -148,9 +155,9 @@ export default function OwnerSOSScreen({ navigation }: any) {
       <View style={styles.loadingContainer}>
         <StatusBar barStyle="dark-content" />
         <Animated.View style={[styles.pulseCircle, { transform: [{ scale: pulseAnim }] }]}>
-          <Ionicons name="warning" size={32} color="#dc2626" />
+          <Ionicons name="warning" size={32} color={COLORS.error} />
         </Animated.View>
-        <ActivityIndicator size="small" color="#dc2626" style={{ marginTop: 20 }} />
+        <ActivityIndicator size="small" color={COLORS.error} style={{ marginTop: 20 }} />
         <Text style={styles.loadingText}>Finding nearby mechanics...</Text>
       </View>
     );
@@ -160,9 +167,9 @@ export default function OwnerSOSScreen({ navigation }: any) {
     return (
       <View style={styles.container}>
         <StatusBar barStyle="light-content" />
-        <LinearGradient colors={['#dc2626', '#991b1b']} style={styles.header}>
+        <LinearGradient colors={[COLORS.error, COLORS.error]} style={styles.header}>
           <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-            <Ionicons name="arrow-back" size={22} color="#fff" />
+            <Ionicons name="arrow-back" size={22} color={COLORS.white} />
           </TouchableOpacity>
           <View>
             <Text style={styles.headerTitle}>SOS Emergency</Text>
@@ -178,13 +185,13 @@ export default function OwnerSOSScreen({ navigation }: any) {
                 activeOpacity={0.85}
                 onPress={() => handlePickVehicle(v)}>
                 <View style={styles.vehicleIconWrap}>
-                  <Ionicons name="car-sport" size={22} color="#dc2626" />
+                  <Ionicons name="car-sport" size={22} color={COLORS.error} />
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.vehicleName}>{v.make} {v.model} ({v.year})</Text>
                   <Text style={styles.vehiclePlate}>{v.licensePlate}</Text>
                 </View>
-                <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
+                <Ionicons name="chevron-forward" size={20} color={COLORS.textSecondary} />
               </TouchableOpacity>
             ))}
           </ScrollView>
@@ -197,12 +204,12 @@ export default function OwnerSOSScreen({ navigation }: any) {
     return (
       <View style={styles.container}>
         <StatusBar barStyle="light-content" />
-        <LinearGradient colors={['#dc2626', '#991b1b']} style={styles.header}>
+        <LinearGradient colors={[COLORS.error, COLORS.error]} style={styles.header}>
           <TouchableOpacity style={styles.backBtn} onPress={() => setStep('map')}>
-            <Ionicons name="arrow-back" size={22} color="#fff" />
+            <Ionicons name="arrow-back" size={22} color={COLORS.white} />
           </TouchableOpacity>
           <View>
-            <Text style={styles.headerTitle}>Confirm Request</Text>
+            <Text style={styles.headerTitle}>Confirm Job</Text>
             <Text style={styles.headerSubtitle}>Review before sending</Text>
           </View>
         </LinearGradient>
@@ -210,7 +217,7 @@ export default function OwnerSOSScreen({ navigation }: any) {
         <Animated.View style={[styles.confirmBody, fadeStyle]}>
           <View style={styles.confirmBadgeWrap}>
             <View style={styles.confirmBadge}>
-              <Ionicons name="warning" size={28} color="#dc2626" />
+              <Ionicons name="warning" size={28} color={COLORS.error} />
             </View>
             <Text style={styles.confirmHeadline}>Emergency Assistance</Text>
             <Text style={styles.confirmSub}>This mechanic will be notified immediately</Text>
@@ -241,23 +248,23 @@ export default function OwnerSOSScreen({ navigation }: any) {
             <View style={styles.confirmDivider} />
 
             <View style={styles.confirmDetailRow}>
-              <Ionicons name="car-outline" size={16} color="#6b7280" />
+              <Ionicons name="car-outline" size={16} color={COLORS.textSecondary} />
               <Text style={styles.confirmDetailText}>{selectedVehicle?.make} {selectedVehicle?.model} — {selectedVehicle?.licensePlate}</Text>
             </View>
             <View style={styles.confirmDetailRow}>
-              <Ionicons name="location-outline" size={16} color="#6b7280" />
+              <Ionicons name="location-outline" size={16} color={COLORS.textSecondary} />
               <Text style={styles.confirmDetailText}>Your current GPS location will be shared</Text>
             </View>
           </View>
 
           <TouchableOpacity style={styles.sendBtn} onPress={handleConfirmSOS} disabled={submitting} activeOpacity={0.85}>
-            <LinearGradient colors={['#dc2626', '#991b1b']} style={styles.sendGradient}>
+            <LinearGradient colors={[COLORS.error, COLORS.error]} style={styles.sendGradient}>
               {submitting ? (
-                <ActivityIndicator color="#fff" />
+                <ActivityIndicator color={COLORS.white} />
               ) : (
                 <>
-                  <Ionicons name="warning" size={18} color="#fff" />
-                  <Text style={styles.sendText}>Confirm & Send SOS</Text>
+                  <Ionicons name="warning" size={18} color={COLORS.white} />
+                  <Text style={styles.sendText}>Create Emergency Job</Text>
                 </>
               )}
             </LinearGradient>
@@ -274,9 +281,9 @@ export default function OwnerSOSScreen({ navigation }: any) {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
-      <LinearGradient colors={['#dc2626', '#991b1b']} style={styles.header}>
+      <LinearGradient colors={[COLORS.error, COLORS.error]} style={styles.header}>
         <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={22} color="#fff" />
+          <Ionicons name="arrow-back" size={22} color={COLORS.white} />
         </TouchableOpacity>
         <View>
           <Text style={styles.headerTitle}>SOS Emergency</Text>
@@ -291,7 +298,7 @@ export default function OwnerSOSScreen({ navigation }: any) {
           {myLocation && (
             <Marker coordinate={myLocation} title="You">
               <View style={styles.myPin}>
-                <Ionicons name="person" size={16} color="#fff" />
+                <Ionicons name="person" size={16} color={COLORS.white} />
               </View>
             </Marker>
           )}
@@ -305,7 +312,7 @@ export default function OwnerSOSScreen({ navigation }: any) {
                 styles.mechanicPin,
                 selectedMechanic?.id === m.id && styles.mechanicPinSelected,
               ]}>
-                <Ionicons name="construct" size={16} color="#fff" />
+                <Ionicons name="construct" size={16} color={COLORS.white} />
               </View>
             </Marker>
           ))}
@@ -314,7 +321,7 @@ export default function OwnerSOSScreen({ navigation }: any) {
 
       {mechanics.length === 0 ? (
         <View style={styles.noMechanicsCard}>
-          <Ionicons name="alert-circle-outline" size={32} color="#9ca3af" />
+          <Ionicons name="alert-circle-outline" size={32} color={COLORS.textSecondary} />
           <Text style={styles.noMechanicsText}>No mechanics with a saved location were found nearby.</Text>
         </View>
       ) : (
@@ -349,7 +356,7 @@ export default function OwnerSOSScreen({ navigation }: any) {
               </View>
               {selectedMechanic.distance !== null && (
                 <View style={styles.selectedDistancePill}>
-                  <Ionicons name="navigate" size={11} color="#dc2626" />
+                  <Ionicons name="navigate" size={11} color={COLORS.error} />
                   <Text style={styles.selectedDistanceText}>
                     {selectedMechanic.distance < 1
                       ? `${Math.round(selectedMechanic.distance * 1000)}m`
@@ -365,9 +372,9 @@ export default function OwnerSOSScreen({ navigation }: any) {
             disabled={!selectedMechanic}
             activeOpacity={0.85}
             onPress={() => setStep('confirm')}>
-            <LinearGradient colors={['#dc2626', '#991b1b']} style={styles.requestGradient}>
-              <Ionicons name="warning" size={18} color="#fff" />
-              <Text style={styles.requestBtnText}>Request This Shop</Text>
+            <LinearGradient colors={[COLORS.error, COLORS.error]} style={styles.requestGradient}>
+              <Ionicons name="warning" size={18} color={COLORS.white} />
+              <Text style={styles.requestBtnText}>Choose This Mechanic</Text>
             </LinearGradient>
           </TouchableOpacity>
         </Animated.View>
@@ -377,62 +384,62 @@ export default function OwnerSOSScreen({ navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f9fafb' },
-  loadingContainer: { flex: 1, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center' },
-  pulseCircle: { width: 72, height: 72, borderRadius: 36, backgroundColor: '#fef2f2', justifyContent: 'center', alignItems: 'center' },
-  loadingText: { fontSize: FONT_SIZES.md, color: '#6b7280', fontWeight: '600', marginTop: 12 },
+  container: { flex: 1, backgroundColor: COLORS.background },
+  loadingContainer: { flex: 1, backgroundColor: COLORS.white, justifyContent: 'center', alignItems: 'center' },
+  pulseCircle: { width: 72, height: 72, borderRadius: 36, backgroundColor: COLORS.errorTint, justifyContent: 'center', alignItems: 'center' },
+  loadingText: { fontSize: FONT_SIZES.md, color: COLORS.textSecondary, fontWeight: '600', marginTop: 12 },
   header: { paddingTop: 60, paddingBottom: SPACING.lg, paddingHorizontal: SPACING.lg, flexDirection: 'row', alignItems: 'center', gap: SPACING.md, borderBottomLeftRadius: 24, borderBottomRightRadius: 24 },
   backBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.2)', justifyContent: 'center', alignItems: 'center' },
-  headerTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: '#fff' },
-  headerSubtitle: { fontSize: FONT_SIZES.xs, color: '#fecaca', marginTop: 2 },
+  headerTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.white },
+  headerSubtitle: { fontSize: FONT_SIZES.xs, color: COLORS.errorTint, marginTop: 2 },
   vehicleList: { flex: 1, padding: SPACING.lg },
-  vehicleOption: { flexDirection: 'row', alignItems: 'center', gap: SPACING.md, backgroundColor: '#fff', borderRadius: RADIUS.md, padding: SPACING.md, marginBottom: SPACING.md, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 },
-  vehicleIconWrap: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#fef2f2', justifyContent: 'center', alignItems: 'center' },
-  vehicleName: { fontSize: FONT_SIZES.md, fontWeight: '700', color: '#1b1b1b' },
-  vehiclePlate: { fontSize: FONT_SIZES.xs, color: '#6b7280', marginTop: 2 },
+  vehicleOption: { flexDirection: 'row', alignItems: 'center', gap: SPACING.md, backgroundColor: COLORS.white, borderRadius: RADIUS.md, padding: SPACING.md, marginBottom: SPACING.md, shadowColor: COLORS.black, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 },
+  vehicleIconWrap: { width: 44, height: 44, borderRadius: 22, backgroundColor: COLORS.errorTint, justifyContent: 'center', alignItems: 'center' },
+  vehicleName: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.text },
+  vehiclePlate: { fontSize: FONT_SIZES.xs, color: COLORS.textSecondary, marginTop: 2 },
   mapContainer: { flex: 1 },
   map: { flex: 1 },
-  myPin: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#2563eb', justifyContent: 'center', alignItems: 'center', borderWidth: 3, borderColor: '#fff', elevation: 4 },
-  mechanicPin: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#1b4332', justifyContent: 'center', alignItems: 'center', borderWidth: 3, borderColor: '#fff', elevation: 4 },
-  mechanicPinSelected: { backgroundColor: '#dc2626', width: 42, height: 42, borderRadius: 21 },
-  noMechanicsCard: { backgroundColor: '#fff', padding: SPACING.lg, alignItems: 'center', gap: 8 },
-  noMechanicsText: { fontSize: FONT_SIZES.sm, color: '#6b7280', textAlign: 'center' },
-  bottomCard: { backgroundColor: '#fff', padding: SPACING.lg, paddingBottom: 32, borderTopLeftRadius: 24, borderTopRightRadius: 24, shadowColor: '#000', shadowOffset: { width: 0, height: -4 }, shadowOpacity: 0.1, shadowRadius: 12, elevation: 10 },
+  myPin: { width: 36, height: 36, borderRadius: 18, backgroundColor: COLORS.info, justifyContent: 'center', alignItems: 'center', borderWidth: 3, borderColor: COLORS.white, elevation: 4 },
+  mechanicPin: { width: 36, height: 36, borderRadius: 18, backgroundColor: COLORS.primary, justifyContent: 'center', alignItems: 'center', borderWidth: 3, borderColor: COLORS.white, elevation: 4 },
+  mechanicPinSelected: { backgroundColor: COLORS.error, width: 42, height: 42, borderRadius: 21 },
+  noMechanicsCard: { backgroundColor: COLORS.white, padding: SPACING.lg, alignItems: 'center', gap: 8 },
+  noMechanicsText: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, textAlign: 'center' },
+  bottomCard: { backgroundColor: COLORS.white, padding: SPACING.lg, paddingBottom: 32, borderTopLeftRadius: 24, borderTopRightRadius: 24, shadowColor: COLORS.black, shadowOffset: { width: 0, height: -4 }, shadowOpacity: 0.1, shadowRadius: 12, elevation: 10 },
   mechanicScroll: { marginBottom: SPACING.md },
-  mechanicChip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: RADIUS.full, borderWidth: 1, borderColor: '#e5e7eb', marginRight: 8, backgroundColor: '#fff', alignItems: 'center' },
-  mechanicChipActive: { backgroundColor: '#dc2626', borderColor: '#dc2626' },
-  mechanicChipText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: '#1b1b1b' },
-  mechanicChipDistance: { fontSize: 10, color: '#6b7280', marginTop: 1 },
-  mechanicChipTextActive: { color: '#fff' },
+  mechanicChip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: RADIUS.full, borderWidth: 1, borderColor: COLORS.border, marginRight: 8, backgroundColor: COLORS.white, alignItems: 'center' },
+  mechanicChipActive: { backgroundColor: COLORS.error, borderColor: COLORS.error },
+  mechanicChipText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.text },
+  mechanicChipDistance: { fontSize: 10, color: COLORS.textSecondary, marginTop: 1 },
+  mechanicChipTextActive: { color: COLORS.white },
   selectedInfo: { flexDirection: 'row', alignItems: 'center', gap: SPACING.md, marginBottom: SPACING.md },
-  selectedAvatar: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#1b4332', justifyContent: 'center', alignItems: 'center' },
-  selectedAvatarText: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: '#fff' },
-  selectedName: { fontSize: FONT_SIZES.md, fontWeight: '700', color: '#1b1b1b' },
-  selectedLocation: { fontSize: FONT_SIZES.xs, color: '#6b7280' },
-  selectedDistancePill: { flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: '#fef2f2', paddingHorizontal: 8, paddingVertical: 4, borderRadius: RADIUS.full },
-  selectedDistanceText: { fontSize: 11, fontWeight: '700', color: '#dc2626' },
+  selectedAvatar: { width: 44, height: 44, borderRadius: 22, backgroundColor: COLORS.primary, justifyContent: 'center', alignItems: 'center' },
+  selectedAvatarText: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.white },
+  selectedName: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.text },
+  selectedLocation: { fontSize: FONT_SIZES.xs, color: COLORS.textSecondary },
+  selectedDistancePill: { flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: COLORS.errorTint, paddingHorizontal: 8, paddingVertical: 4, borderRadius: RADIUS.full },
+  selectedDistanceText: { fontSize: 11, fontWeight: '700', color: COLORS.error },
   requestBtn: { borderRadius: RADIUS.md, overflow: 'hidden' },
   requestGradient: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, padding: 16 },
-  requestBtnText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: '#fff' },
+  requestBtnText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.white },
   confirmBody: { flex: 1, padding: SPACING.lg },
   confirmBadgeWrap: { alignItems: 'center', marginBottom: SPACING.xl },
-  confirmBadge: { width: 64, height: 64, borderRadius: 32, backgroundColor: '#fef2f2', justifyContent: 'center', alignItems: 'center', marginBottom: 12 },
-  confirmHeadline: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: '#1b1b1b' },
-  confirmSub: { fontSize: FONT_SIZES.sm, color: '#9ca3af', marginTop: 2 },
-  confirmCard: { backgroundColor: '#fff', borderRadius: RADIUS.md, padding: SPACING.lg, borderWidth: 1, borderColor: '#f3f4f6', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 },
+  confirmBadge: { width: 64, height: 64, borderRadius: 32, backgroundColor: COLORS.errorTint, justifyContent: 'center', alignItems: 'center', marginBottom: 12 },
+  confirmHeadline: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.text },
+  confirmSub: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, marginTop: 2 },
+  confirmCard: { backgroundColor: COLORS.white, borderRadius: RADIUS.md, padding: SPACING.lg, borderWidth: 1, borderColor: COLORS.background, shadowColor: COLORS.black, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 },
   confirmMechanicRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING.md },
-  confirmAvatar: { width: 48, height: 48, borderRadius: 24, backgroundColor: '#1b4332', justifyContent: 'center', alignItems: 'center' },
-  confirmAvatarText: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: '#fff' },
-  confirmMechanicName: { fontSize: FONT_SIZES.md, fontWeight: '700', color: '#1b1b1b' },
-  confirmMechanicLocation: { fontSize: FONT_SIZES.xs, color: '#6b7280', marginTop: 2 },
-  distancePill: { backgroundColor: '#fef2f2', paddingHorizontal: 10, paddingVertical: 5, borderRadius: RADIUS.full },
-  distancePillText: { fontSize: 11, fontWeight: '700', color: '#dc2626' },
-  confirmDivider: { height: 1, backgroundColor: '#f3f4f6', marginVertical: SPACING.md },
+  confirmAvatar: { width: 48, height: 48, borderRadius: 24, backgroundColor: COLORS.primary, justifyContent: 'center', alignItems: 'center' },
+  confirmAvatarText: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.white },
+  confirmMechanicName: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.text },
+  confirmMechanicLocation: { fontSize: FONT_SIZES.xs, color: COLORS.textSecondary, marginTop: 2 },
+  distancePill: { backgroundColor: COLORS.errorTint, paddingHorizontal: 10, paddingVertical: 5, borderRadius: RADIUS.full },
+  distancePillText: { fontSize: 11, fontWeight: '700', color: COLORS.error },
+  confirmDivider: { height: 1, backgroundColor: COLORS.background, marginVertical: SPACING.md },
   confirmDetailRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 10 },
-  confirmDetailText: { fontSize: FONT_SIZES.sm, color: '#374151', flex: 1 },
+  confirmDetailText: { fontSize: FONT_SIZES.sm, color: COLORS.text, flex: 1 },
   sendBtn: { marginTop: SPACING.xl, borderRadius: RADIUS.md, overflow: 'hidden' },
   sendGradient: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, padding: 16 },
-  sendText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: '#fff' },
+  sendText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.white },
   cancelBtn: { marginTop: SPACING.md, padding: 14, alignItems: 'center' },
-  cancelText: { fontSize: FONT_SIZES.md, fontWeight: '600', color: '#6b7280' },
+  cancelText: { fontSize: FONT_SIZES.md, fontWeight: '600', color: COLORS.textSecondary },
 });

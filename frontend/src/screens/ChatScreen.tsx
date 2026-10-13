@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { COLORS, JOB_STATUS_COLORS, SPACING, FONT_SIZES, RADIUS } from '../constants';
 import {
   View, Text, StyleSheet, FlatList, TouchableOpacity,
   TextInput, StatusBar, ActivityIndicator, KeyboardAvoidingView,
@@ -24,16 +25,8 @@ import { reviewService } from '../services/reviewService';
 import ConfirmDialog from '../components/ConfirmDialog';
 import WalletPaymentSheet from '../components/WalletPaymentSheet';
 import { AppAlertCard } from '../components/AppAlert';
-import { SPACING, FONT_SIZES, RADIUS } from '../constants';
 const getStatusColor = (status: string) => {
-  switch (status) {
-    case 'PENDING': return '#f59e0b';
-    case 'ACCEPTED': return '#3b82f6';
-    case 'IN_PROGRESS': return '#8b5cf6';
-    case 'COMPLETED': return '#10b981';
-    case 'CANCELLED': return '#ef4444';
-    default: return '#6b7280';
-  }
+  return JOB_STATUS_COLORS[status] || COLORS.textSecondary;
 };
 
 const formatDate = (dateStr: string | null | undefined) => {
@@ -78,7 +71,7 @@ function AnimatedActionButton({ style, textStyle, icon, iconColor, label, onPres
         disabled={disabled}
         activeOpacity={0.9}>
         {loading ? (
-          <ActivityIndicator size="small" color={textStyle?.color === '#fff' ? '#fff' : iconColor} />
+          <ActivityIndicator size="small" color={textStyle?.color === COLORS.white ? COLORS.white : iconColor} />
         ) : (
           <>
             <Ionicons name={icon} size={15} color={iconColor} />
@@ -92,11 +85,12 @@ function AnimatedActionButton({ style, textStyle, icon, iconColor, label, onPres
 
 // ─── JobCardBubble: expandable job card rendered inline in the chat ───
 function JobCardBubble({
-  item, isMine, isOwner, myId, accentColor, onActionDone, onPaid, navigation, expanded, onToggleExpanded, onRequestDelete,
+  item, isMine, isCustomer, isMechanic, myId, accentColor, onActionDone, onPaid, navigation, expanded, onToggleExpanded, onRequestDelete,
 }: {
   item: Message;
   isMine: boolean;
-  isOwner: boolean;
+  isCustomer: boolean;
+  isMechanic: boolean;
   myId: number;
   accentColor: string;
   onActionDone: (updated: Message) => void;
@@ -145,12 +139,12 @@ const [showPaymentModal, setShowPaymentModal] = useState(false);
   const isDeletableCard = meta.status === 'CANCELLED' || (meta.status === 'COMPLETED' && !!meta.isPaid);
   const isPendingOriginal = meta.status === 'PENDING' && !meta.proposedByMechanicId;
   const isPendingCounter = meta.status === 'PENDING' && !!meta.proposedByMechanicId;
-  const mechanicCanRespond = !isOwner && isPendingOriginal;
-  const mechanicAwaitingOwner = !isOwner && isPendingCounter && meta.proposedByMechanicId === myId;
-  const ownerCanRespondToCounter = isOwner && isPendingCounter;
-  const ownerAwaitingMechanic = isOwner && isPendingOriginal;
-  const mechanicCanStart = !isOwner && meta.status === 'ACCEPTED';
-  const mechanicCanComplete = !isOwner && meta.status === 'IN_PROGRESS';
+  const mechanicCanRespond = isMechanic && isPendingOriginal;
+  const mechanicAwaitingCustomer = isMechanic && isPendingCounter && meta.proposedByMechanicId === myId;
+  const customerCanRespondToCounter = isCustomer && isPendingCounter;
+  const customerAwaitingMechanic = isCustomer && isPendingOriginal;
+  const mechanicCanStart = isMechanic && meta.status === 'ACCEPTED';
+  const mechanicCanComplete = isMechanic && meta.status === 'IN_PROGRESS';
   const canNegotiatePrice = meta.status === 'COMPLETED' && !meta.isPaid;
   const hasActiveBid = canNegotiatePrice && meta.biddingByUserId != null;
   const isMyBid = hasActiveBid && meta.biddingByUserId === myId;
@@ -369,7 +363,7 @@ const handleCancelJob = async () => {
         <TouchableOpacity
           style={styles.jobCardHeader}
           onPress={onToggleExpanded}
-          onLongPress={isOwner && isDeletableCard ? onRequestDelete : undefined}
+          onLongPress={isCustomer && isDeletableCard ? onRequestDelete : undefined}
           activeOpacity={0.85}>
           <View style={styles.jobCardHeaderLeft}>
             <Ionicons name="briefcase" size={16} color={accentColor} />
@@ -380,7 +374,7 @@ const handleCancelJob = async () => {
               <View style={[styles.jobCardStatusDot, { backgroundColor: statusColor }]} />
               <Text style={[styles.jobCardStatusText, { color: statusColor }]}>{meta.status.replace('_', ' ')}</Text>
             </View>
-            <Ionicons name={expanded ? 'chevron-up' : 'chevron-down'} size={16} color="#9ca3af" />
+            <Ionicons name={expanded ? 'chevron-up' : 'chevron-down'} size={16} color={COLORS.textSecondary} />
           </View>
         </TouchableOpacity>
 
@@ -388,24 +382,24 @@ const handleCancelJob = async () => {
           <View style={styles.jobCardBody}>
             <Text style={styles.jobCardDesc}>{meta.description}</Text>
             <View style={styles.jobCardDetailRow}>
-              <Ionicons name="construct-outline" size={13} color="#9ca3af" />
+              <Ionicons name="construct-outline" size={13} color={COLORS.textSecondary} />
               <Text style={styles.jobCardDetailText}>{meta.jobType}</Text>
             </View>
             {meta.location && (
               <View style={styles.jobCardDetailRow}>
-                <Ionicons name="location-outline" size={13} color="#9ca3af" />
+                <Ionicons name="location-outline" size={13} color={COLORS.textSecondary} />
                 <Text style={styles.jobCardDetailText} numberOfLines={1}>{meta.location}</Text>
               </View>
             )}
             {meta.scheduledDate && (
               <View style={styles.jobCardDetailRow}>
-                <Ionicons name="calendar-outline" size={13} color="#9ca3af" />
+                <Ionicons name="calendar-outline" size={13} color={COLORS.textSecondary} />
                 <Text style={styles.jobCardDetailText}>{formatDate(meta.scheduledDate)}</Text>
               </View>
             )}
             {(meta.estimatedCost || meta.finalCost) && (
               <View style={styles.jobCardDetailRow}>
-                <Ionicons name="cash-outline" size={13} color="#9ca3af" />
+                <Ionicons name="cash-outline" size={13} color={COLORS.textSecondary} />
                 <Text style={styles.jobCardDetailText}>
                   {meta.finalCost ? `Final: GHS ${meta.finalCost}` : `Est: GHS ${meta.estimatedCost}`}
                 </Text>
@@ -429,19 +423,19 @@ const handleCancelJob = async () => {
               </View>
             )}
 
-            {mechanicAwaitingOwner && (
-              <Text style={styles.awaitingText}>Waiting for the owner to respond to your proposal…</Text>
+            {mechanicAwaitingCustomer && (
+              <Text style={styles.awaitingText}>Waiting for the customer to respond to your proposal…</Text>
             )}
-            {ownerAwaitingMechanic && (
+            {customerAwaitingMechanic && (
               <Text style={styles.awaitingText}>Waiting for the mechanic to respond…</Text>
             )}
-            {isOwner && meta.status === 'PENDING' && (
+            {isCustomer && meta.status === 'PENDING' && (
               <View style={styles.jobCardActionsFullRow}>
                 <AnimatedActionButton
                   style={styles.declineBtn}
                   textStyle={styles.declineBtnText}
                   icon="close-circle-outline"
-                  iconColor="#dc2626"
+                  iconColor={COLORS.error}
                   label="Cancel Job"
                   onPress={() => setCancelJobConfirm(true)}
                   disabled={processing}
@@ -456,7 +450,7 @@ const handleCancelJob = async () => {
                     style={styles.acceptBtn}
                     textStyle={styles.acceptBtnText}
                     icon="checkmark"
-                    iconColor="#fff"
+                    iconColor={COLORS.white}
                     label="Accept Job"
                     onPress={handleAccept}
                     disabled={processing}
@@ -468,7 +462,7 @@ const handleCancelJob = async () => {
                     style={styles.changesBtn}
                     textStyle={styles.changesBtnText}
                     icon="create-outline"
-                    iconColor="#7c3aed"
+                    iconColor={COLORS.info}
                     label="Changes"
                     onPress={() => setProposeModal(true)}
                     disabled={processing}
@@ -477,7 +471,7 @@ const handleCancelJob = async () => {
                     style={styles.declineBtn}
                     textStyle={styles.declineBtnText}
                     icon="close"
-                    iconColor="#dc2626"
+                    iconColor={COLORS.error}
                     label="Decline"
                     onPress={() => setDeclineConfirm(true)}
                     disabled={processing}
@@ -486,13 +480,13 @@ const handleCancelJob = async () => {
               </View>
             )}
 
-            {ownerCanRespondToCounter && (
+            {customerCanRespondToCounter && (
               <View style={styles.jobCardActions}>
                 <AnimatedActionButton
                   style={styles.acceptBtn}
                   textStyle={styles.acceptBtnText}
                   icon="checkmark"
-                  iconColor="#fff"
+                  iconColor={COLORS.white}
                   label="Accept Offer"
                   onPress={handleAcceptCounter}
                   disabled={processing}
@@ -502,7 +496,7 @@ const handleCancelJob = async () => {
                   style={styles.declineBtn}
                   textStyle={styles.declineBtnText}
                   icon="close"
-                  iconColor="#dc2626"
+                  iconColor={COLORS.error}
                   label="Reject"
                   onPress={handleRejectCounter}
                   disabled={processing}
@@ -516,7 +510,7 @@ const handleCancelJob = async () => {
                   style={styles.startBtn}
                   textStyle={styles.startBtnText}
                   icon="play"
-                  iconColor="#fff"
+                  iconColor={COLORS.white}
                   label="Start Job"
                   onPress={handleStartJob}
                   disabled={processing}
@@ -531,7 +525,7 @@ const handleCancelJob = async () => {
                   style={styles.completeBtn}
                   textStyle={styles.completeBtnText}
                   icon="checkmark-done"
-                  iconColor="#fff"
+                  iconColor={COLORS.white}
                   label="Mark as Completed"
                   onPress={() => setShowCompleteModal(true)}
                   disabled={processing}
@@ -541,18 +535,18 @@ const handleCancelJob = async () => {
 
             {meta.status === 'COMPLETED' && meta.isPaid && (
               <View style={styles.paidBadgeChat}>
-                <Ionicons name="checkmark-circle" size={14} color="#10b981" />
+                <Ionicons name="checkmark-circle" size={14} color={COLORS.success} />
                 <Text style={styles.paidBadgeChatText}>Paid</Text>
               </View>
             )}
 
-            {isOwner && meta.status === 'COMPLETED' && !meta.isPaid && (
+            {isCustomer && meta.status === 'COMPLETED' && !meta.isPaid && (
               <View style={styles.jobCardActionsFullRow}>
                 <AnimatedActionButton
                   style={styles.payBtnCard}
                   textStyle={styles.payBtnCardText}
                   icon="card"
-                  iconColor="#fff"
+                  iconColor={COLORS.white}
                   label={`Pay GHS ${meta.finalCost || 0}`}
                   onPress={() => setShowPaymentModal(true)}
                   disabled={processing}
@@ -581,7 +575,7 @@ const handleCancelJob = async () => {
                             style={styles.acceptBtn}
                             textStyle={styles.acceptBtnText}
                             icon="checkmark"
-                            iconColor="#fff"
+                            iconColor={COLORS.white}
                             label="Accept Price"
                             onPress={handleAcceptBid}
                             disabled={processing}
@@ -593,7 +587,7 @@ const handleCancelJob = async () => {
                             style={styles.changesBtn}
                             textStyle={styles.changesBtnText}
                             icon="create-outline"
-                            iconColor="#7c3aed"
+                            iconColor={COLORS.info}
                             label="Counter"
                             onPress={() => setBidModal(true)}
                             disabled={processing}
@@ -602,7 +596,7 @@ const handleCancelJob = async () => {
                             style={styles.declineBtn}
                             textStyle={styles.declineBtnText}
                             icon="close"
-                            iconColor="#dc2626"
+                            iconColor={COLORS.error}
                             label="Decline"
                             onPress={handleDeclineBid}
                             disabled={processing}
@@ -617,7 +611,7 @@ const handleCancelJob = async () => {
                       style={styles.bidBtn}
                       textStyle={styles.bidBtnText}
                       icon="pricetag-outline"
-                      iconColor="#7c3aed"
+                      iconColor={COLORS.info}
                       label="Propose New Price"
                       onPress={() => setBidModal(true)}
                       disabled={processing}
@@ -643,7 +637,7 @@ const handleCancelJob = async () => {
               />
               <Text style={styles.proposeLabel}>New Date & Time</Text>
               <TouchableOpacity style={styles.proposeDateBtn} onPress={() => setShowDatePicker(true)}>
-                <Ionicons name="calendar-outline" size={15} color="#7c3aed" />
+                <Ionicons name="calendar-outline" size={15} color={COLORS.info} />
                 <Text style={styles.proposeDateBtnText}>{proposedDate ? formatDate(proposedDate.toISOString()) : 'Optional — tap to set'}</Text>
               </TouchableOpacity>
               {showDatePicker && (
@@ -653,7 +647,7 @@ const handleCancelJob = async () => {
                   display={Platform.OS === 'ios' ? 'spinner' : 'default'}
                   minimumDate={new Date()}
                   themeVariant="light"
-                  textColor="#1b1b1b"
+                  textColor={COLORS.text}
                   onChange={(e, selected) => {
                     if (Platform.OS === 'android') setShowDatePicker(false);
                     if (selected) setProposedDate(selected);
@@ -674,7 +668,7 @@ const handleCancelJob = async () => {
                   <Text style={styles.proposeCancelText}>Cancel</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.proposeSubmitBtn} onPress={handleSubmitProposal} disabled={processing} activeOpacity={0.85}>
-                  {processing ? <ActivityIndicator size="small" color="#fff" /> : <Text style={styles.proposeSubmitText}>Send</Text>}
+                  {processing ? <ActivityIndicator size="small" color={COLORS.white} /> : <Text style={styles.proposeSubmitText}>Send</Text>}
                 </TouchableOpacity>
               </View>
             </View>
@@ -699,7 +693,7 @@ const handleCancelJob = async () => {
                   <Text style={styles.proposeCancelText}>Cancel</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.proposeSubmitBtn} onPress={handleSubmitComplete} disabled={processing} activeOpacity={0.85}>
-                  {processing ? <ActivityIndicator size="small" color="#fff" /> : <Text style={styles.proposeSubmitText}>Complete</Text>}
+                  {processing ? <ActivityIndicator size="small" color={COLORS.white} /> : <Text style={styles.proposeSubmitText}>Complete</Text>}
                 </TouchableOpacity>
               </View>
             </View>
@@ -733,7 +727,7 @@ const handleCancelJob = async () => {
                   <Text style={styles.proposeCancelText}>Cancel</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.proposeSubmitBtn} onPress={handleSubmitBid} disabled={processing} activeOpacity={0.85}>
-                  {processing ? <ActivityIndicator size="small" color="#fff" /> : <Text style={styles.proposeSubmitText}>Send Offer</Text>}
+                  {processing ? <ActivityIndicator size="small" color={COLORS.white} /> : <Text style={styles.proposeSubmitText}>Send Offer</Text>}
                 </TouchableOpacity>
               </View>
             </View>
@@ -744,7 +738,7 @@ const handleCancelJob = async () => {
           visible={declineConfirm}
           icon="close-circle-outline"
           title="Decline This Job"
-          message="This will cancel the job request. The owner will be notified."
+          message="This will cancel the job. The customer will be notified."
           confirmText="Decline"
           destructive
           onConfirm={handleDecline}
@@ -791,11 +785,12 @@ const handleCancelJob = async () => {
 }
 // ─── PartCardBubble: expandable part-order card rendered inline in the chat ───
 function PartCardBubble({
-  item, isMine, isOwner, myId, accentColor, onActionDone, navigation, expanded, onToggleExpanded, onRequestDelete,
+  item, isMine, isCustomer, isMechanic, myId, accentColor, onActionDone, navigation, expanded, onToggleExpanded, onRequestDelete,
 }: {
   item: Message;
   isMine: boolean;
-  isOwner: boolean;
+  isCustomer: boolean;
+  isMechanic: boolean;
   myId: number;
   accentColor: string;
   onActionDone: (updated: Message) => void;
@@ -830,8 +825,8 @@ function PartCardBubble({
   const isDeletableCard = meta.status === 'DECLINED' || meta.status === 'CANCELLED' || (meta.status === 'COMPLETED' && !!meta.isPaid);
   const hasProposal = meta.proposedPrice != null;
   const isMyProposal = hasProposal && meta.proposedByUserId === myId;
-  const sellerCanRespondToOrder = !isOwner && meta.status === 'PENDING';
-  const buyerCanCancel = isOwner && meta.status === 'PENDING';
+  const sellerCanRespondToOrder = isMechanic && meta.status === 'PENDING';
+  const buyerCanCancel = isCustomer && meta.status === 'PENDING';
   const canNegotiate = meta.status === 'PENDING' && !hasProposal;
   const otherPartyId = isMine ? item.receiver_id : item.sender_id;
   const chatJobId = item.job_id;
@@ -955,7 +950,7 @@ function PartCardBubble({
         <TouchableOpacity
           style={styles.jobCardHeader}
           onPress={onToggleExpanded}
-          onLongPress={isOwner && isDeletableCard ? onRequestDelete : undefined}
+          onLongPress={isCustomer && isDeletableCard ? onRequestDelete : undefined}
           activeOpacity={0.85}>
           <View style={styles.jobCardHeaderLeft}>
             <Ionicons name="cube" size={16} color={accentColor} />
@@ -968,7 +963,7 @@ function PartCardBubble({
                 {meta.status === 'ACCEPTED' ? 'RESERVED' : meta.status}
               </Text>
             </View>
-            <Ionicons name={expanded ? 'chevron-up' : 'chevron-down'} size={16} color="#9ca3af" />
+            <Ionicons name={expanded ? 'chevron-up' : 'chevron-down'} size={16} color={COLORS.textSecondary} />
           </View>
         </TouchableOpacity>
         {expanded && (
@@ -977,7 +972,7 @@ function PartCardBubble({
               <Image source={{ uri: meta.imageUrl }} style={styles.partCardImage} />
             )}
             <View style={styles.jobCardDetailRow}>
-              <Ionicons name="cash-outline" size={13} color="#9ca3af" />
+              <Ionicons name="cash-outline" size={13} color={COLORS.textSecondary} />
               <Text style={styles.jobCardDetailText}>Price: GHS {meta.price}</Text>
             </View>
             {hasProposal && (
@@ -994,7 +989,7 @@ function PartCardBubble({
                       style={styles.acceptBtn}
                       textStyle={styles.acceptBtnText}
                       icon="checkmark"
-                      iconColor="#fff"
+                      iconColor={COLORS.white}
                       label="Accept"
                       onPress={handleAcceptOffer}
                       disabled={processing}
@@ -1004,7 +999,7 @@ function PartCardBubble({
                       style={styles.declineBtn}
                       textStyle={styles.declineBtnText}
                       icon="close"
-                      iconColor="#dc2626"
+                      iconColor={COLORS.error}
                       label="Reject"
                       onPress={handleRejectOffer}
                       disabled={processing}
@@ -1020,7 +1015,7 @@ function PartCardBubble({
                     style={styles.acceptBtn}
                     textStyle={styles.acceptBtnText}
                     icon="checkmark"
-                    iconColor="#fff"
+                    iconColor={COLORS.white}
                     label="Accept Order"
                     onPress={handleAcceptOrder}
                     disabled={processing}
@@ -1033,7 +1028,7 @@ function PartCardBubble({
                       style={styles.changesBtn}
                       textStyle={styles.changesBtnText}
                       icon="pricetag-outline"
-                      iconColor="#7c3aed"
+                      iconColor={COLORS.info}
                       label="Propose Price"
                       onPress={() => setOfferModal(true)}
                       disabled={processing}
@@ -1043,7 +1038,7 @@ function PartCardBubble({
                     style={styles.declineBtn}
                     textStyle={styles.declineBtnText}
                     icon="close"
-                    iconColor="#dc2626"
+                    iconColor={COLORS.error}
                     label="Decline"
                     onPress={() => setDeclineConfirm(true)}
                     disabled={processing}
@@ -1060,7 +1055,7 @@ function PartCardBubble({
                       style={styles.changesBtn}
                       textStyle={styles.changesBtnText}
                       icon="pricetag-outline"
-                      iconColor="#7c3aed"
+                      iconColor={COLORS.info}
                       label="Propose Price"
                       onPress={() => setOfferModal(true)}
                       disabled={processing}
@@ -1070,7 +1065,7 @@ function PartCardBubble({
                     style={styles.declineBtn}
                     textStyle={styles.declineBtnText}
                     icon="close"
-                    iconColor="#dc2626"
+                    iconColor={COLORS.error}
                     label="Cancel Order"
                     onPress={() => setCancelConfirm(true)}
                     disabled={processing}
@@ -1078,16 +1073,16 @@ function PartCardBubble({
                 </View>
               </View>
             )}
-            {meta.status === 'ACCEPTED' && !isOwner && !meta.isPaid && (
+            {meta.status === 'ACCEPTED' && isMechanic && !meta.isPaid && (
   <Text style={styles.awaitingText}>Reserved — waiting for the buyer to pay…</Text>
 )}
-{meta.status === 'ACCEPTED' && !isOwner && meta.isPaid && (
+{meta.status === 'ACCEPTED' && isMechanic && meta.isPaid && (
   <View style={styles.jobCardActionsFullRow}>
     <AnimatedActionButton
       style={styles.completeBtn}
       textStyle={styles.completeBtnText}
       icon="checkmark-done"
-      iconColor="#fff"
+      iconColor={COLORS.white}
       label="Mark as Sold"
       onPress={handleMarkSold}
       disabled={processing}
@@ -1095,45 +1090,45 @@ function PartCardBubble({
     />
   </View>
 )}
-{meta.status === 'ACCEPTED' && isOwner && !meta.isPaid && (
+{meta.status === 'ACCEPTED' && isCustomer && !meta.isPaid && (
   <View style={styles.jobCardActionsFullRow}>
     <AnimatedActionButton
       style={styles.payBtnCard}
       textStyle={styles.payBtnCardText}
       icon="card"
-      iconColor="#fff"
+      iconColor={COLORS.white}
       label={`Pay GHS ${meta.price}`}
       onPress={() => setShowPaymentModal(true)}
       disabled={processing}
     />
   </View>
 )}
-{meta.status === 'ACCEPTED' && isOwner && meta.isPaid && (
+{meta.status === 'ACCEPTED' && isCustomer && meta.isPaid && (
   <View style={styles.paidBadgeChat}>
-    <Ionicons name="checkmark-circle" size={14} color="#10b981" />
+    <Ionicons name="checkmark-circle" size={14} color={COLORS.success} />
     <Text style={styles.paidBadgeChatText}>Paid — waiting for seller to mark as sold</Text>
   </View>
 )}
             {meta.status === 'COMPLETED' && meta.isPaid && (
               <View style={styles.paidBadgeChat}>
-                <Ionicons name="checkmark-circle" size={14} color="#10b981" />
+                <Ionicons name="checkmark-circle" size={14} color={COLORS.success} />
                 <Text style={styles.paidBadgeChatText}>Paid</Text>
               </View>
             )}
-            {isOwner && meta.status === 'COMPLETED' && !meta.isPaid && (
+            {isCustomer && meta.status === 'COMPLETED' && !meta.isPaid && (
               <View style={styles.jobCardActionsFullRow}>
                 <AnimatedActionButton
                   style={styles.payBtnCard}
                   textStyle={styles.payBtnCardText}
                   icon="card"
-                  iconColor="#fff"
+                  iconColor={COLORS.white}
                   label={`Pay GHS ${meta.price}`}
                   onPress={() => setShowPaymentModal(true)}
                   disabled={processing}
                 />
               </View>
             )}
-            {!isOwner && meta.status === 'COMPLETED' && !meta.isPaid && (
+            {isMechanic && meta.status === 'COMPLETED' && !meta.isPaid && (
               <Text style={styles.awaitingText}>Sold — waiting for payment…</Text>
             )}
           </View>
@@ -1156,7 +1151,7 @@ function PartCardBubble({
                   <Text style={styles.proposeCancelText}>Cancel</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.proposeSubmitBtn} onPress={handleSubmitOffer} disabled={processing} activeOpacity={0.85}>
-                  {processing ? <ActivityIndicator size="small" color="#fff" /> : <Text style={styles.proposeSubmitText}>Send Offer</Text>}
+                  {processing ? <ActivityIndicator size="small" color={COLORS.white} /> : <Text style={styles.proposeSubmitText}>Send Offer</Text>}
                 </TouchableOpacity>
               </View>
             </View>
@@ -1244,12 +1239,12 @@ function AudioMessageBubble({ url, durationSeconds, isMine, onLongPress }: {
       <Ionicons
         name={status.playing ? 'pause-circle' : 'play-circle'}
         size={34}
-        color={isMine ? '#fff' : '#1b4332'}
+        color={isMine ? COLORS.white : COLORS.primary}
       />
       <View style={styles.audioProgressTrack}>
-        <View style={[styles.audioProgressFill, { width: `${progress * 100}%`, backgroundColor: isMine ? '#fff' : '#1b4332' }]} />
+        <View style={[styles.audioProgressFill, { width: `${progress * 100}%`, backgroundColor: isMine ? COLORS.white : COLORS.primary }]} />
       </View>
-      <Text style={[styles.audioDurationText, { color: isMine ? '#fff' : '#1b1b1b' }]}>
+      <Text style={[styles.audioDurationText, { color: isMine ? COLORS.white : COLORS.text }]}>
         {formatDuration(displaySeconds)}
       </Text>
     </TouchableOpacity>
@@ -1337,7 +1332,8 @@ const [attachMenuVisible, setAttachMenuVisible] = useState(false);
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
 
   const myId = user?.userId;
-  const isOwner = user?.role === 'OWNER';
+  const isCustomer = user?.role === 'customer';
+  const isMechanic = user?.role === 'mechanic';
 
   useEffect(() => {
     loadMessages();
@@ -1602,7 +1598,7 @@ const pickFromLibrary = async () => {
     });
   };
 
-  const accentColor = isOwner ? '#1b4332' : '#000814';
+  const accentColor = isCustomer ? COLORS.primary : COLORS.primary;
 
   const renderMessage = ({ item, index }: { item: Message; index: number }) => {
     const isMine = item.sender_id === myId;
@@ -1625,7 +1621,8 @@ const pickFromLibrary = async () => {
           <JobCardBubble
             item={item}
             isMine={isMine}
-            isOwner={isOwner}
+            isCustomer={isCustomer}
+            isMechanic={isMechanic}
             myId={myId}
             accentColor={accentColor}
             onActionDone={upsertJobCard}
@@ -1661,7 +1658,8 @@ const pickFromLibrary = async () => {
           <PartCardBubble
             item={item}
             isMine={isMine}
-            isOwner={isOwner}
+            isCustomer={isCustomer}
+            isMechanic={isMechanic}
             myId={myId}
             accentColor={accentColor}
             onActionDone={upsertPartCard}
@@ -1758,16 +1756,16 @@ const pickFromLibrary = async () => {
       </>
     );
   };
-  const headerColor = isOwner
-    ? ['#1b4332', '#2d6a4f']
-    : ['#000814', '#001D3D'];
+  const headerColor = isCustomer
+    ? [COLORS.primary, COLORS.primary]
+    : [COLORS.primary, COLORS.secondary];
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
       <LinearGradient colors={headerColor} style={styles.header}>
         <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={22} color="#fff" />
+          <Ionicons name="arrow-back" size={22} color={COLORS.white} />
         </TouchableOpacity>
         <View style={styles.headerInfo}>
           <View style={styles.headerAvatar}>
@@ -1780,7 +1778,7 @@ const pickFromLibrary = async () => {
       </LinearGradient>
 
       {loading ? (
-        <ActivityIndicator style={{ flex: 1 }} color="#1b4332" />
+        <ActivityIndicator style={{ flex: 1 }} color={COLORS.primary} />
       ) : (
         <KeyboardAvoidingView
           style={{ flex: 1 }}
@@ -1794,7 +1792,7 @@ const pickFromLibrary = async () => {
             onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: false })}
             ListEmptyComponent={
               <View style={styles.emptyChat}>
-                <Ionicons name="chatbubbles-outline" size={48} color="#d1d5db" />
+                <Ionicons name="chatbubbles-outline" size={48} color={COLORS.border} />
                 <Text style={styles.emptyChatText}>No messages yet</Text>
                 <Text style={styles.emptyChatSubText}>Send a message to get started</Text>
               </View>
@@ -1804,7 +1802,7 @@ const pickFromLibrary = async () => {
           {isRecording ? (
             <View style={styles.recordingRow}>
               <TouchableOpacity style={styles.recordingCancelBtn} onPress={cancelRecording}>
-                <Ionicons name="trash-outline" size={22} color="#dc2626" />
+                <Ionicons name="trash-outline" size={22} color={COLORS.error} />
               </TouchableOpacity>
               <View style={styles.recordingIndicator}>
                 <View style={styles.recordingDot} />
@@ -1814,7 +1812,7 @@ const pickFromLibrary = async () => {
               <TouchableOpacity
                 style={[styles.recordingStopBtn, { backgroundColor: accentColor }]}
                 onPress={stopAndPreviewRecording}>
-                <Ionicons name="checkmark" size={22} color="#fff" />
+                <Ionicons name="checkmark" size={22} color={COLORS.white} />
               </TouchableOpacity>
             </View>
           ) : (
@@ -1827,7 +1825,7 @@ const pickFromLibrary = async () => {
                 value={newMessage}
                 onChangeText={setNewMessage}
                 placeholder="Type a message..."
-                placeholderTextColor="#9ca3af"
+                placeholderTextColor={COLORS.textSecondary}
                 multiline
                 maxLength={500}
                 autoCorrect={true}
@@ -1839,12 +1837,12 @@ const pickFromLibrary = async () => {
                 onPress={handleSend}
                 disabled={!newMessage.trim() || sending}>
                 <LinearGradient
-                  colors={isOwner ? ['#1b4332', '#2d6a4f'] : ['#000814', '#001D3D']}
+                  colors={isCustomer ? [COLORS.primary, COLORS.primary] : [COLORS.primary, COLORS.secondary]}
                   style={styles.sendBtnGradient}>
                   {sending ? (
-                    <ActivityIndicator size="small" color="#fff" />
+                    <ActivityIndicator size="small" color={COLORS.white} />
                   ) : (
-                    <Ionicons name="send" size={18} color="#fff" />
+                    <Ionicons name="send" size={18} color={COLORS.white} />
                   )}
                 </LinearGradient>
               </TouchableOpacity>
@@ -1868,27 +1866,27 @@ const pickFromLibrary = async () => {
             <TouchableOpacity style={styles.attachMenuOverlay} activeOpacity={1} onPress={() => setAttachMenuVisible(false)}>
               <View style={styles.attachMenu}>
                 <TouchableOpacity style={styles.attachMenuOption} onPress={() => triggerAttachAction(takePhoto)}>
-                  <View style={[styles.attachMenuIconWrap, { backgroundColor: '#f0fdf4' }]}>
-                    <Ionicons name="camera" size={20} color="#10b981" />
+                  <View style={[styles.attachMenuIconWrap, { backgroundColor: COLORS.successTint }]}>
+                    <Ionicons name="camera" size={20} color={COLORS.success} />
                   </View>
                   <Text style={styles.attachMenuText}>Take Photo</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.attachMenuOption} onPress={() => triggerAttachAction(pickFromLibrary)}>
-                  <View style={[styles.attachMenuIconWrap, { backgroundColor: '#eff6ff' }]}>
-                    <Ionicons name="image" size={20} color="#2563eb" />
+                  <View style={[styles.attachMenuIconWrap, { backgroundColor: COLORS.infoTint }]}>
+                    <Ionicons name="image" size={20} color={COLORS.info} />
                   </View>
                   <Text style={styles.attachMenuText}>Choose Photo</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.attachMenuOption} onPress={() => triggerAttachAction(startRecording)}>
-                  <View style={[styles.attachMenuIconWrap, { backgroundColor: '#fef2f2' }]}>
-                    <Ionicons name="mic" size={20} color="#dc2626" />
+                  <View style={[styles.attachMenuIconWrap, { backgroundColor: COLORS.errorTint }]}>
+                    <Ionicons name="mic" size={20} color={COLORS.error} />
                   </View>
                   <Text style={styles.attachMenuText}>Voice Note</Text>
                 </TouchableOpacity>
-                {isOwner && (
+                {isCustomer && (
   <TouchableOpacity style={styles.attachMenuOption} onPress={() => { setAttachMenuVisible(false); openCreateJob(); }}>
-    <View style={[styles.attachMenuIconWrap, { backgroundColor: '#f5f3ff' }]}>
-      <Ionicons name="briefcase" size={20} color="#7c3aed" />
+    <View style={[styles.attachMenuIconWrap, { backgroundColor: COLORS.infoTint }]}>
+      <Ionicons name="briefcase" size={20} color={COLORS.info} />
     </View>
     <Text style={styles.attachMenuText}>New Job</Text>
   </TouchableOpacity>
@@ -1912,7 +1910,7 @@ const pickFromLibrary = async () => {
               )}
               <View style={styles.previewActionsRow}>
                 <TouchableOpacity style={styles.previewCancelBtn} onPress={cancelImagePreview} disabled={sendingPreview}>
-                  <Ionicons name="close" size={22} color="#fff" />
+                  <Ionicons name="close" size={22} color={COLORS.white} />
                   <Text style={styles.previewBtnText}>Cancel</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -1920,10 +1918,10 @@ const pickFromLibrary = async () => {
                   onPress={confirmSendImage}
                   disabled={sendingPreview}>
                   {sendingPreview ? (
-                    <ActivityIndicator size="small" color="#fff" />
+                    <ActivityIndicator size="small" color={COLORS.white} />
                   ) : (
                     <>
-                      <Ionicons name="send" size={20} color="#fff" />
+                      <Ionicons name="send" size={20} color={COLORS.white} />
                       <Text style={styles.previewBtnText}>Send</Text>
                     </>
                   )}
@@ -1957,7 +1955,7 @@ const pickFromLibrary = async () => {
                 {pendingAudioUri && <AudioPreviewPlayer uri={pendingAudioUri} accentColor={accentColor} />}
                 <View style={styles.audioPreviewActionsRow}>
                   <TouchableOpacity style={styles.audioPreviewDiscardBtn} onPress={cancelAudioPreview} disabled={sendingAudio}>
-                    <Ionicons name="trash-outline" size={18} color="#dc2626" />
+                    <Ionicons name="trash-outline" size={18} color={COLORS.error} />
                     <Text style={styles.audioPreviewDiscardText}>Discard</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
@@ -1965,10 +1963,10 @@ const pickFromLibrary = async () => {
                     onPress={confirmSendAudio}
                     disabled={sendingAudio}>
                     {sendingAudio ? (
-                      <ActivityIndicator size="small" color="#fff" />
+                      <ActivityIndicator size="small" color={COLORS.white} />
                     ) : (
                       <>
-                        <Ionicons name="send" size={18} color="#fff" />
+                        <Ionicons name="send" size={18} color={COLORS.white} />
                         <Text style={styles.audioPreviewSendText}>Send</Text>
                       </>
                     )}
@@ -1985,7 +1983,7 @@ const pickFromLibrary = async () => {
           <View style={styles.reviewCard}>
             {reviewSubmitted ? (
               <View style={{ alignItems: 'center' }}>
-                <Ionicons name="checkmark-circle" size={44} color="#10b981" />
+                <Ionicons name="checkmark-circle" size={44} color={COLORS.success} />
                 <Text style={styles.reviewSuccessTitle}>Thank you!</Text>
                 <Text style={styles.reviewSuccessSubtitle}>Your review has been submitted.</Text>
               </View>
@@ -1999,7 +1997,7 @@ const pickFromLibrary = async () => {
                       <Ionicons
                         name={star <= selectedRating ? 'star' : 'star-outline'}
                         size={32}
-                        color={star <= selectedRating ? '#f59e0b' : '#d1d5db'}
+                        color={star <= selectedRating ? COLORS.warning : COLORS.border}
                       />
                     </TouchableOpacity>
                   ))}
@@ -2021,7 +2019,7 @@ const pickFromLibrary = async () => {
                     onPress={handleSubmitReview}
                     disabled={submittingReview || selectedRating === 0}
                     activeOpacity={0.85}>
-                    {submittingReview ? <ActivityIndicator size="small" color="#fff" /> : <Text style={styles.proposeSubmitText}>Submit</Text>}
+                    {submittingReview ? <ActivityIndicator size="small" color={COLORS.white} /> : <Text style={styles.proposeSubmitText}>Submit</Text>}
                   </TouchableOpacity>
                 </View>
               </>
@@ -2034,128 +2032,128 @@ const pickFromLibrary = async () => {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f9fafb' },
+  container: { flex: 1, backgroundColor: COLORS.background },
   header: { paddingTop: 60, paddingBottom: SPACING.lg, paddingHorizontal: SPACING.lg, flexDirection: 'row', alignItems: 'center', gap: SPACING.md },
   backBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.2)', justifyContent: 'center', alignItems: 'center' },
   headerInfo: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: SPACING.md },
   headerAvatar: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.2)', justifyContent: 'center', alignItems: 'center' },
-  headerAvatarText: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: '#fff' },
-  headerName: { fontSize: FONT_SIZES.md, fontWeight: '700', color: '#fff' },
+  headerAvatarText: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.white },
+  headerName: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.white },
   headerJob: { fontSize: FONT_SIZES.xs, color: 'rgba(255,255,255,0.7)', marginTop: 2 },
   messagesList: { padding: SPACING.lg, paddingBottom: SPACING.md },
   messageRow: { marginBottom: 4 },
   messageRowMine: { alignItems: 'flex-end' },
   messageRowTheirs: { alignItems: 'flex-start' },
   bubble: { maxWidth: '75%', borderRadius: 18, paddingHorizontal: 14, paddingVertical: 10 },
-  bubbleMine: { backgroundColor: '#1b4332', borderBottomRightRadius: 4 },
-  bubbleTheirs: { backgroundColor: '#ffffff', borderBottomLeftRadius: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 2, elevation: 1 },
+  bubbleMine: { backgroundColor: COLORS.primary, borderBottomRightRadius: 4 },
+  bubbleTheirs: { backgroundColor: COLORS.white, borderBottomLeftRadius: 4, shadowColor: COLORS.black, shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 2, elevation: 1 },
   bubbleText: { fontSize: FONT_SIZES.md, lineHeight: 20 },
-  bubbleTextMine: { color: '#ffffff' },
-  bubbleTextTheirs: { color: '#1b1b1b' },
+  bubbleTextMine: { color: COLORS.white },
+  bubbleTextTheirs: { color: COLORS.text },
   bubbleTime: { fontSize: 10, marginTop: 4 },
   bubbleTimeMine: { color: 'rgba(255,255,255,0.6)', textAlign: 'right' },
-  bubbleTimeTheirs: { color: '#9ca3af' },
+  bubbleTimeTheirs: { color: COLORS.textSecondary },
   dateSeparator: { alignItems: 'center', marginVertical: SPACING.md },
-  dateSeparatorText: { fontSize: FONT_SIZES.xs, color: '#9ca3af', backgroundColor: '#f3f4f6', paddingHorizontal: 12, paddingVertical: 4, borderRadius: RADIUS.full },
+  dateSeparatorText: { fontSize: FONT_SIZES.xs, color: COLORS.textSecondary, backgroundColor: COLORS.background, paddingHorizontal: 12, paddingVertical: 4, borderRadius: RADIUS.full },
   emptyChat: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: 80, gap: 8 },
-  emptyChatText: { fontSize: FONT_SIZES.lg, fontWeight: '600', color: '#9ca3af' },
-  emptyChatSubText: { fontSize: FONT_SIZES.sm, color: '#d1d5db' },
-  inputRow: { flexDirection: 'row', alignItems: 'flex-end', padding: SPACING.md, backgroundColor: '#fff', borderTopWidth: 1, borderTopColor: '#f3f4f6', gap: SPACING.sm },
-  attachBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#f3f4f6', justifyContent: 'center', alignItems: 'center' },
+  emptyChatText: { fontSize: FONT_SIZES.lg, fontWeight: '600', color: COLORS.textSecondary },
+  emptyChatSubText: { fontSize: FONT_SIZES.sm, color: COLORS.border },
+  inputRow: { flexDirection: 'row', alignItems: 'flex-end', padding: SPACING.md, backgroundColor: COLORS.white, borderTopWidth: 1, borderTopColor: COLORS.background, gap: SPACING.sm },
+  attachBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: COLORS.background, justifyContent: 'center', alignItems: 'center' },
   attachMenuOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.3)', justifyContent: 'flex-end' },
-  attachMenu: { backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingVertical: SPACING.md, paddingBottom: 40 },
+  attachMenu: { backgroundColor: COLORS.white, borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingVertical: SPACING.md, paddingBottom: 40 },
   attachMenuOption: { flexDirection: 'row', alignItems: 'center', gap: SPACING.md, paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md },
   attachMenuIconWrap: { width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center' },
-  attachMenuText: { fontSize: FONT_SIZES.md, fontWeight: '600', color: '#1b1b1b' },
-  imageBubble: { width: 220, height: 220, borderRadius: 16, backgroundColor: '#f3f4f6' },
-  partCardImage: { width: '100%', height: 140, borderRadius: RADIUS.sm, backgroundColor: '#f3f4f6', marginBottom: 6 },
+  attachMenuText: { fontSize: FONT_SIZES.md, fontWeight: '600', color: COLORS.text },
+  imageBubble: { width: 220, height: 220, borderRadius: 16, backgroundColor: COLORS.background },
+  partCardImage: { width: '100%', height: 140, borderRadius: RADIUS.sm, backgroundColor: COLORS.background, marginBottom: 6 },
   imageViewerOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.9)', justifyContent: 'center', alignItems: 'center' },
 imageViewerFull: { width: '100%', height: '80%' },
   previewActionsRow: { position: 'absolute', bottom: 50, left: 0, right: 0, flexDirection: 'row', justifyContent: 'space-around', paddingHorizontal: SPACING.xl },
   previewCancelBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: 'rgba(255,255,255,0.15)', paddingHorizontal: 22, paddingVertical: 12, borderRadius: RADIUS.full },
   previewSendBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 26, paddingVertical: 12, borderRadius: RADIUS.full },
-  previewBtnText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: '#fff' },
-  input: { flex: 1, backgroundColor: '#f9fafb', borderRadius: 20, borderWidth: 1, borderColor: '#e5e7eb', paddingHorizontal: 16, paddingVertical: 10, fontSize: FONT_SIZES.md, color: '#1b1b1b', maxHeight: 100 },
+  previewBtnText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.white },
+  input: { flex: 1, backgroundColor: COLORS.background, borderRadius: 20, borderWidth: 1, borderColor: COLORS.border, paddingHorizontal: 16, paddingVertical: 10, fontSize: FONT_SIZES.md, color: COLORS.text, maxHeight: 100 },
   sendBtn: { borderRadius: 22, overflow: 'hidden' },
   sendBtnDisabled: { opacity: 0.5 },
   sendBtnGradient: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center' },
   jobCardWrap: { marginBottom: 4, width: '100%' },
-  jobCard: { width: '100%', backgroundColor: '#fff', borderRadius: 16, borderWidth: 1, borderColor: '#e5e7eb', overflow: 'hidden', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 6, elevation: 2 },
-  jobCardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: SPACING.md, backgroundColor: '#f9fafb' },
+  jobCard: { width: '100%', backgroundColor: COLORS.white, borderRadius: 16, borderWidth: 1, borderColor: COLORS.border, overflow: 'hidden', shadowColor: COLORS.black, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 6, elevation: 2 },
+  jobCardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: SPACING.md, backgroundColor: COLORS.background },
   jobCardHeaderLeft: { flexDirection: 'row', alignItems: 'center', gap: 6, flex: 1 },
-  jobCardTitle: { fontSize: FONT_SIZES.sm, fontWeight: '700', color: '#1b1b1b', flexShrink: 1 },
+  jobCardTitle: { fontSize: FONT_SIZES.sm, fontWeight: '700', color: COLORS.text, flexShrink: 1 },
   jobCardHeaderRight: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   jobCardStatusBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 8, paddingVertical: 3, borderRadius: RADIUS.full },
   jobCardStatusDot: { width: 5, height: 5, borderRadius: 2.5 },
   jobCardStatusText: { fontSize: 9, fontWeight: '800' },
   jobCardBody: { padding: SPACING.md, gap: 6 },
-  jobCardDesc: { fontSize: FONT_SIZES.xs, color: '#6b7280', marginBottom: 4, lineHeight: 17 },
+  jobCardDesc: { fontSize: FONT_SIZES.xs, color: COLORS.textSecondary, marginBottom: 4, lineHeight: 17 },
   jobCardDetailRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  jobCardDetailText: { fontSize: 11, color: '#6b7280', flexShrink: 1 },
-  counterOfferBox: { backgroundColor: '#f5f3ff', borderRadius: RADIUS.sm, padding: 10, marginTop: 6, gap: 3 },
-  counterOfferTitle: { fontSize: 10, fontWeight: '800', color: '#7c3aed', textTransform: 'uppercase', marginBottom: 2 },
-  counterOfferLine: { fontSize: 12, color: '#4c1d95' },
-  awaitingText: { fontSize: 11, color: '#9ca3af', fontStyle: 'italic', marginTop: 6 },
+  jobCardDetailText: { fontSize: 11, color: COLORS.textSecondary, flexShrink: 1 },
+  counterOfferBox: { backgroundColor: COLORS.infoTint, borderRadius: RADIUS.sm, padding: 10, marginTop: 6, gap: 3 },
+  counterOfferTitle: { fontSize: 10, fontWeight: '800', color: COLORS.info, textTransform: 'uppercase', marginBottom: 2 },
+  counterOfferLine: { fontSize: 12, color: COLORS.secondary },
+  awaitingText: { fontSize: 11, color: COLORS.textSecondary, fontStyle: 'italic', marginTop: 6 },
   jobCardActionsStack: { gap: 6, marginTop: 8 },
   jobCardActionsFullRow: { flexDirection: 'row', marginTop: 8 },
   jobCardActions: { flexDirection: 'row', gap: 6 },
-  acceptBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, backgroundColor: '#10b981', paddingVertical: 9, borderRadius: RADIUS.sm },
-  acceptBtnText: { fontSize: 12, fontWeight: '700', color: '#fff' },
-  changesBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, backgroundColor: '#f5f3ff', paddingVertical: 9, borderRadius: RADIUS.sm, borderWidth: 1, borderColor: '#ddd6fe' },
-  changesBtnText: { fontSize: 12, fontWeight: '700', color: '#7c3aed' },
-  declineBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, backgroundColor: '#fef2f2', paddingVertical: 9, borderRadius: RADIUS.sm, borderWidth: 1, borderColor: '#fecaca' },
-  declineBtnText: { fontSize: 12, fontWeight: '700', color: '#dc2626' },
-  startBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, backgroundColor: '#8b5cf6', paddingVertical: 9, borderRadius: RADIUS.sm },
-  startBtnText: { fontSize: 12, fontWeight: '700', color: '#fff' },
-  completeBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, backgroundColor: '#10b981', paddingVertical: 9, borderRadius: RADIUS.sm },
-  completeBtnText: { fontSize: 12, fontWeight: '700', color: '#fff' },
-  paidBadgeChat: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, marginTop: 8, padding: 8, backgroundColor: '#f0fdf4', borderRadius: RADIUS.sm },
-  paidBadgeChatText: { fontSize: 12, fontWeight: '700', color: '#10b981' },
-  payBtnCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, backgroundColor: '#1b4332', paddingVertical: 9, borderRadius: RADIUS.sm },
-  payBtnCardText: { fontSize: 12, fontWeight: '700', color: '#fff' },
-  payOption: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#f9fafb', borderRadius: RADIUS.sm, padding: 10, marginTop: 8, borderWidth: 1, borderColor: '#f3f4f6' },
-  payOptionText: { fontSize: 13, fontWeight: '600', color: '#1b1b1b' },
+  acceptBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, backgroundColor: COLORS.success, paddingVertical: 9, borderRadius: RADIUS.sm },
+  acceptBtnText: { fontSize: 12, fontWeight: '700', color: COLORS.white },
+  changesBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, backgroundColor: COLORS.infoTint, paddingVertical: 9, borderRadius: RADIUS.sm, borderWidth: 1, borderColor: COLORS.border },
+  changesBtnText: { fontSize: 12, fontWeight: '700', color: COLORS.info },
+  declineBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, backgroundColor: COLORS.errorTint, paddingVertical: 9, borderRadius: RADIUS.sm, borderWidth: 1, borderColor: COLORS.errorTint },
+  declineBtnText: { fontSize: 12, fontWeight: '700', color: COLORS.error },
+  startBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, backgroundColor: COLORS.secondary, paddingVertical: 9, borderRadius: RADIUS.sm },
+  startBtnText: { fontSize: 12, fontWeight: '700', color: COLORS.white },
+  completeBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, backgroundColor: COLORS.success, paddingVertical: 9, borderRadius: RADIUS.sm },
+  completeBtnText: { fontSize: 12, fontWeight: '700', color: COLORS.white },
+  paidBadgeChat: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, marginTop: 8, padding: 8, backgroundColor: COLORS.successTint, borderRadius: RADIUS.sm },
+  paidBadgeChatText: { fontSize: 12, fontWeight: '700', color: COLORS.success },
+  payBtnCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, backgroundColor: COLORS.primary, paddingVertical: 9, borderRadius: RADIUS.sm },
+  payBtnCardText: { fontSize: 12, fontWeight: '700', color: COLORS.white },
+  payOption: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: COLORS.background, borderRadius: RADIUS.sm, padding: 10, marginTop: 8, borderWidth: 1, borderColor: COLORS.background },
+  payOptionText: { fontSize: 13, fontWeight: '600', color: COLORS.text },
   biddingSection: { marginTop: 4 },
-  bidBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, backgroundColor: '#f5f3ff', paddingVertical: 9, borderRadius: RADIUS.sm, borderWidth: 1, borderColor: '#ddd6fe' },
-  bidBtnText: { fontSize: 12, fontWeight: '700', color: '#7c3aed' },
+  bidBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, backgroundColor: COLORS.infoTint, paddingVertical: 9, borderRadius: RADIUS.sm, borderWidth: 1, borderColor: COLORS.border },
+  bidBtnText: { fontSize: 12, fontWeight: '700', color: COLORS.info },
   cardOverlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.55)', justifyContent: 'center', alignItems: 'center', padding: SPACING.md, borderRadius: 16 },
-  proposeCard: { backgroundColor: '#fff', borderRadius: RADIUS.md, padding: SPACING.md, width: '100%' },
-  proposeTitle: { fontSize: FONT_SIZES.md, fontWeight: '700', color: '#1b1b1b', marginBottom: 8, textAlign: 'center' },
-  proposeLabel: { fontSize: 11, fontWeight: '600', color: '#374151', marginBottom: 4, marginTop: 8 },
-  proposeInput: { backgroundColor: '#f9fafb', borderRadius: RADIUS.sm, borderWidth: 1, borderColor: '#e5e7eb', padding: 8, fontSize: FONT_SIZES.sm, color: '#1b1b1b' },
+  proposeCard: { backgroundColor: COLORS.white, borderRadius: RADIUS.md, padding: SPACING.md, width: '100%' },
+  proposeTitle: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.text, marginBottom: 8, textAlign: 'center' },
+  proposeLabel: { fontSize: 11, fontWeight: '600', color: COLORS.text, marginBottom: 4, marginTop: 8 },
+  proposeInput: { backgroundColor: COLORS.background, borderRadius: RADIUS.sm, borderWidth: 1, borderColor: COLORS.border, padding: 8, fontSize: FONT_SIZES.sm, color: COLORS.text },
   proposeTextArea: { height: 50, textAlignVertical: 'top' },
-  proposeDateBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#f5f3ff', borderRadius: RADIUS.sm, borderWidth: 1, borderColor: '#ddd6fe', padding: 8 },
-  proposeDateBtnText: { fontSize: 11, color: '#7c3aed', fontWeight: '600', flexShrink: 1 },
+  proposeDateBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: COLORS.infoTint, borderRadius: RADIUS.sm, borderWidth: 1, borderColor: COLORS.border, padding: 8 },
+  proposeDateBtnText: { fontSize: 11, color: COLORS.info, fontWeight: '600', flexShrink: 1 },
   proposeActionsRow: { flexDirection: 'row', gap: 8, marginTop: 12 },
-  proposeCancelBtn: { flex: 1, padding: 10, borderRadius: RADIUS.sm, backgroundColor: '#f3f4f6', alignItems: 'center' },
-  proposeCancelText: { fontSize: 12, fontWeight: '600', color: '#6b7280' },
-  proposeSubmitBtn: { flex: 1, padding: 10, borderRadius: RADIUS.sm, backgroundColor: '#1b4332', alignItems: 'center' },
-  proposeSubmitText: { fontSize: 12, fontWeight: '700', color: '#fff' },
-  reviewCard: { backgroundColor: '#fff', borderRadius: RADIUS.md, padding: SPACING.lg, width: '100%', alignItems: 'center' },
+  proposeCancelBtn: { flex: 1, padding: 10, borderRadius: RADIUS.sm, backgroundColor: COLORS.background, alignItems: 'center' },
+  proposeCancelText: { fontSize: 12, fontWeight: '600', color: COLORS.textSecondary },
+  proposeSubmitBtn: { flex: 1, padding: 10, borderRadius: RADIUS.sm, backgroundColor: COLORS.primary, alignItems: 'center' },
+  proposeSubmitText: { fontSize: 12, fontWeight: '700', color: COLORS.white },
+  reviewCard: { backgroundColor: COLORS.white, borderRadius: RADIUS.md, padding: SPACING.lg, width: '100%', alignItems: 'center' },
   starsRow: { flexDirection: 'row', gap: 6, marginVertical: SPACING.md },
-  reviewSuccessTitle: { fontSize: FONT_SIZES.md, fontWeight: '700', color: '#1b1b1b', marginTop: 8, marginBottom: 2 },
-  reviewSuccessSubtitle: { fontSize: FONT_SIZES.sm, color: '#6b7280' },
-  recordingRow: { flexDirection: 'row', alignItems: 'center', padding: SPACING.md, backgroundColor: '#fff', borderTopWidth: 1, borderTopColor: '#f3f4f6', gap: SPACING.sm },
-  recordingCancelBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#fef2f2', justifyContent: 'center', alignItems: 'center' },
+  reviewSuccessTitle: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.text, marginTop: 8, marginBottom: 2 },
+  reviewSuccessSubtitle: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary },
+  recordingRow: { flexDirection: 'row', alignItems: 'center', padding: SPACING.md, backgroundColor: COLORS.white, borderTopWidth: 1, borderTopColor: COLORS.background, gap: SPACING.sm },
+  recordingCancelBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: COLORS.errorTint, justifyContent: 'center', alignItems: 'center' },
   recordingIndicator: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8 },
-  recordingDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: '#dc2626' },
-  recordingTimeText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: '#1b1b1b' },
-  recordingHintText: { fontSize: FONT_SIZES.sm, color: '#9ca3af' },
+  recordingDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: COLORS.error },
+  recordingTimeText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.text },
+  recordingHintText: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary },
   recordingStopBtn: { width: 44, height: 44, borderRadius: 22, justifyContent: 'center', alignItems: 'center' },
   audioBubble: { flexDirection: 'row', alignItems: 'center', gap: 8, borderRadius: 20, paddingHorizontal: 12, paddingVertical: 10, minWidth: 200, maxWidth: '75%' },
-  audioBubbleMine: { backgroundColor: '#1b4332', borderBottomRightRadius: 4 },
-  audioBubbleTheirs: { backgroundColor: '#ffffff', borderBottomLeftRadius: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 2, elevation: 1 },
+  audioBubbleMine: { backgroundColor: COLORS.primary, borderBottomRightRadius: 4 },
+  audioBubbleTheirs: { backgroundColor: COLORS.white, borderBottomLeftRadius: 4, shadowColor: COLORS.black, shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 2, elevation: 1 },
   audioProgressTrack: { flex: 1, height: 4, borderRadius: 2, backgroundColor: 'rgba(128,128,128,0.25)', overflow: 'hidden' },
   audioProgressFill: { height: '100%', borderRadius: 2 },
   audioDurationText: { fontSize: FONT_SIZES.xs, fontWeight: '600', minWidth: 34, textAlign: 'right' },
   audioPreviewOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.55)', justifyContent: 'center', alignItems: 'center', padding: SPACING.lg },
-  audioPreviewCard: { backgroundColor: '#fff', borderRadius: RADIUS.lg, padding: SPACING.lg, width: '100%' },
-  audioPreviewTitle: { fontSize: FONT_SIZES.md, fontWeight: '700', color: '#1b1b1b', textAlign: 'center', marginBottom: SPACING.md },
+  audioPreviewCard: { backgroundColor: COLORS.white, borderRadius: RADIUS.lg, padding: SPACING.lg, width: '100%' },
+  audioPreviewTitle: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.text, textAlign: 'center', marginBottom: SPACING.md },
   audioPreviewPlayerRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING.md },
-  audioPreviewDurationText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: '#374151', minWidth: 40, textAlign: 'right' },
+  audioPreviewDurationText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.text, minWidth: 40, textAlign: 'right' },
   audioPreviewActionsRow: { flexDirection: 'row', gap: SPACING.sm, marginTop: SPACING.lg },
-  audioPreviewDiscardBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, padding: 12, borderRadius: RADIUS.md, backgroundColor: '#fef2f2' },
-  audioPreviewDiscardText: { fontSize: FONT_SIZES.sm, fontWeight: '700', color: '#dc2626' },
+  audioPreviewDiscardBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, padding: 12, borderRadius: RADIUS.md, backgroundColor: COLORS.errorTint },
+  audioPreviewDiscardText: { fontSize: FONT_SIZES.sm, fontWeight: '700', color: COLORS.error },
   audioPreviewSendBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, padding: 12, borderRadius: RADIUS.md },
-  audioPreviewSendText: { fontSize: FONT_SIZES.sm, fontWeight: '700', color: '#fff' },
+  audioPreviewSendText: { fontSize: FONT_SIZES.sm, fontWeight: '700', color: COLORS.white },
 });

@@ -1,8 +1,8 @@
 import React from 'react';
+import { COLORS, FONT_FAMILY, SPACING, FONT_SIZES, RADIUS } from '../constants';
 import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { SPACING, FONT_SIZES, RADIUS } from '../constants';
 
 interface ConfirmDialogProps {
   visible: boolean;
@@ -31,12 +31,12 @@ export function ConfirmDialogCard({
   confirmText = 'Confirm',
   cancelText = 'Cancel',
   destructive = false,
-  accentColor = '#1b4332',
+  accentColor = COLORS.primary,
   onConfirm,
   onCancel,
 }: Omit<ConfirmDialogProps, 'visible'>) {
-  const resolvedIconColor = iconColor || (destructive ? '#dc2626' : accentColor);
-  const resolvedIconBg = iconBg || (destructive ? '#fef2f2' : '#f0fdf4');
+  const resolvedIconColor = iconColor || (destructive ? COLORS.error : accentColor);
+  const resolvedIconBg = iconBg || (destructive ? COLORS.errorTint : COLORS.successTint);
 
   return (
     <View style={styles.card}>
@@ -79,16 +79,16 @@ export default function ConfirmDialog(props: ConfirmDialogProps) {
 
 const styles = StyleSheet.create({
   overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: SPACING.xl },
-  card: { backgroundColor: '#fff', borderRadius: RADIUS.lg, padding: SPACING.xl, width: '100%', alignItems: 'center' },
+  card: { backgroundColor: COLORS.white, borderRadius: RADIUS.lg, padding: SPACING.xl, width: '100%', alignItems: 'center' },
   iconWrap: { width: 60, height: 60, borderRadius: 30, justifyContent: 'center', alignItems: 'center', marginBottom: SPACING.md },
-  title: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: '#1b1b1b', marginBottom: 8, textAlign: 'center' },
-  message: { fontSize: FONT_SIZES.sm, color: '#6b7280', textAlign: 'center', lineHeight: 20, marginBottom: SPACING.xl },
+  title: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.text, marginBottom: 8, textAlign: 'center', fontFamily: FONT_FAMILY.headingBold },
+  message: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, textAlign: 'center', lineHeight: 20, marginBottom: SPACING.xl, fontFamily: FONT_FAMILY.body },
   actionsRow: { flexDirection: 'row', gap: SPACING.md, alignSelf: 'stretch' },
-  cancelBtn: { flex: 1, padding: 14, borderRadius: RADIUS.md, backgroundColor: '#f3f4f6', alignItems: 'center' },
-  cancelText: { fontSize: FONT_SIZES.md, fontWeight: '600', color: '#6b7280' },
+  cancelBtn: { flex: 1, padding: 14, borderRadius: RADIUS.md, backgroundColor: COLORS.background, alignItems: 'center' },
+  cancelText: { fontSize: FONT_SIZES.md, fontWeight: '600', color: COLORS.textSecondary, fontFamily: FONT_FAMILY.bodySemiBold },
   confirmBtn: { flex: 1, borderRadius: RADIUS.md, overflow: 'hidden' },
   confirmGradient: { padding: 14, alignItems: 'center' },
-  confirmText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: '#fff' },
-  destructiveBtn: { flex: 1, padding: 14, borderRadius: RADIUS.md, backgroundColor: '#dc2626', alignItems: 'center' },
-  destructiveText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: '#fff' },
+  confirmText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.accentInk, fontFamily: FONT_FAMILY.bodyBold },
+  destructiveBtn: { flex: 1, padding: 14, borderRadius: RADIUS.md, backgroundColor: COLORS.error, alignItems: 'center' },
+  destructiveText: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.white, fontFamily: FONT_FAMILY.bodyBold },
 });

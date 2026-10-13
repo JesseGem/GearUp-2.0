@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
+import { COLORS, FONT_FAMILY } from '../../constants';
 import {
   View, Text, TouchableOpacity,
   StyleSheet, StatusBar, ActivityIndicator, Modal,
@@ -58,16 +59,16 @@ export default function ResetNewPasswordScreen({ route, navigation }: any) {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <StatusBar barStyle="light-content" />
-      <LinearGradient colors={['#1b4332', '#2d6a4f']} style={styles.hero}>
+      <LinearGradient colors={[COLORS.primary, COLORS.secondary]} style={styles.hero}>
         {!done && (
           <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-            <Ionicons name="arrow-back" size={22} color="#fff" />
+            <Ionicons name="arrow-back" size={22} color={COLORS.white} />
           </TouchableOpacity>
         )}
         <Animated.View style={{ opacity: heroAnim, alignItems: 'center' }}>
           <View style={styles.iconOuter}>
             <View style={styles.iconInner}>
-              <Ionicons name="lock-closed" size={32} color="#1b4332" />
+              <Ionicons name="lock-closed" size={32} color={COLORS.primary} />
             </View>
           </View>
           <Text style={styles.logoText}>New Password</Text>
@@ -78,7 +79,7 @@ export default function ResetNewPasswordScreen({ route, navigation }: any) {
           <View style={styles.cardHandle} />
           {done ? (
             <View style={styles.sentState}>
-              <Ionicons name="checkmark-circle" size={56} color="#10b981" />
+              <Ionicons name="checkmark-circle" size={56} color={COLORS.success} />
               <Text style={styles.sentTitle}>Password reset!</Text>
               <Text style={styles.sentSubtitle}>
                 Your password has been changed successfully. You can now sign in with your new password.
@@ -100,7 +101,7 @@ export default function ResetNewPasswordScreen({ route, navigation }: any) {
                 onChangeText={setNewPassword}
                 isPassword
               />
-              <PasswordRequirementsChecklist password={newPassword} accentColor="#1b4332" />
+              <PasswordRequirementsChecklist password={newPassword} accentColor={COLORS.primary} />
               <AppTextInput
                 label="Confirm Password"
                 icon="lock-closed-outline"
@@ -109,9 +110,9 @@ export default function ResetNewPasswordScreen({ route, navigation }: any) {
                 isPassword
               />
               <TouchableOpacity style={styles.submitBtn} onPress={handleResetPassword} disabled={loading}>
-                <LinearGradient colors={['#1b4332', '#2d6a4f']} style={styles.submitGradient}>
+                <LinearGradient colors={[COLORS.accent, COLORS.accent]} style={styles.submitGradient}>
                   {loading ? (
-                    <ActivityIndicator color="#fff" />
+                    <ActivityIndicator color={COLORS.accentInk} />
                   ) : (
                     <Text style={styles.submitText}>Reset Password</Text>
                   )}
@@ -138,35 +139,35 @@ export default function ResetNewPasswordScreen({ route, navigation }: any) {
   );
 }
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#1b4332' },
+  container: { flex: 1, backgroundColor: COLORS.primary },
   hero: { height: 220, justifyContent: 'center', alignItems: 'center' },
   backBtn: { position: 'absolute', top: 60, left: 20, width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.2)', justifyContent: 'center', alignItems: 'center', zIndex: 1 },
   iconOuter: { width: 76, height: 76, borderRadius: 38, backgroundColor: 'rgba(255,255,255,0.15)', justifyContent: 'center', alignItems: 'center', marginBottom: 12 },
-  iconInner: { width: 56, height: 56, borderRadius: 28, backgroundColor: '#fbbf24', justifyContent: 'center', alignItems: 'center' },
-  logoText: { fontSize: 22, fontWeight: '800', color: '#ffffff' },
+  iconInner: { width: 56, height: 56, borderRadius: 28, backgroundColor: COLORS.accent, justifyContent: 'center', alignItems: 'center' },
+  logoText: { fontSize: 22, fontWeight: '800', color: COLORS.white, fontFamily: FONT_FAMILY.headingBold },
   card: {
     flex: 1,
     marginTop: -28,
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.white,
     borderTopLeftRadius: 32,
     borderTopRightRadius: 32,
-    shadowColor: '#000',
+    shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: -4 },
     shadowOpacity: 0.1,
     shadowRadius: 16,
     elevation: 12,
   },
   cardContent: { paddingHorizontal: 24, paddingTop: 12, paddingBottom: 32 },
-  cardHandle: { width: 40, height: 4, borderRadius: 2, backgroundColor: '#e5e7eb', alignSelf: 'center', marginBottom: 20 },
-  title: { fontSize: 22, fontWeight: '700', color: '#1b1b1b', marginBottom: 8 },
-  subtitle: { fontSize: 14, color: '#6b7280', marginBottom: 24, lineHeight: 20 },
+  cardHandle: { width: 40, height: 4, borderRadius: 2, backgroundColor: COLORS.border, alignSelf: 'center', marginBottom: 20 },
+  title: { fontSize: 22, fontWeight: '700', color: COLORS.text, marginBottom: 8, fontFamily: FONT_FAMILY.headingBold },
+  subtitle: { fontSize: 14, color: COLORS.textSecondary, marginBottom: 24, lineHeight: 20, fontFamily: FONT_FAMILY.body },
   submitBtn: { marginTop: 4, borderRadius: 14, overflow: 'hidden' },
   submitGradient: { height: 54, justifyContent: 'center', alignItems: 'center' },
-  submitText: { fontSize: 16, fontWeight: '700', color: '#ffffff' },
+  submitText: { fontSize: 16, fontWeight: '700', color: COLORS.accentInk, fontFamily: FONT_FAMILY.bodyBold },
   sentState: { alignItems: 'center', paddingTop: 20 },
-  sentTitle: { fontSize: 20, fontWeight: '700', color: '#1b1b1b', marginTop: 16, marginBottom: 8 },
-  sentSubtitle: { fontSize: 14, color: '#6b7280', textAlign: 'center', lineHeight: 20, marginBottom: 32 },
-  backToLoginBtn: { backgroundColor: '#1b4332', paddingHorizontal: 32, paddingVertical: 14, borderRadius: 10 },
-  backToLoginText: { fontSize: 15, fontWeight: '700', color: '#fff' },
+  sentTitle: { fontSize: 20, fontWeight: '700', color: COLORS.text, marginTop: 16, marginBottom: 8 },
+  sentSubtitle: { fontSize: 14, color: COLORS.textSecondary, textAlign: 'center', lineHeight: 20, marginBottom: 32 },
+  backToLoginBtn: { backgroundColor: COLORS.primary, paddingHorizontal: 32, paddingVertical: 14, borderRadius: 10 },
+  backToLoginText: { fontSize: 15, fontWeight: '700', color: COLORS.white },
   alertOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.55)', justifyContent: 'center', alignItems: 'center', padding: 20 },
 });
