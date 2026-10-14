@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { COLORS, SPACING, FONT_SIZES, RADIUS } from '../../constants';
+import { COLORS, PAGE_HEADER_TOP_PADDING, SPACING, FONT_SIZES, RADIUS } from '../../constants';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   StatusBar, ActivityIndicator, TextInput, Modal, Platform, Animated, Image
@@ -732,7 +732,7 @@ export default function CustomerProfileScreen({ navigation }: any) {
 }
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
-  header: { paddingTop: 60, paddingBottom: SPACING.xl, alignItems: 'center', gap: SPACING.sm, borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
+  header: { paddingTop: PAGE_HEADER_TOP_PADDING, paddingBottom: SPACING.xl, alignItems: 'center', gap: SPACING.sm, borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
   avatar: { width: 80, height: 80, borderRadius: 40, backgroundColor: COLORS.secondary, justifyContent: 'center', alignItems: 'center' },
   avatarImage: { width: 80, height: 80, borderRadius: 40 },
   avatarText: { fontSize: 32, fontWeight: '700', color: COLORS.white },
@@ -769,9 +769,9 @@ const styles = StyleSheet.create({
   deleteAccountText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.error },
   deleteAccountPendingText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.primary },
   modal: { flex: 1, backgroundColor: COLORS.background },
-  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: SPACING.lg, paddingTop: 60, backgroundColor: COLORS.white, borderBottomWidth: 1, borderBottomColor: COLORS.background },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: SPACING.lg, paddingTop: PAGE_HEADER_TOP_PADDING, backgroundColor: COLORS.white, borderBottomWidth: 1, borderBottomColor: COLORS.background },
   modalTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.text },
-  modalBody: { padding: SPACING.lg },
+  modalBody: { width: '100%', maxWidth: 760, alignSelf: 'center', padding: SPACING.lg },
   label: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.text, marginBottom: 6, marginTop: 14 },
   input: { backgroundColor: COLORS.white, borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.border, padding: 12, fontSize: FONT_SIZES.md, color: COLORS.text },
   textArea: { height: 80, textAlignVertical: 'top' },
@@ -813,8 +813,8 @@ const styles = StyleSheet.create({
   avatarPickerPlaceholder: { width: 84, height: 84, borderRadius: 42, backgroundColor: COLORS.successTint, borderWidth: 1.5, borderColor: COLORS.accent, borderStyle: 'dashed', justifyContent: 'center', alignItems: 'center' },
   avatarUploadingOverlay: { ...StyleSheet.absoluteFillObject, borderRadius: 42, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'center', alignItems: 'center' },
   avatarEditBadge: { position: 'absolute', bottom: 0, right: 0, width: 26, height: 26, borderRadius: 13, backgroundColor: COLORS.primary, justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: COLORS.white },
-  avatarMenuOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.3)', justifyContent: 'flex-end' },
-  avatarMenu: { backgroundColor: COLORS.white, borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingVertical: SPACING.md, paddingBottom: 40 },
+  avatarMenuOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.3)', justifyContent: Platform.OS === 'web' ? 'center' : 'flex-end', alignItems: 'center', padding: Platform.OS === 'web' ? SPACING.lg : 0 },
+  avatarMenu: { width: '100%', maxWidth: 480, backgroundColor: COLORS.white, borderTopLeftRadius: 20, borderTopRightRadius: 20, borderRadius: Platform.OS === 'web' ? 20 : 0, paddingVertical: SPACING.md, paddingBottom: 40 },
   avatarMenuOption: { flexDirection: 'row', alignItems: 'center', gap: SPACING.md, paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md },
   avatarMenuIconWrap: { width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center' },
   avatarMenuText: { fontSize: FONT_SIZES.md, fontWeight: '600', color: COLORS.text },

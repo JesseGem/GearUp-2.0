@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { COLORS, SPACING, FONT_SIZES, RADIUS } from '../../constants';
+import { COLORS, PAGE_HEADER_TOP_PADDING, SPACING, FONT_SIZES, RADIUS } from '../../constants';
 import {
   View, Text, StyleSheet, StatusBar, TouchableOpacity,
   ActivityIndicator, KeyboardAvoidingView, Platform, Modal, Alert
@@ -177,10 +177,10 @@ export default function WithdrawScreen({ navigation }: any) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
-  header: { paddingTop: 60, paddingBottom: SPACING.lg, paddingHorizontal: SPACING.lg, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  header: { paddingTop: PAGE_HEADER_TOP_PADDING, paddingBottom: SPACING.lg, paddingHorizontal: SPACING.lg, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   backBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.2)', justifyContent: 'center', alignItems: 'center' },
   headerTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.white },
-  body: { flex: 1, padding: SPACING.lg },
+  body: { flex: 1, width: '100%', maxWidth: 640, alignSelf: 'center', padding: SPACING.lg },
   balanceLabel: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary },
   balanceValue: { fontSize: 32, fontWeight: '800', color: COLORS.text, marginTop: 2, marginBottom: SPACING.lg },
   destinationCard: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm, backgroundColor: COLORS.white, borderRadius: RADIUS.md, padding: SPACING.md, borderWidth: 1, borderColor: COLORS.background, marginBottom: SPACING.lg },

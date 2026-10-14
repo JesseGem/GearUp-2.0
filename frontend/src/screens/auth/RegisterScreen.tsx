@@ -3,7 +3,7 @@ import { COLORS, FONT_FAMILY } from '../../constants';
 import {
   View, Text, TouchableOpacity,
   StyleSheet, StatusBar, ActivityIndicator,
-  Animated, KeyboardAvoidingView, Platform, ScrollView
+  Animated, KeyboardAvoidingView, Platform, ScrollView, useWindowDimensions
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -15,6 +15,8 @@ import { isAllowedEmailDomain, isPasswordValid } from '../../utils/validation';
 import BrandLogo from '../../components/BrandLogo';
 
 export default function RegisterScreen({ navigation }: any) {
+  const { width, height } = useWindowDimensions();
+  const isDesktop = Platform.OS === 'web' && width >= 768;
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -63,19 +65,20 @@ export default function RegisterScreen({ navigation }: any) {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={[styles.container, isDesktop && styles.desktopContainer]}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <StatusBar barStyle="light-content" />
-      <LinearGradient colors={[COLORS.primary, COLORS.primary]} style={styles.hero}>
-        <Animated.View style={{ opacity: heroAnim, alignItems: 'center' }}>
-          <BrandLogo appearance="dark" width={160} />
-          <Text style={styles.tagline}>Join the community</Text>
-        </Animated.View>
-      </LinearGradient>
+      <View style={[styles.pagePanel, isDesktop && styles.desktopPanel, isDesktop && { height: Math.min(height - 48, 800) }]}>
+        <LinearGradient colors={[COLORS.primary, COLORS.primary]} style={[styles.hero, isDesktop && styles.desktopHero]}>
+          <Animated.View style={{ opacity: heroAnim, alignItems: 'center' }}>
+            <BrandLogo appearance="light" width={180} />
+            <Text style={styles.tagline}>Join the community</Text>
+          </Animated.View>
+        </LinearGradient>
 
-      <Animated.View style={[styles.card, { transform: [{ translateY: cardAnim }] }]}>
-        <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={styles.cardContent}>
-          <View style={styles.cardHandle} />
+        <Animated.View style={[styles.card, isDesktop && styles.desktopCard, { transform: [{ translateY: cardAnim }] }]}>
+        <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={[styles.cardContent, isDesktop && styles.desktopCardContent]}>
+          {!isDesktop && <View style={styles.cardHandle} />}
           <Text style={styles.title}>Create account</Text>
           <Text style={styles.subtitle}>Sign up to get started</Text>
 
@@ -111,7 +114,8 @@ export default function RegisterScreen({ navigation }: any) {
             </Text>
           </TouchableOpacity>
         </ScrollView>
-      </Animated.View>
+        </Animated.View>
+      </View>
 
       {alert && (
         <View style={styles.alertOverlay}>
@@ -129,8 +133,12 @@ export default function RegisterScreen({ navigation }: any) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.primary },
+  desktopContainer: { backgroundColor: COLORS.background, justifyContent: 'center', padding: 24 },
+  pagePanel: { flex: 1 },
+  desktopPanel: { width: '100%', maxWidth: 520, alignSelf: 'center', flexGrow: 0, flexShrink: 0, flexBasis: 'auto', backgroundColor: COLORS.white, borderRadius: 24, overflow: 'hidden', shadowColor: COLORS.black, shadowOffset: { width: 0, height: 12 }, shadowOpacity: 0.14, shadowRadius: 28, elevation: 12 },
   hero: { height: 200, justifyContent: 'center', alignItems: 'center' },
-  tagline: { fontSize: 13, color: COLORS.darkTextSecondary, marginTop: 8, fontFamily: FONT_FAMILY.body },
+  desktopHero: { height: 156 },
+  tagline: { fontSize: 13, color: COLORS.darkTextSecondary, marginTop: 16, fontFamily: FONT_FAMILY.body },
   card: {
     flex: 1,
     marginTop: -28,
@@ -143,7 +151,9 @@ const styles = StyleSheet.create({
     shadowRadius: 16,
     elevation: 12,
   },
+  desktopCard: { flex: 1, marginTop: 0, borderTopLeftRadius: 0, borderTopRightRadius: 0, shadowOpacity: 0, elevation: 0 },
   cardContent: { paddingHorizontal: 24, paddingTop: 12, paddingBottom: 32 },
+  desktopCardContent: { paddingHorizontal: 32, paddingTop: 24, paddingBottom: 32 },
   cardHandle: { width: 40, height: 4, borderRadius: 2, backgroundColor: COLORS.border, alignSelf: 'center', marginBottom: 16 },
   title: { fontSize: 22, fontWeight: '700', color: COLORS.text, marginBottom: 4, fontFamily: FONT_FAMILY.headingBold },
   subtitle: { fontSize: 14, color: COLORS.textSecondary, marginBottom: 18, fontFamily: FONT_FAMILY.body },

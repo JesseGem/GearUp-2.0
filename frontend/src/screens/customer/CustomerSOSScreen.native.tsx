@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { COLORS, SPACING, FONT_SIZES, RADIUS } from '../../constants';
+import { COLORS, PAGE_HEADER_TOP_PADDING, SPACING, FONT_SIZES, RADIUS } from '../../constants';
 import {
   View,
   Text,
@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
   loadingContainer: { flex: 1, backgroundColor: COLORS.white, justifyContent: 'center', alignItems: 'center' },
   pulseCircle: { width: 72, height: 72, borderRadius: 36, backgroundColor: COLORS.errorTint, justifyContent: 'center', alignItems: 'center' },
   loadingText: { fontSize: FONT_SIZES.md, color: COLORS.textSecondary, fontWeight: '600', marginTop: 12 },
-  header: { paddingTop: 60, paddingBottom: SPACING.lg, paddingHorizontal: SPACING.lg, flexDirection: 'row', alignItems: 'center', gap: SPACING.md, borderBottomLeftRadius: 24, borderBottomRightRadius: 24 },
+  header: { paddingTop: PAGE_HEADER_TOP_PADDING, paddingBottom: SPACING.lg, paddingHorizontal: SPACING.lg, flexDirection: 'row', alignItems: 'center', gap: SPACING.md, borderBottomLeftRadius: 24, borderBottomRightRadius: 24 },
   backBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.2)', justifyContent: 'center', alignItems: 'center' },
   headerTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.white },
   headerSubtitle: { fontSize: FONT_SIZES.xs, color: COLORS.errorTint, marginTop: 2 },

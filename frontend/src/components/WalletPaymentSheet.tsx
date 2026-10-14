@@ -140,7 +140,7 @@ export default function WalletPaymentSheet({
 
 const styles = StyleSheet.create({
   overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.55)', justifyContent: 'center', alignItems: 'center', padding: SPACING.lg },
-  card: { backgroundColor: COLORS.white, borderRadius: RADIUS.lg, padding: SPACING.xl, width: '100%', alignItems: 'center' },
+  card: { backgroundColor: COLORS.white, borderRadius: RADIUS.lg, padding: SPACING.xl, width: '100%', maxWidth: 480, alignSelf: 'center', alignItems: 'center' },
   iconWrap: { width: 56, height: 56, borderRadius: 28, backgroundColor: COLORS.background, justifyContent: 'center', alignItems: 'center', marginBottom: SPACING.md },
   title: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.text, textAlign: 'center', fontFamily: FONT_FAMILY.headingBold },
   amountText: { fontSize: FONT_SIZES.xxl, fontWeight: '800', color: COLORS.text, marginTop: 4, marginBottom: SPACING.md, fontFamily: FONT_FAMILY.headingBold },

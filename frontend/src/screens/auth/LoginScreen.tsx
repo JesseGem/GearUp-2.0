@@ -3,7 +3,7 @@ import { COLORS, FONT_FAMILY } from '../../constants';
 import {
   View, Text, TouchableOpacity,
   StyleSheet, StatusBar, ActivityIndicator, Modal,
-  Animated, KeyboardAvoidingView, Platform, ScrollView
+  Animated, KeyboardAvoidingView, Platform, ScrollView, useWindowDimensions
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -16,6 +16,8 @@ import { isAllowedEmailDomain } from '../../utils/validation';
 import BrandLogo from '../../components/BrandLogo';
 
 export default function LoginScreen({ navigation }: any) {
+  const { width, height } = useWindowDimensions();
+  const isDesktop = Platform.OS === 'web' && width >= 768;
   const dispatch = useDispatch<AppDispatch>();
   const { loading } = useSelector((state: RootState) => state.auth);
   const [email, setEmail] = useState('');
@@ -48,19 +50,20 @@ export default function LoginScreen({ navigation }: any) {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={[styles.container, isDesktop && styles.desktopContainer]}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <StatusBar barStyle="light-content" />
-      <LinearGradient colors={[COLORS.primary, COLORS.primary]} style={styles.hero}>
-        <Animated.View style={{ opacity: heroAnim, alignItems: 'center' }}>
-          <BrandLogo appearance="dark" width={180} />
-          <Text style={styles.tagline}>Your mechanic, wherever you are.</Text>
-        </Animated.View>
-      </LinearGradient>
+      <View style={[styles.pagePanel, isDesktop && styles.desktopPanel, isDesktop && { height: Math.min(height - 48, 660) }]}>
+        <LinearGradient colors={[COLORS.primary, COLORS.primary]} style={[styles.hero, isDesktop && styles.desktopHero]}>
+          <Animated.View style={{ opacity: heroAnim, alignItems: 'center' }}>
+            <BrandLogo appearance="light" width={180} />
+            <Text style={styles.tagline}>Your mechanic, wherever you are.</Text>
+          </Animated.View>
+        </LinearGradient>
 
-      <Animated.View style={[styles.card, { transform: [{ translateY: cardAnim }] }]}>
-        <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={styles.cardContent}>
-          <View style={styles.cardHandle} />
+        <Animated.View style={[styles.card, isDesktop && styles.desktopCard, { transform: [{ translateY: cardAnim }] }]}>
+        <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={[styles.cardContent, isDesktop && styles.desktopCardContent]}>
+          {!isDesktop && <View style={styles.cardHandle} />}
           <Text style={styles.title}>Welcome back</Text>
           <Text style={styles.subtitle}>Sign in to your account</Text>
 
@@ -110,7 +113,8 @@ export default function LoginScreen({ navigation }: any) {
             </Text>
           </TouchableOpacity>
         </ScrollView>
-      </Animated.View>
+        </Animated.View>
+      </View>
 
       <Modal visible={!!alert} transparent animationType="fade" onRequestClose={() => setAlert(null)}>
         <View style={styles.alertOverlay}>
@@ -129,7 +133,11 @@ export default function LoginScreen({ navigation }: any) {
 }
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.primary },
+  desktopContainer: { backgroundColor: COLORS.background, justifyContent: 'center', padding: 24 },
+  pagePanel: { flex: 1 },
+  desktopPanel: { width: '100%', maxWidth: 480, alignSelf: 'center', flexGrow: 0, flexShrink: 0, flexBasis: 'auto', backgroundColor: COLORS.white, borderRadius: 24, overflow: 'hidden', shadowColor: COLORS.black, shadowOffset: { width: 0, height: 12 }, shadowOpacity: 0.14, shadowRadius: 28, elevation: 12 },
   hero: { height: 280, justifyContent: 'center', alignItems: 'center' },
+  desktopHero: { height: 180 },
   tagline: { fontSize: 14, color: COLORS.darkTextSecondary, marginTop: 10, fontFamily: FONT_FAMILY.body },
   card: {
     flex: 1,
@@ -143,7 +151,9 @@ const styles = StyleSheet.create({
     shadowRadius: 16,
     elevation: 12,
   },
+  desktopCard: { flex: 1, marginTop: 0, borderTopLeftRadius: 0, borderTopRightRadius: 0, shadowOpacity: 0, elevation: 0 },
   cardContent: { paddingHorizontal: 24, paddingTop: 12, paddingBottom: 32 },
+  desktopCardContent: { paddingHorizontal: 32, paddingTop: 28, paddingBottom: 32 },
   cardHandle: { width: 40, height: 4, borderRadius: 2, backgroundColor: COLORS.border, alignSelf: 'center', marginBottom: 20 },
   title: { fontSize: 24, fontWeight: '700', color: COLORS.text, marginBottom: 4, fontFamily: FONT_FAMILY.headingBold },
   subtitle: { fontSize: 14, color: COLORS.textSecondary, marginBottom: 24, fontFamily: FONT_FAMILY.body },

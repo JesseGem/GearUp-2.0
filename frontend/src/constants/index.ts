@@ -1,4 +1,9 @@
+import { Platform } from 'react-native';
+
 export const API_BASE_URL = 'http://YOUR_LOCAL_IP:8080/api/v1';
+
+export const APP_CONTENT_MAX_WIDTH = 1280;
+export const PAGE_HEADER_TOP_PADDING = Platform.OS === 'web' ? 24 : 60;
 
 export const FONT_FAMILY = {
   body: 'Inter_400Regular',

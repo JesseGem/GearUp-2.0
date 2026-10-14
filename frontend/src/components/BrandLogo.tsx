@@ -8,13 +8,13 @@ type BrandLogoProps = {
 };
 
 const LOGO_ASSETS = {
-  lightWordmark: require('../../assets/GearUp-Logo-White.png'),
-  darkWordmark: require('../../assets/GearUp-Logo.png'),
+  lightWordmark: require('../../assets/GearUp-Wordmark-Light-on-Dark.png'),
+  darkWordmark: require('../../assets/GearUp-Wordmark-Dark-on-Light.png'),
   lightMark: require('../../assets/GearUp-Icon-White.png'),
   darkMark: require('../../assets/GearUp-Icon.png'),
 };
 
-const WORDMARK_ASPECT_RATIO = 475 / 216;
+const WORDMARK_ASPECT_RATIO = 256 / 80;
 
 export default function BrandLogo({ appearance = 'light', markOnly = false, width = 180 }: BrandLogoProps) {
   const source = markOnly

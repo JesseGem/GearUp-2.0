@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { COLORS, SPACING, FONT_SIZES, RADIUS } from '../constants';
+import { COLORS, PAGE_HEADER_TOP_PADDING, SPACING, FONT_SIZES, RADIUS } from '../constants';
 import {
   View, Text, StyleSheet, StatusBar, TouchableOpacity,
   ActivityIndicator, KeyboardAvoidingView, Platform, Modal
@@ -156,10 +156,10 @@ const [amount, setAmount] = useState('');
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
-  header: { paddingTop: 60, paddingBottom: SPACING.lg, paddingHorizontal: SPACING.lg, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  header: { paddingTop: PAGE_HEADER_TOP_PADDING, paddingBottom: SPACING.lg, paddingHorizontal: SPACING.lg, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   backBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.2)', justifyContent: 'center', alignItems: 'center' },
   headerTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.white },
-  body: { flex: 1, padding: SPACING.lg },
+  body: { flex: 1, width: '100%', maxWidth: 600, alignSelf: 'center', padding: SPACING.lg },
   label: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.text, marginBottom: 8 },
   quickRow: { flexDirection: 'row', gap: SPACING.sm, marginBottom: SPACING.xl },
   quickChip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: RADIUS.full, backgroundColor: COLORS.white, borderWidth: 1, borderColor: COLORS.border },

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { COLORS, SPACING, FONT_SIZES, RADIUS } from '../constants';
+import { COLORS, PAGE_HEADER_TOP_PADDING, SPACING, FONT_SIZES, RADIUS } from '../constants';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   Modal, TextInput, ActivityIndicator, KeyboardAvoidingView, Platform
@@ -326,8 +326,8 @@ export default function CreateJobModal({ visible, onClose, vehicles, userId, loc
 
   return (
     <Modal visible={visible} animationType="slide" presentationStyle="pageSheet">
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-      <View style={styles.modal}>
+      <KeyboardAvoidingView style={[{ flex: 1 }, Platform.OS === 'web' && styles.webModalOverlay]} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      <View style={[styles.modal, Platform.OS === 'web' && styles.webModal]}>
         {showMapPickerView ? (
           <>
             <View style={styles.modalHeader}>
@@ -462,7 +462,7 @@ export default function CreateJobModal({ visible, onClose, vehicles, userId, loc
               keyboardShouldPersistTaps="handled"
               keyboardDismissMode="on-drag"
               automaticallyAdjustKeyboardInsets={true}
-              contentContainerStyle={{ paddingBottom: 300 }}>
+              contentContainerStyle={{ paddingBottom: Platform.OS === 'web' ? 32 : 300 }}>
               {lockedMechanic ? (
                 <View style={styles.lockedMechanicRow}>
                   <View style={styles.selectedMechanicAvatar}>
@@ -672,7 +672,9 @@ export default function CreateJobModal({ visible, onClose, vehicles, userId, loc
 
 const styles = StyleSheet.create({
   modal: { flex: 1, backgroundColor: COLORS.background },
-  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: SPACING.lg, paddingTop: 60, backgroundColor: COLORS.white, borderBottomWidth: 1, borderBottomColor: COLORS.background },
+  webModalOverlay: { justifyContent: 'center', alignItems: 'center', padding: 24, backgroundColor: 'rgba(11,18,32,0.38)' },
+  webModal: { width: '100%', maxWidth: 760, height: '90%', borderRadius: 20, overflow: 'hidden' },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: SPACING.lg, paddingTop: PAGE_HEADER_TOP_PADDING, backgroundColor: COLORS.white, borderBottomWidth: 1, borderBottomColor: COLORS.background },
   backRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   modalTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.text },
   modalBody: { padding: SPACING.lg },

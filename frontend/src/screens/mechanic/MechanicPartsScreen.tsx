@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { COLORS, SPACING, FONT_SIZES, RADIUS } from '../../constants';
+import { COLORS, PAGE_HEADER_TOP_PADDING, SPACING, FONT_SIZES, RADIUS } from '../../constants';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   StatusBar, RefreshControl, ActivityIndicator, Modal, TextInput,
@@ -557,11 +557,11 @@ export default function MechanicPartsScreen({ navigation }: any) {
 }
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
-  header: { paddingTop: 60, paddingBottom: SPACING.lg, paddingHorizontal: SPACING.lg, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
+  header: { paddingTop: PAGE_HEADER_TOP_PADDING, paddingBottom: SPACING.lg, paddingHorizontal: SPACING.lg, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
   headerTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.white },
   fab: { position: 'absolute', right: SPACING.lg, bottom: 110, borderRadius: 28, shadowColor: COLORS.black, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 8 },
   fabGradient: { width: 56, height: 56, borderRadius: 28, justifyContent: 'center', alignItems: 'center' },
-  list: { flex: 1, padding: SPACING.lg },
+  list: { flex: 1, width: '100%', maxWidth: 1080, alignSelf: 'center', padding: SPACING.lg },
   partCard: { backgroundColor: COLORS.white, borderRadius: RADIUS.md, padding: SPACING.md, marginBottom: SPACING.md, shadowColor: COLORS.black, shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 },
   partCardRow: { flexDirection: 'row', gap: SPACING.md, marginBottom: 8, alignItems: 'center' },
   partThumb: { width: 64, height: 64, borderRadius: RADIUS.md },
@@ -589,10 +589,10 @@ const styles = StyleSheet.create({
   addFirstBtn: { marginTop: 8, paddingHorizontal: 24, paddingVertical: 12, backgroundColor: COLORS.accent, borderRadius: RADIUS.md },
   addFirstBtnText: { fontSize: FONT_SIZES.md, fontWeight: '600', color: COLORS.accentInk },
   modal: { flex: 1, backgroundColor: COLORS.background },
-  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: SPACING.lg, paddingTop: 60, backgroundColor: COLORS.white, borderBottomWidth: 1, borderBottomColor: COLORS.background },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: SPACING.lg, paddingTop: PAGE_HEADER_TOP_PADDING, backgroundColor: COLORS.white, borderBottomWidth: 1, borderBottomColor: COLORS.background },
   modalTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.text },
   modalSubtitle: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, marginTop: 2 },
-  modalBody: { padding: SPACING.lg },
+  modalBody: { width: '100%', maxWidth: 760, alignSelf: 'center', padding: SPACING.lg },
   label: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.text, marginBottom: 6, marginTop: 14 },
   input: { backgroundColor: COLORS.white, borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.border, padding: 12, fontSize: FONT_SIZES.md, color: COLORS.text },
   textArea: { height: 80, textAlignVertical: 'top' },

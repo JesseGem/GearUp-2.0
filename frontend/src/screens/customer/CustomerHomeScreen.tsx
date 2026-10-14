@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { COLORS, FONT_FAMILY, JOB_STATUS_COLORS, SPACING, FONT_SIZES, RADIUS } from '../../constants';
+import { APP_CONTENT_MAX_WIDTH, COLORS, FONT_FAMILY, JOB_STATUS_COLORS, PAGE_HEADER_TOP_PADDING, SPACING, FONT_SIZES, RADIUS } from '../../constants';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  StatusBar, RefreshControl, ActivityIndicator, Alert, Animated, Dimensions, FlatList, Image
+  StatusBar, RefreshControl, ActivityIndicator, Alert, Animated, FlatList, Image, useWindowDimensions
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -13,8 +13,6 @@ import { vehicleService } from '../../services/vehicleService';
 import { paymentService } from '../../services/paymentService';
 import { userService } from '../../services/userService';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const CARD_WIDTH = SCREEN_WIDTH - SPACING.lg * 2;
 const AUTO_SWIPE_INTERVAL = 4500;
 
 const VEHICLE_ICONS: Record<string, any> = {
@@ -46,6 +44,8 @@ type UpdateCardData = {
 };
 
 export default function CustomerHomeScreen({ navigation }: any) {
+  const { width: viewportWidth } = useWindowDimensions();
+  const cardWidth = Math.min(viewportWidth, APP_CONTENT_MAX_WIDTH) - SPACING.lg * 2;
   const { user } = useSelector((state: RootState) => state.auth);
   const [jobs, setJobs] = useState<any[]>([]);
   const [vehicles, setVehicles] = useState<any[]>([]);
@@ -197,7 +197,7 @@ const [updates, setUpdates] = useState<UpdateCardData[]>([]);
   };
 
   const onUpdateScrollEnd = (e: any) => {
-    const newIndex = Math.round(e.nativeEvent.contentOffset.x / (CARD_WIDTH + SPACING.sm));
+    const newIndex = Math.round(e.nativeEvent.contentOffset.x / (cardWidth + SPACING.sm));
     setUpdateIndex(newIndex);
     startAutoTimer();
   };
@@ -260,7 +260,7 @@ const [updates, setUpdates] = useState<UpdateCardData[]>([]);
                 keyExtractor={item => item.key}
                 horizontal
                 pagingEnabled={false}
-                snapToInterval={CARD_WIDTH + SPACING.sm}
+                snapToInterval={cardWidth + SPACING.sm}
                 decelerationRate="fast"
                 showsHorizontalScrollIndicator={false}
                 onMomentumScrollEnd={onUpdateScrollEnd}
@@ -268,7 +268,7 @@ const [updates, setUpdates] = useState<UpdateCardData[]>([]);
                 ItemSeparatorComponent={() => <View style={{ width: SPACING.sm }} />}
                 renderItem={({ item }) => (
                   <TouchableOpacity
-                    style={[styles.updateCard, { backgroundColor: item.bg, width: CARD_WIDTH }]}
+                    style={[styles.updateCard, { backgroundColor: item.bg, width: cardWidth }]}
                     activeOpacity={0.85}
                     onPress={item.onPress}>
                     <View style={[styles.updateIconWrap, { backgroundColor: COLORS.white }]}>
@@ -414,7 +414,7 @@ const [updates, setUpdates] = useState<UpdateCardData[]>([]);
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
-  header: { paddingTop: 60, paddingBottom: SPACING.xl, paddingHorizontal: SPACING.lg, borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
+  header: { paddingTop: PAGE_HEADER_TOP_PADDING, paddingBottom: SPACING.xl, paddingHorizontal: SPACING.lg, borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
   headerContent: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACING.lg },
   greeting: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.white, fontFamily: FONT_FAMILY.headingBold },
   subGreeting: { fontSize: FONT_SIZES.sm, color: COLORS.darkTextSecondary, marginTop: 2, fontFamily: FONT_FAMILY.body },

@@ -79,7 +79,7 @@ export default function ConfirmDialog(props: ConfirmDialogProps) {
 
 const styles = StyleSheet.create({
   overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: SPACING.xl },
-  card: { backgroundColor: COLORS.white, borderRadius: RADIUS.lg, padding: SPACING.xl, width: '100%', alignItems: 'center' },
+  card: { backgroundColor: COLORS.white, borderRadius: RADIUS.lg, padding: SPACING.xl, width: '100%', maxWidth: 480, alignSelf: 'center', alignItems: 'center' },
   iconWrap: { width: 60, height: 60, borderRadius: 30, justifyContent: 'center', alignItems: 'center', marginBottom: SPACING.md },
   title: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.text, marginBottom: 8, textAlign: 'center', fontFamily: FONT_FAMILY.headingBold },
   message: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, textAlign: 'center', lineHeight: 20, marginBottom: SPACING.xl, fontFamily: FONT_FAMILY.body },

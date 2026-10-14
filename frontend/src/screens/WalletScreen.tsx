@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { COLORS, SPACING, FONT_SIZES, RADIUS } from '../constants';
+import { COLORS, PAGE_HEADER_TOP_PADDING, SPACING, FONT_SIZES, RADIUS } from '../constants';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   StatusBar, RefreshControl, ActivityIndicator, Alert
@@ -163,7 +163,7 @@ export default function WalletScreen({ navigation }: any) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
-  header: { paddingTop: 60, paddingBottom: SPACING.xl, paddingHorizontal: SPACING.lg, alignItems: 'center', borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
+  header: { paddingTop: PAGE_HEADER_TOP_PADDING, paddingBottom: SPACING.xl, paddingHorizontal: SPACING.lg, alignItems: 'center', borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
   headerTopRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginBottom: SPACING.md },
   backBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.2)', justifyContent: 'center', alignItems: 'center' },
   headerTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.white },

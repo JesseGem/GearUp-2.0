@@ -10,6 +10,7 @@ import {
   Modal,
   KeyboardAvoidingView,
   Platform,
+  useWindowDimensions,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -26,6 +27,8 @@ const getRoleTab = (role?: string) => {
 };
 
 export default function OtpScreen({ route, navigation }: any) {
+  const { width } = useWindowDimensions();
+  const isDesktop = Platform.OS === 'web' && width >= 768;
   const dispatch = useDispatch<AppDispatch>();
 const { loading, error, user } = useSelector((state: RootState) => state.auth);
   const { mode = 'register', name, email, phone, password, role } = route.params;
@@ -158,7 +161,7 @@ const { loading, error, user } = useSelector((state: RootState) => state.auth);
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={[styles.container, isDesktop && styles.desktopContainer]}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       {/* Back button */}
@@ -185,7 +188,7 @@ const { loading, error, user } = useSelector((state: RootState) => state.auth);
         <Ionicons name="arrow-back" size={22} color={COLORS.primary} />
       </TouchableOpacity>
 
-      <View style={styles.inner}>
+      <View style={[styles.inner, isDesktop && styles.desktopInner]}>
         {/* Icon */}
         <LinearGradient
           colors={[COLORS.accent, COLORS.primary]}
@@ -295,6 +298,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
   },
+  desktopContainer: { justifyContent: 'center', padding: 24 },
   backBtn: {
     position: 'absolute',
     top: 16,
@@ -318,6 +322,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: SPACING.lg,
   },
+  desktopInner: { flex: 0, width: '100%', maxWidth: 480, alignSelf: 'center', padding: 32, backgroundColor: COLORS.white, borderRadius: RADIUS.lg, shadowColor: COLORS.black, shadowOffset: { width: 0, height: 12 }, shadowOpacity: 0.14, shadowRadius: 28, elevation: 12 },
 
   // Icon
   iconCircle: {

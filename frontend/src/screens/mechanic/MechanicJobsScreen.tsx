@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { COLORS, JOB_STATUS_COLORS, SPACING, FONT_SIZES, RADIUS } from '../../constants';
+import { COLORS, JOB_STATUS_COLORS, PAGE_HEADER_TOP_PADDING, SPACING, FONT_SIZES, RADIUS } from '../../constants';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   StatusBar, RefreshControl, ActivityIndicator, Alert, Modal, TextInput,
@@ -483,14 +483,14 @@ export default function MechanicJobsScreen({ navigation }: any) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
-  header: { paddingTop: 60, paddingBottom: SPACING.lg, paddingHorizontal: SPACING.lg, borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
+  header: { paddingTop: PAGE_HEADER_TOP_PADDING, paddingBottom: SPACING.lg, paddingHorizontal: SPACING.lg, borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
   headerTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.white },
   tabs: { paddingHorizontal: SPACING.lg, paddingVertical: SPACING.sm, backgroundColor: COLORS.white, maxHeight: 52 },
   tab: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 8, borderRadius: RADIUS.full, marginRight: 8, backgroundColor: COLORS.background },
   tabActive: { backgroundColor: ACCENT },
   tabText: { fontSize: FONT_SIZES.xs, fontWeight: '600', color: COLORS.textSecondary },
   tabTextActive: { color: COLORS.white },
-  list: { flex: 1, padding: SPACING.lg },
+  list: { flex: 1, width: '100%', maxWidth: 1080, alignSelf: 'center', padding: SPACING.lg },
   sectionHeaderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: SPACING.md, marginBottom: SPACING.sm },
   sectionHeader: { fontSize: FONT_SIZES.sm, fontWeight: '800', color: COLORS.textSecondary, textTransform: 'uppercase', letterSpacing: 0.5 },
   sectionHeaderRight: { flexDirection: 'row', alignItems: 'center', gap: 6 },

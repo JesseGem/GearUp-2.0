@@ -31,7 +31,7 @@ export default function SplashScreen() {
           styles.content,
           { opacity: fadeAnim, transform: [{ scale: scaleAnim }] },
         ]}>
-        <BrandLogo appearance="dark" width={220} />
+        <BrandLogo appearance="light" width={220} />
         <Text style={styles.tagline}>Your mechanic, wherever you are.</Text>
       </Animated.View>
     </LinearGradient>

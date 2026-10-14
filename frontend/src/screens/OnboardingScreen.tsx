@@ -1,14 +1,12 @@
-import { COLORS } from '../constants';
+import { APP_CONTENT_MAX_WIDTH, COLORS } from '../constants';
 // This is the Onboarding screens
 import React, { useState, useRef } from 'react';
 import {
   View, Text, StyleSheet, StatusBar, TouchableOpacity,
-  Dimensions, Animated
+  Animated, Platform, useWindowDimensions
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-
-const { width } = Dimensions.get('window');
 
 const SLIDES = [
   {
@@ -48,13 +46,15 @@ const SLIDES = [
   },
 ];
 
-const ACCENT_INPUT_RANGE = SLIDES.map((_, i) => i * width);
 const ACCENT_COLORS = SLIDES.map(s => s.accent);
 const DARK_COLORS = SLIDES.map(s => s.colors[0]);
 
 const AnimatedIonicons = Animated.createAnimatedComponent(Ionicons);
 
 export default function OnboardingScreen({ navigation }: any) {
+  const { width: viewportWidth } = useWindowDimensions();
+  const width = Math.min(viewportWidth, APP_CONTENT_MAX_WIDTH);
+  const accentInputRange = SLIDES.map((_, i) => i * width);
   const [index, setIndex] = useState(0);
   const listRef = useRef<Animated.FlatList>(null);
   const scrollX = useRef(new Animated.Value(0)).current;
@@ -70,11 +70,11 @@ export default function OnboardingScreen({ navigation }: any) {
   }, []);
 
   const accentColor = scrollX.interpolate({
-    inputRange: ACCENT_INPUT_RANGE,
+    inputRange: accentInputRange,
     outputRange: ACCENT_COLORS,
   });
   const darkColor = scrollX.interpolate({
-    inputRange: ACCENT_INPUT_RANGE,
+    inputRange: accentInputRange,
     outputRange: DARK_COLORS,
   });
 
@@ -234,7 +234,7 @@ export default function OnboardingScreen({ navigation }: any) {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  topRow: { position: 'absolute', top: 60, left: 20, right: 20, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', zIndex: 2 },
+  topRow: { position: 'absolute', top: Platform.OS === 'web' ? 24 : 60, left: 20, right: 20, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', zIndex: 2 },
   navChip: { width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.15)', justifyContent: 'center', alignItems: 'center' },
   navChipHidden: { opacity: 0 },
   skipBtn: { padding: 8 },

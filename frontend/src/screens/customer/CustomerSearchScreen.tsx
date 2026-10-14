@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { COLORS, SPACING, FONT_SIZES, RADIUS } from '../../constants';
+import { COLORS, PAGE_HEADER_TOP_PADDING, SPACING, FONT_SIZES, RADIUS } from '../../constants';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   StatusBar, TextInput, ActivityIndicator, Alert, Linking, Modal, Platform, Animated, Image
@@ -770,7 +770,7 @@ export default function CustomerSearchScreen({ navigation }: any) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
-  header: { paddingTop: 60, paddingBottom: SPACING.lg, paddingHorizontal: SPACING.lg, gap: SPACING.md, borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
+  header: { paddingTop: PAGE_HEADER_TOP_PADDING, paddingBottom: SPACING.lg, paddingHorizontal: SPACING.lg, gap: SPACING.md, borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
   headerTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.white },
   searchBar: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.white, borderRadius: RADIUS.md, paddingHorizontal: SPACING.md, height: 46, gap: 8 },
   searchInput: { flex: 1, fontSize: FONT_SIZES.md, color: COLORS.text },
@@ -801,7 +801,7 @@ const styles = StyleSheet.create({
   subTabBtnActive: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
   subTabText: { fontSize: FONT_SIZES.sm, fontWeight: '600', color: COLORS.textSecondary },
   subTabTextActive: { color: COLORS.white },
-  list: { flex: 1, padding: SPACING.lg },
+  list: { flex: 1, width: '100%', maxWidth: 1080, alignSelf: 'center', padding: SPACING.lg },
   resultsCount: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, marginBottom: SPACING.md },
   mechanicCard: { backgroundColor: COLORS.white, borderRadius: RADIUS.md, padding: SPACING.md, marginBottom: SPACING.md, shadowColor: COLORS.black, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 },
   cardHeader: { flexDirection: 'row', alignItems: 'center', gap: SPACING.md, marginBottom: 8 },
@@ -826,8 +826,8 @@ const styles = StyleSheet.create({
   emptyIconWrap: { width: 72, height: 72, borderRadius: 36, backgroundColor: COLORS.background, justifyContent: 'center', alignItems: 'center', marginBottom: 4 },
   emptyText: { fontSize: FONT_SIZES.lg, fontWeight: '600', color: COLORS.text },
   emptySubtext: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, textAlign: 'center', paddingHorizontal: 40 },
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
-  modalSheet: { backgroundColor: COLORS.white, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: SPACING.lg, paddingBottom: 40 },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: Platform.OS === 'web' ? 'center' : 'flex-end', alignItems: 'center', padding: Platform.OS === 'web' ? SPACING.lg : 0 },
+  modalSheet: { width: '100%', maxWidth: 520, backgroundColor: COLORS.white, borderTopLeftRadius: 24, borderTopRightRadius: 24, borderRadius: Platform.OS === 'web' ? 24 : 0, padding: SPACING.lg, paddingBottom: 40 },
   modalHandle: { width: 40, height: 4, borderRadius: 2, backgroundColor: COLORS.border, alignSelf: 'center', marginBottom: SPACING.md },
   modalTitle: { fontSize: FONT_SIZES.lg, fontWeight: '700', color: COLORS.text, textAlign: 'center' },
   modalSubtitle: { fontSize: FONT_SIZES.sm, color: COLORS.textSecondary, textAlign: 'center', marginTop: 4, marginBottom: SPACING.lg },
@@ -847,10 +847,10 @@ const styles = StyleSheet.create({
   partCardPrice: { fontSize: FONT_SIZES.md, fontWeight: '700', color: COLORS.primary, marginTop: 4 },
   requestedBadge: { position: 'absolute', top: 8, left: 8, flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: COLORS.primary, paddingHorizontal: 8, paddingVertical: 3, borderRadius: RADIUS.full },
   requestedBadgeText: { fontSize: 10, fontWeight: '700', color: COLORS.white },
-  detailModal: { flex: 1, backgroundColor: COLORS.background },
-  detailModalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: SPACING.lg, paddingTop: 60, backgroundColor: COLORS.white, borderBottomWidth: 1, borderBottomColor: COLORS.background },
+  detailModal: { flex: 1, width: '100%', maxWidth: Platform.OS === 'web' ? 860 : undefined, alignSelf: 'center', backgroundColor: COLORS.background },
+  detailModalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: SPACING.lg, paddingTop: PAGE_HEADER_TOP_PADDING, backgroundColor: COLORS.white, borderBottomWidth: 1, borderBottomColor: COLORS.background },
   detailModalTitle: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.text },
-  detailModalBody: { padding: SPACING.lg },
+  detailModalBody: { width: '100%', maxWidth: 760, alignSelf: 'center', padding: SPACING.lg },
   detailImage: { width: '100%', height: 220, borderRadius: RADIUS.md, backgroundColor: COLORS.background, marginBottom: SPACING.md },
   detailImagePlaceholder: { width: '100%', height: 220, borderRadius: RADIUS.md, backgroundColor: COLORS.background, justifyContent: 'center', alignItems: 'center', marginBottom: SPACING.md },
   detailName: { fontSize: FONT_SIZES.xl, fontWeight: '700', color: COLORS.text },

@@ -8,7 +8,7 @@ import RootNavigator from './src/navigation';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { Platform } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import {
@@ -21,7 +21,7 @@ import {
   SpaceGrotesk_500Medium,
   SpaceGrotesk_700Bold,
 } from '@expo-google-fonts/space-grotesk';
-import { FONT_FAMILY } from './src/constants';
+import { APP_CONTENT_MAX_WIDTH, COLORS, FONT_FAMILY } from './src/constants';
 
 if (Platform.OS !== 'web') {
   SplashScreen.preventAutoHideAsync().catch((error: unknown) => {
@@ -52,13 +52,21 @@ export default function App() {
   if (!fontsLoaded && !fontError) return null;
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={styles.viewport}>
       <SafeAreaProvider>
-        <Provider store={store}>
-          <StatusBar style="auto" />
-          <RootNavigator />
-        </Provider>
+        <View style={[styles.frame, Platform.OS === 'web' && styles.webFrame]}>
+          <Provider store={store}>
+            <StatusBar style="auto" />
+            <RootNavigator />
+          </Provider>
+        </View>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );
 }
+
+const styles = StyleSheet.create({
+  viewport: { flex: 1, width: '100%', backgroundColor: COLORS.background },
+  frame: { flex: 1, width: '100%', backgroundColor: COLORS.background },
+  webFrame: { maxWidth: APP_CONTENT_MAX_WIDTH, alignSelf: 'center' },
+});
